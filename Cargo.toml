@@ -1,0 +1,35 @@
+[package]
+name = "ros2_bevy"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = { version = "0.10.0", features = ["dynamic_linking"] }
+rand = "0.8.5"
+bevy_mod_picking = "0.12.0"
+bevy_flycam = "*"
+bevy_fly_camera = "0.10.0"
+bevy-inspector-egui = "0.18.3"
+
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
+
+[dependencies.bevy_kira_audio]
+version = "0.15"
+# `ogg` format support is enabled by default, disable if you don't want it
+default-features = false
+# enable the features you care about
+features = [
+  "wav",
+  "flac",
+  "mp3",
+  "ogg",
+]
