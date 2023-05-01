@@ -1,56 +1,32 @@
-mod camera;
-mod inspector;
-
-
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use camera::DefaultCamera;
-use inspector::InspectorPlugin;
+mod body;
 
 
 use bevy::prelude::*;
-use bevy::input::common_conditions::*;
+use bevy_flycam::PlayerPlugin;
+use bevy_rapier3d::prelude::*;
+use bevy_obj::*;
+
+//use crate::body::cube::components::*;
+use crate::body::robot::components::*;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugin(DefaultCamera)
-        .add_plugin(
-            WorldInspectorPlugin::default().run_if(input_toggle_active(true, KeyCode::Escape)),
-        )
-        // Startup systems
-        .add_startup_system(setup)
-        
+        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
+        .add_plugin(RapierDebugRenderPlugin::default())
+        .add_plugin(PlayerPlugin)
+        .add_plugin(RobotPlugin)
+        //.add_plugin(CubePlugin)
+        .add_plugin(ObjPlugin) // for loading obj meshes
+        //.add_startup_system(setup_graphics)
+        .add_startup_system(setup_physics)
         .run();
 }
 
-/// set up a simple 3D scene
-fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    // plane
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(shape::Plane::from_size(5.0).into()),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        ..default()
-    });
-    // cube
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-        material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        ..default()
-    });
-    // light
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            intensity: 1500.0,
-            shadows_enabled: true,
-            ..default()
-        },
-        transform: Transform::from_xyz(4.0, 8.0, 4.0),
-        ..default()
-    });
-    
+fn setup_physics(mut commands: Commands) {
+    /* Create the ground. */
+    commands
+        .spawn(Collider::cuboid(100.0, 0.1, 100.0))
+        .insert(TransformBundle::from(Transform::from_xyz(0.0, -2.0, 0.0)));
+
 }

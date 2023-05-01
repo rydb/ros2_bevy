@@ -12,6 +12,13 @@ bevy_mod_picking = "0.12.0"
 bevy_flycam = "*"
 bevy_fly_camera = "0.10.0"
 bevy-inspector-egui = "0.18.3"
+rapier3d = "0.17.2"
+bevy_rapier3d = "0.21.0"
+bevy_obj = "0.10.0"
+urdf-rs = "0.6.9"
+bevy_common_assets = {version = "0.6.0", features = ["xml"] }
+serde = "1.0.160"
+bevy_asset_loader = "0.16.0"
 
 
 # Enable a small amount of optimization in debug mode
@@ -33,3 +40,7 @@ features = [
   "mp3",
   "ogg",
 ]
+
+[build]
+rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+#stuff to fix compile speed for rust, major cause of low speed is linking, and this linker should be faster?

@@ -4,11 +4,7 @@ mod components;
 use bevy::prelude::*;
 
 
-use bevy_fly_camera::FlyCameraPlugin;
-use bevy_flycam::PlayerPlugin;
-use bevy_flycam::MovementSettings;
-use bevy_flycam::KeyBindings;
-
+use bevy_flycam::*;
 use systems::*;
 use components::*;
 
@@ -18,11 +14,20 @@ pub struct DefaultCamera;
 impl Plugin for DefaultCamera {
     fn build(&self, app: &mut App) {
         app 
-        .add_plugin(FlyCameraPlugin)
-        .add_startup_system(spawn_fly_camera)
+        .add_plugin(PlayerPlugin)
+        .insert_resource(MovementSettings {
+            sensitivity: 0.00015, // default: 0.00012
+            speed: 12.0, // default: 12.0
+        })
+        .insert_resource(KeyBindings {
+            move_ascend: KeyCode::E,
+            move_descend: KeyCode::Q,
+            ..Default::default()
+        })
         ;
         //Startup Systems
         //.add_startup_system(spawn_camera)
         //;
     }
 }
+

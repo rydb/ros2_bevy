@@ -1,22 +1,25 @@
 ## ros2_bevy
 
-A simulation alternative to gazebo based on the bevy game engine:
+An experimental simulation alternative to gazebo based on the bevy game engine + Rapier:
 
 ## Purpose
 
-This purpose of tool is simulate ROS2 with the benefits of Rust as the backbone of simulation.
+This purpose of tool is simulate ROS2 with physics and act as a proof of concept alternative to Gazebo.
 
-## Reasons to use ros2_bevy over Gazebo:
+## Main features
 
-gazebo is legacy, and has alot of tutorials for it, however, here are some reasons to use this over gazebo:
-
-- C++ is a miserable language to use, and the experience of C++ translates to using Gazebo as well. You need to deal with Cmake, with apt dependencies, and the headache that is header files. rust dependencies are automatically pulled from cargo, and that should extend to this tool as it expands. 
-
-
-- Interfacing with gazebo means interfacing with string literals that change every update. 
+- urdf -> to ready to simulate model. No .sdf! No console! no sourcing! # TODO
+- Rust based
+- differential drive plugin proof of concept plugin # TODO
 
 
-Here is how you set the enviorment variables which state where your models are stored(on linux) across three different updates
+## Why ros2_bevy and not Gazebo?
+Gazebo has <X> key issues:
+-  .sdf, the file format that are used for saving/loading information about the "world", are something edited by the User, and not the simulator.
+  
+    Save files are not something a user should have to manage. ROS2_bevy will ideally allow you to edit models directly through Rust via bevy's ECS.
+
+-  Gazebo changes naming conventions frequently, and quietly. Below is how you tell gazebo which directory you've stored a model's meshes in for 3 of the most recent versions Gazebo Ignition.
 
 ```bash
 # Gazebo Gaarden
@@ -28,3 +31,9 @@ export GAZEBO_RESOURCE_PATH=<path_to_model_dir>:
 # Gazebo Fortress
 export IGN_GAZEBO_RESOURCE_PATH=<path_to_model_dir>:
 ```
+
+- When bevy or this simulator updates, Rust will show you errors at compile time to tell you what broke at what line. In order to discover which plugin, or which PATH broke/changed for Gazebo, you will have to discover that at runtime.
+
+- ROS2_bevy uses Rust. Rust is easier to write code for, Rust code is easier to maintain, Rust is easier to add external dependencies to via cargo, Rust doesn't use Cmake. So on and so forth. 
+
+
