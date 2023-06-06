@@ -1,21 +1,73 @@
-use bevy::prelude::*;
-use bevy_asset_loader::prelude::AssetCollectionApp;
-use bevy_common_assets::xml::XmlAssetPlugin;
-use crate::body::robot::resources::*;
-use crate::body::robot::systems::*;
+use serde::{Deserialize, Serialize};
+use std::path::Path;
+use std::convert::From;
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "bevy", derive(Component))]
+pub enum AssetSource {
+    Local(String),
+    Remote(String),
+    Search(String),
+    Bundled(String),
+    Package(String),
+}
 
-pub const BOT_URDF: &str = "urdf/diff_bot.xml";
+impl AssetSource {
+    pub fn label(&self) -> &str {
+        match self {
+            Self::Local(_) => "Local",
+            Self::Remote(_) => "Remote",
+            Self::Search(_) => "Search",
+            Self::Bundled(_) => "Bundled",
+            Self::Package(_) => "Package",
+        }
+    }
+}
 
-pub struct RobotPlugin;
+impl Default for AssetSource {
+    fn default() -> Self {
+        AssetSource::Local(String::new()).into()
+    }
+}
 
-impl Plugin for RobotPlugin {
-    fn build(&self, app: &mut App){
-        app
-        //.add_plugin(XmlAssetPlugin::<Urdf>::new(&["xml"]))
-        //.init_collection::<UrdfStuff>()
-        .add_startup_system(spawn_robot)
-        .add_startup_system(print_urdf)
-        ;
+// Utility functions to add / strip prefixes for using AssetSource in AssetIo objects
+impl From<&Path> for AssetSource {
+    fn from(path: &Path) -> Self {
+        if let Some(path) = path.to_str().and_then(|p| Some(String::from(p))) {
+            AssetSource::from(&path)
+        } else {
+            AssetSource::default()
+        }
+    }
+}
+
+// Utility functions to add / strip prefixes for using AssetSource in AssetIo objects
+impl From<&String> for AssetSource {
+    fn from(path: &String) -> Self {
+        // TODO(luca) pattern matching here would make sure unimplemented variants are a compile error
+        if let Some(path) = path.strip_prefix("rmf-server://").map(|p| p.to_string()) {
+            return AssetSource::Remote(path);
+        } else if let Some(path) = path.strip_prefix("file://").map(|p| p.to_string()) {
+            return AssetSource::Local(path);
+        } else if let Some(path) = path.strip_prefix("search://").map(|p| p.to_string()) {
+            return AssetSource::Search(path);
+        } else if let Some(path) = path.strip_prefix("bundled://").map(|p| p.to_string()) {
+            return AssetSource::Bundled(path);
+        } else if let Some(path) = path.strip_prefix("package://").map(|p| p.to_string()) {
+            return AssetSource::Package(path);
+        }
+        AssetSource::default()
+    }
+}
+
+impl From<&AssetSource> for String {
+    fn from(asset_source: &AssetSource) -> String {
+        match asset_source {
+            AssetSource::Remote(uri) => String::from("rmf-server://") + uri,
+            AssetSource::Local(filename) => String::from("file://") + filename,
+            AssetSource::Search(name) => String::from("search://") + name,
+            AssetSource::Bundled(name) => String::from("bundled://") + name,
+            AssetSource::Package(path) => /*String::from("package://") + */ path.to_owned(), //package part of papckage is not needed for now..
+        }
     }
 }
