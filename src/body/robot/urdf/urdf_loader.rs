@@ -8,18 +8,13 @@ use bevy::{
     utils::BoxedFuture,
 };
 
+use serde::Deserialize;
+
+use urdf_rs::Robot;
+
 use super::urdf_to_bevy::{UrdfRoot};
 
 use thiserror::Error;
-
-
-use serde::Deserialize;
-
-#[derive(Debug, Deserialize, TypeUuid)]
-#[uuid = "39cadc56-aa9c-4543-8640-a018b74b5052"]
-pub struct CustomAsset {
-    pub value: i32,
-}
 
 #[derive(Default)]
 pub struct UrdfLoader;
@@ -44,6 +39,14 @@ pub enum UrdfError {
     #[error("Failed to load Urdf")]
     ParsingError,
     //Io(#[from] std::io::Error),
+}
+
+//Robot that is spawned from UrdfRoot
+#[derive(Resource, Default)]
+#[cfg_attr(feature = "bevy", derive(Resource))]
+pub struct SpawnedRobot {
+    pub handle: Handle<UrdfRoot>,
+    pub printed: bool,
 }
 
 async fn load_urdf<'a, 'b>(

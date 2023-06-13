@@ -6,18 +6,18 @@ pub mod components;
 mod systems;
 pub mod resources;
 pub mod custom_asset_loader_test;
-mod urdf;
+pub mod urdf;
 
 use crate::body::robot::systems::*;
-
-
+use crate::robot::urdf::urdf_loader::*;
+use crate::robot::urdf::urdf_to_bevy::*;
 
 use bevy::prelude::*;
 use bevy_flycam::PlayerPlugin;
 use bevy_rapier3d::prelude::*;
 use bevy_obj::*;
 
-use self::{resources::CountDownTimer, custom_asset_loader_test::CustomAssetLoader};
+use self::{resources::CountDownTimer, custom_asset_loader_test::CustomAssetLoader, urdf::urdf_loader::UrdfLoader};
 
 /// plugin which contains all relevant asset loaders
 pub struct AssetLoadersPlugin;
@@ -26,6 +26,7 @@ impl Plugin for AssetLoadersPlugin {
     fn build(&self, app: &mut App) {
         app
         .add_asset_loader(CustomAssetLoader)
+        .add_asset_loader(UrdfLoader)
         ;
     }
 }
@@ -71,11 +72,18 @@ impl Plugin for FeatureTestPlugin {
         .add_plugin(BasePlateWorld)
 
         // resources
+        .init_resource::<SpawnedRobot>()
         .insert_resource(CountDownTimer::new(2))
-        .add_startup_system(spawn_cube)
-        .add_startup_system(spawn_robots_from_urdf)
-        .add_system(move_robot_forward)
-        .add_system(list_robots)
+
+        // Assets
+        .add_asset::<UrdfRoot>()
+        //.add_startup_system(spawn_cube)
+        //.add_startup_system(spawn_robots_from_urdf)
+        //.add_system(move_robot_forward)
+        //.add_system(list_robots)
+
+        .add_startup_system(setup_diff_bot)
+        .add_system(load_diff_bot)
         ;
     }
 }

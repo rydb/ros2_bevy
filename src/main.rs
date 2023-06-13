@@ -9,11 +9,12 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 //use crate::body::cube::components::*;
 use crate::body::robot::components::*;
 use crate::robot::custom_asset_loader_test::*;
+use crate::robot::urdf::urdf_loader::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins) //< --- bevy needs these in order to run
         .add_plugin(WorldInspectorPlugin::new())
-        // .init_resource::<body::robot::custom_asset_loader_test::State>()
+
         // .add_asset::<CustomAsset>()
         // .add_asset_loader(CustomAssetLoader)
         // .add_startup_system(setup)

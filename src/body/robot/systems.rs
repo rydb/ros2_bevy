@@ -7,7 +7,7 @@ use bevy_rapier3d::prelude::*;
 
 use crate::body::robot::{components::*, self};
 
-use super::resources::CountDownTimer;
+use super::{resources::CountDownTimer, urdf::{urdf_to_bevy::UrdfRoot, urdf_loader::SpawnedRobot}};
 
 /// NOTE: NAME OF BEVY ASSET FOLDER. SHOULD BE REPLACED BY PROPER ASSET LOADER LATER.
 pub const ASSET_FOLDER: &str = "assets/";
@@ -151,7 +151,27 @@ pub fn list_robots (
         //println!("{:#?}", robot.name)
     }
 }
+pub fn setup_diff_bot(
+    mut urdf: ResMut<SpawnedRobot>,
+    asset_server: Res<AssetServer>
+) {
+    urdf.handle = asset_server.load("diff_bot.xml");
+}
 
+/// Predicted steps:
+/// 1. load urdf
+/// 2. load all sub models
+/// 3.
+pub fn load_diff_bot(
+    mut urdf_state: ResMut<SpawnedRobot>,
+    urdf_assets: ResMut<Assets<UrdfRoot>>) {
+    
+    let urdf = urdf_assets.get(&urdf_state.handle); // urdf.handle = asset_server.load("diff_bot.xml");
+
+    println!("urdf is: {:#?}", urdf)
+
+
+}
 
 
 // moves all robots forward(knowing the total forces being exerted on the collider would be helpful? Mabye for establishing some kind of formula?)
