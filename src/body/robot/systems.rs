@@ -151,25 +151,40 @@ pub fn list_robots (
         //println!("{:#?}", robot.name)
     }
 }
-pub fn setup_diff_bot(
-    mut urdf: ResMut<SpawnedRobot>,
-    asset_server: Res<AssetServer>
-) {
-    urdf.handle = asset_server.load("diff_bot.xml");
-    println!("urdf is {:#?}", urdf)
-}
+// pub fn setup_diff_bot(
+//     mut urdf: ResMut<SpawnedRobot>,
+//     asset_server: Res<AssetServer>
+// ) {
+//     urdf.handle = asset_server.load("diff_bot.xml");
+//     println!("urdf is {:#?}", urdf)
+// }
+
+
+
 
 /// Predicted steps:
 /// 1. load urdf
 /// 2. load all sub models
 /// 3.
 pub fn load_diff_bot(
-    mut urdf_state: ResMut<SpawnedRobot>,
-    urdf_assets: ResMut<Assets<UrdfRoot>>) {
-    
-    let urdf = urdf_assets.get(&urdf_state.handle); // urdf.handle = asset_server.load("diff_bot.xml");
+    assets: Res<SpawnedRobot>,
+    // mut urdf_state: ResMut<SpawnedRobot>,
+    //asset_server: Res<AssetServer>,
+    urdf_assets: ResMut<Assets<UrdfRoot>>
+) {
+    //check to see if we can fetch urdf, if we can, proceed
+    match urdf_assets.get(&assets.urdf_handle) {
+        Some(urdf) => println!("urdf is {:#?}", urdf),
+        None => return//panic!("Failed to fetch urdf. Unable to retrieve urdf from handle, {:#?}", &urdf_state.handle)
+    }
+    println!("urdf is: {:#?}", assets.urdf_handle);
 
-    println!("urdf is: {:#?}", urdf.unwrap())
+    
+    // match urdf {
+    //     Some(v) => println!("urdf is {:#?}", urdf.unwrap()),
+    //     None => panic!("Failed to fetch urdf. Unable to retrieve urdf from the handle, {:#?} ", urdf_state.handle)
+    // }
+    //println!("urdf is: {:#?}", urdf.())
 
 
 }

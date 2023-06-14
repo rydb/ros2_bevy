@@ -16,6 +16,9 @@ use super::urdf_to_bevy::{UrdfRoot};
 
 use thiserror::Error;
 
+
+use bevy_asset_loader::prelude::*;
+
 #[derive(Default)]
 pub struct UrdfLoader;
 
@@ -41,12 +44,11 @@ pub enum UrdfError {
     //Io(#[from] std::io::Error),
 }
 
-//Robot that is spawned from UrdfRoot
-#[derive(Resource, Default, Debug)]
-#[cfg_attr(feature = "bevy", derive(Resource))]
+//Robot that is spawned from UrdfRoot(OLD)
+#[derive(Resource, Default, Debug, AssetCollection)]
 pub struct SpawnedRobot {
-    pub handle: Handle<UrdfRoot>,
-    pub printed: bool,
+    #[asset(path = "diff_bot.xml")]
+    pub urdf_handle: Handle<UrdfRoot>,
 }
 
 async fn load_urdf<'a, 'b>(
