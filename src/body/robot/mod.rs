@@ -21,48 +21,50 @@ use bevy_obj::*;
 
 use self::{resources::CountDownTimer, custom_asset_loader_test::CustomAssetLoader, urdf::urdf_loader::UrdfLoader};
 
-
 #[derive(Clone, Eq, PartialEq, Debug, Hash, Default, States)]
-enum MyStates {
+enum AssetLoaderStates {
     #[default]
     AssetLoading,
     Next,
 }
-
-/// plugin which contains all relevant asset loaders
+/// plugin which contains all relevant custom asset loaders + initializes/adds all relevant
+/// resources required to load them.
 pub struct AssetLoadersPlugin;
 
 impl Plugin for AssetLoadersPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_asset_loader(CustomAssetLoader)
-        .add_asset_loader(UrdfLoader)
+        .add_state::<AssetLoaderStates>()
+        .add_plugin(ObjPlugin) // .obj
+        .add_asset_loader(CustomAssetLoader) // for loading CustomAsset Example
+        
+        // urdf loading stuff
+        .add_asset_loader(UrdfLoader) // Enables loading urdfs via `UrdfRoot` Supports .xml (TODO) Add .urdf support?
+        .init_resource::<SpawnedRobot>()
+        .add_asset::<UrdfRoot>()
+        .add_loading_state(
+            LoadingState::new(AssetLoaderStates::AssetLoading).continue_to_state(AssetLoaderStates::Next)
+        )
+        .add_collection_to_loading_state::<_, SpawnedRobot>(AssetLoaderStates::AssetLoading)
+        .add_system(load_diff_bot.in_schedule(OnEnter(AssetLoaderStates::Next)))
+        
         ;
     }
 }
 
-
-/// plugins for creating a base plate world. 
 pub struct BasePlateWorld;
 
 impl Plugin for BasePlateWorld {
     fn build(&self, app: &mut App) {
         app
-        .add_state::<MyStates>()
-        .add_asset::<UrdfRoot>()
+        .add_plugin(AssetLoadersPlugin)
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
         .add_plugin(RapierDebugRenderPlugin::default())
         .add_plugin(PlayerPlugin)
-        .add_plugin(AssetLoadersPlugin)
-        .add_loading_state(
-            LoadingState::new(MyStates::AssetLoading).continue_to_state(MyStates::Next)
-        )
-        .add_collection_to_loading_state::<_, SpawnedRobot>(MyStates::AssetLoading)
-        .add_system(load_diff_bot.in_schedule(OnEnter(MyStates::Next)))
+
 
         
         //.add_plugin(CubePlugin)
-        .add_plugin(ObjPlugin) // for loading obj meshes
         .add_startup_system(setup_physics)
         ;
     }
@@ -88,7 +90,6 @@ impl Plugin for FeatureTestPlugin {
         .add_plugin(BasePlateWorld)
 
         // resources
-        .init_resource::<SpawnedRobot>()
         .insert_resource(CountDownTimer::new(2))
 
         // Assets
