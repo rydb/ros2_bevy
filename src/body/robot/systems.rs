@@ -156,6 +156,7 @@ pub fn setup_diff_bot(
     asset_server: Res<AssetServer>
 ) {
     urdf.handle = asset_server.load("diff_bot.xml");
+    println!("urdf is {:#?}", urdf)
 }
 
 /// Predicted steps:
@@ -168,7 +169,7 @@ pub fn load_diff_bot(
     
     let urdf = urdf_assets.get(&urdf_state.handle); // urdf.handle = asset_server.load("diff_bot.xml");
 
-    println!("urdf is: {:#?}", urdf)
+    println!("urdf is: {:#?}", urdf.unwrap())
 
 
 }

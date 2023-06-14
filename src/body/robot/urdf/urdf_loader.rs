@@ -29,7 +29,7 @@ impl AssetLoader for UrdfLoader {
     }
 
     fn extensions(&self) -> &[&str] {
-        static EXTENSIONS: &[&str] = &["urdf"];
+        static EXTENSIONS: &[&str] = &["xml"];
         EXTENSIONS
     }
 }
@@ -42,7 +42,7 @@ pub enum UrdfError {
 }
 
 //Robot that is spawned from UrdfRoot
-#[derive(Resource, Default)]
+#[derive(Resource, Default, Debug)]
 #[cfg_attr(feature = "bevy", derive(Resource))]
 pub struct SpawnedRobot {
     pub handle: Handle<UrdfRoot>,
