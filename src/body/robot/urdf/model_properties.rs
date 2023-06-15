@@ -16,9 +16,7 @@
 */
 
 use super::recall::{Recall};
-#[cfg(feature = "bevy")]
 use bevy::prelude::*;
-use glam::{Quat, Vec2, Vec3};
 use serde::{Deserialize, Serialize};
 use bevy::prelude::{Deref, DerefMut};
 pub const DEFAULT_LEVEL_HEIGHT: f32 = 3.0;
@@ -126,13 +124,12 @@ impl RectFace {
 }
 
 // Removed `Serialized` and `Deserialize` macro here because its broken for glam::Vec3????
-#[derive(Deref, DerefMut, PartialEq, Clone, Debug)]
-#[cfg_attr(feature = "bevy", derive(Component))]
-pub struct Scale(pub Vec3);
+#[derive(Component, Deref, DerefMut, PartialEq, Clone, Debug)]
+pub struct Scale(pub glam::Vec3);
 
 impl Default for Scale {
     fn default() -> Self {
-        Self(Vec3::ONE)
+        Self(glam::Vec3::ONE)
     }
 }
 
@@ -249,7 +246,7 @@ impl Rotation {
     }
 }
 
-#[cfg(feature = "bevy")]
+//#[cfg(feature = "bevy")]
 impl Rotation {
     pub fn as_yaw(&self) -> Self {
         match self {
@@ -299,8 +296,7 @@ impl Default for Rotation {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
-#[cfg_attr(feature = "bevy", derive(Component))]
+#[derive(Component, Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub struct Pose {
     pub trans: [f32; 3],
     #[serde(default)]
@@ -316,7 +312,7 @@ impl Default for Pose {
     }
 }
 
-#[cfg(feature = "bevy")]
+//#[cfg(feature = "bevy")]
 impl Pose {
     pub fn transform(&self) -> Transform {
         Transform {

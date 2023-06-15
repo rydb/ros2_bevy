@@ -175,10 +175,8 @@ pub fn load_diff_bot(
     //check to see if we can fetch urdf, if we can, proceed
     match urdf_assets.get(&assets.urdf_handle) {
         Some(urdf) => println!("urdf is {:#?}", urdf),
-        None => return//panic!("Failed to fetch urdf. Unable to retrieve urdf from handle, {:#?}", &urdf_state.handle)
+        None => panic!("Failed to fetch urdf. Unable to retrieve urdf from handle, {:#?}", &assets.urdf_handle)
     }
-    println!("urdf is: {:#?}", assets.urdf_handle);
-
     
     // match urdf {
     //     Some(v) => println!("urdf is {:#?}", urdf.unwrap()),
