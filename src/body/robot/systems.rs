@@ -31,7 +31,7 @@ pub fn spawn_robots_from_urdf(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut asset_server: Res<AssetServer>,
 
-    mut model_query: Query<&Robot>,
+    mut model_query: Query<&BevyRobot>,
 ) {
     //fetch all entities which are robots, and spawn them from their urdfs.
     for robot in model_query.iter_mut() {
@@ -44,7 +44,8 @@ pub fn spawn_robots_from_urdf(
             + SOURCE_FOLDER_FOR_ROBOT //src dir
             + &robot.pkg_dir // pkg dir
             + URDF_FOLDER //urdf dir
-            + &robot.urdf_file) // urdf file + extension
+            //+ &robot.urdf_file
+        ) // urdf file + extension
         .to_str()
         .unwrap()
         .to_owned();
@@ -123,7 +124,7 @@ pub fn spawn_cube(
     mut materials: ResMut<Assets<StandardMaterial>>,
     assset_server: Res<AssetServer>,
 
-    model_query: Query<Entity, With<Robot>>,
+    model_query: Query<Entity, With<BevyRobot>>,
 ) {
     let cube = commands.spawn(
         ModelBundle::new(
@@ -144,21 +145,13 @@ pub fn spawn_cube(
             // },
 
 pub fn list_robots (
-    model_query: Query<&Robot>,
+    model_query: Query<&BevyRobot>,
 ) {
     //println!("current robots are: ");
     for robot in model_query.iter() {
         //println!("{:#?}", robot.name)
     }
 }
-// pub fn setup_diff_bot(
-//     mut urdf: ResMut<SpawnedRobot>,
-//     asset_server: Res<AssetServer>
-// ) {
-//     urdf.handle = asset_server.load("diff_bot.xml");
-//     println!("urdf is {:#?}", urdf)
-// }
-
 
 
 
@@ -167,6 +160,7 @@ pub fn list_robots (
 /// 2. load all sub models
 /// 3.
 pub fn load_diff_bot(
+    mut commands: Commands,
     assets: Res<SpawnedRobot>,
     // mut urdf_state: ResMut<SpawnedRobot>,
     //asset_server: Res<AssetServer>,
@@ -174,9 +168,16 @@ pub fn load_diff_bot(
 ) {
     //check to see if we can fetch urdf, if we can, proceed
     match urdf_assets.get(&assets.urdf_handle) {
-        Some(urdf) => println!("urdf is {:#?}", urdf),
+        Some(urdf) => commands.spawn
+        (
+    (
+                BevyRobot {name: "diff_bot".to_owned(), root_dir: "group_robot_ros2".to_owned(), pkg_dir: "model_pkg".to_owned()},
+                urdf.to_owned(),
+            )    
+            
+        )/*println!("urdf is {:#?}", urdf)*/,
         None => panic!("Failed to fetch urdf. Unable to retrieve urdf from handle, {:#?}", &assets.urdf_handle)
-    }
+    };
     
     // match urdf {
     //     Some(v) => println!("urdf is {:#?}", urdf.unwrap()),
@@ -190,7 +191,7 @@ pub fn load_diff_bot(
 
 // moves all robots forward(knowing the total forces being exerted on the collider would be helpful? Mabye for establishing some kind of formula?)
 pub fn move_robot_forward(
-    mut model_query: Query<&mut ExternalForce, With<Robot>>,
+    mut model_query: Query<&mut ExternalForce, With<BevyRobot>>,
     mut timer_query: ResMut<CountDownTimer>,
     time: Res<Time>,
     

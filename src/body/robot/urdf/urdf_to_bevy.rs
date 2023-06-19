@@ -5,10 +5,9 @@ use std::collections::{BTreeMap, HashSet};
 use std::io;
 
 use bevy::ecs::system::EntityCommands;
-use bevy::prelude::{Component, Deref, DerefMut, Entity, Bundle};
-use bevy::reflect::{TypeUuid};
-
-
+use bevy::prelude::*;
+use bevy::reflect::{TypeUuid, Reflect, };
+use bevy::ecs::reflect::*;
 
 use glam::Vec3;
 use serde::{Deserialize, Serialize};
@@ -106,6 +105,33 @@ pub enum MeshPrimitive {
 }
 
 impl MeshPrimitive {
+    /// returns the bevy mesh equivilent of this enum variant..
+    pub fn bevy_equiv(&self) -> Mesh{
+        match &self {
+            Self::Box { size } => Mesh::from(shape::Box {
+                min_x: -size[0], max_x: size[0],
+                min_y: -size[1], max_y: size[1],
+                min_z: -size[2], max_z: size[2],
+            }),
+            Self::Cylinder { radius, length} => Mesh::from(shape::Cylinder{
+                radius: *radius,
+                height: *length,
+                ..default()
+            }),
+            Self::Capsule { radius, length } => Mesh::from(shape::Capsule {
+                radius: *radius,
+                depth: *length, // this is probably not right... leaving this to not throw an error in case it is...
+                ..default()
+            }),
+            Self::Sphere { radius} => Mesh::from(shape::Capsule {
+                radius: *radius,
+                depth: 0.0, // a capsule is a sphere if there is no mid section, and the icosphere doesnt work for Mesh::from....
+                ..default()
+            }),
+
+        }
+    }
+
     pub fn label(&self) -> String {
         match &self {
             MeshPrimitive::Box { .. } => "Box",
@@ -116,6 +142,8 @@ impl MeshPrimitive {
         .to_string()
     }
 }
+
+
 
 #[derive(Component, Clone, Debug, Default, PartialEq)]
 pub struct RecallMeshPrimitive {
@@ -191,23 +219,34 @@ pub struct WorkcellVisualMarker;
 pub struct WorkcellCollisionMarker;
 
 #[derive(Serialize, Deserialize, Debug, Default, Clone)]
+//#[reflect(Resource, Default)]
 pub struct BevyModel {
     pub name: String,
+    //#[reflect(ignore)]
     pub geometry: Geometry,
+    //#[reflect(ignore)]
     pub pose: Pose,
 }
 
 impl BevyModel {
-    pub fn add_bevy_components(&self, mut commands: EntityCommands) {
+    pub fn add_bevy_components(&self, mut commands: EntityCommands, mesh_server: Res<Assets<Mesh>>) {
         match &self.geometry {
             Geometry::Primitive(primitive) => {
+                
+                
+                println!("primtive model detected, spawning");
                 commands.insert((
+                    PbrBundle {
+                         mesh: mesh_server.add(primitive.bevy_equiv()),
+                        ..default()
+                    },
                     primitive.clone(),
                     self.pose.clone(),
                     NameInWorkcell(self.name.clone()),
                 ));
             }
             Geometry::Mesh { filename, scale } => {
+                println!("mesh model detected, loading and spawning");
                 println!("Setting pose of {:?} to {:?}", filename, self.pose);
                 let scale = Scale(scale.unwrap_or_default());
                 // TODO(luca) Make a bundle for workcell models to avoid manual insertion here
@@ -310,84 +349,3 @@ impl From<&urdf_rs::Collision> for BevyModel {
     }
 }
 
-
-
-
-// #[derive(Serialize, Deserialize, Debug, Clone)]
-// pub enum Geometry {
-//     //#[serde(flatten)]
-//     Primitive(MeshPrimitive),
-//     Mesh {
-//         filename: String,
-//         //(TODO)Serializing/Deserializing doesn't seem to work for this field. Should eventually figure out why."
-//         #[serde(default, skip)]
-//         scale: Option<Vec3>,
-//     },
-// }
-
-// #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-// #[cfg_attr(feature = "bevy", derive(Component))]
-// pub enum MeshPrimitive {
-//     Box { size: [f32; 3] },
-//     Cylinder { radius: f32, length: f32 },
-//     Capsule { radius: f32, length: f32 },
-//     Sphere { radius: f32 },
-// }
-
-// impl From<&urdf_rs::Geometry> for Geometry {
-//     fn from(geom: &urdf_rs::Geometry) -> Self {
-//         match geom {
-//             urdf_rs::Geometry::Box { size } => Geometry::Primitive(MeshPrimitive::Box {
-//                 size: (**size).map(|f| f as f32),
-//             }),
-//             urdf_rs::Geometry::Cylinder { radius, length } => {
-//                 Geometry::Primitive(MeshPrimitive::Cylinder {
-//                     radius: *radius as f32,
-//                     length: *length as f32,
-//                 })
-//             }
-//             urdf_rs::Geometry::Capsule { radius, length } => {
-//                 Geometry::Primitive(MeshPrimitive::Capsule {
-//                     radius: *radius as f32,
-//                     length: *length as f32,
-//                 })
-//             }
-//             urdf_rs::Geometry::Sphere { radius } => Geometry::Primitive(MeshPrimitive::Sphere {
-//                 radius: *radius as f32,
-//             }),
-//             urdf_rs::Geometry::Mesh { filename, scale } => {
-//                 let scale = scale
-//                     .clone()
-//                     .and_then(|s| Some(Vec3::from_array(s.map(|v| v as f32))));
-//                 Geometry::Mesh {
-//                     filename: filename.clone(),
-//                     scale,
-//                 }
-//             }
-//         }
-//     }
-// }
-
-// pub struct BevyModel {
-//     pub name: String,
-//     pub geometry: Geometry,
-//     pub pose: Pose,
-// }
-
-
-
-// impl BevyModel {
-//     fn from_urdf_data(
-//         pose: &urdf_rs::Pose,
-//         name: &Option<String>,
-//         geometry: &urdf_rs::Geometry,
-//     ) -> Self {
-//         let trans = pose.xyz.map(|t| t as f32);
-//         let rot = Rotation::EulerExtrinsicXYZ(pose.rpy.map(|t| Angle::Rad(t as f32)));
-//         BevyModel {
-//             name: name.clone().unwrap_or_default(),
-//             geometry: geometry.into(),
-//             pose: Pose { trans, rot },
-//         }
-//     }
-// }

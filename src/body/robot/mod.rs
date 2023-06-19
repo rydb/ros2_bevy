@@ -11,13 +11,16 @@ pub mod custom_asset_loader_test;
 pub mod urdf;
 
 use crate::body::robot::systems::*;
-use crate::robot::urdf::urdf_loader::*;
-use crate::robot::urdf::urdf_to_bevy::*;
+use super::robot::urdf::urdf_loader::*;
+use super::robot::urdf::urdf_to_bevy::*;
 
 use bevy::prelude::*;
 use bevy_flycam::PlayerPlugin;
 use bevy_rapier3d::prelude::*;
 use bevy_obj::*;
+
+
+use super::robot::urdf::urdf_spawner::*;
 
 use self::{resources::CountDownTimer, custom_asset_loader_test::CustomAssetLoader, urdf::urdf_loader::UrdfLoader};
 
@@ -91,7 +94,7 @@ impl Plugin for FeatureTestPlugin {
 
         // resources
         .insert_resource(CountDownTimer::new(2))
-
+        .add_system(handle_new_urdf_roots)
         // Assets
         //.add_collection_to_loading_state::<UrdfRoot>()
         //.add_startup_system(spawn_cube)

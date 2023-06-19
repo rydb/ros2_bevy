@@ -1,15 +1,9 @@
 mod body;
 
 use bevy::prelude::*;
-use bevy_flycam::PlayerPlugin;
-use bevy_rapier3d::prelude::*;
-use bevy_obj::*;
-use body::robot::{FeatureTestPlugin, RobotTestPlugin, self, custom_asset_loader_test::CustomAsset};
+use body::robot::{FeatureTestPlugin, RobotTestPlugin};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 //use crate::body::cube::components::*;
-use crate::body::robot::components::*;
-use crate::robot::custom_asset_loader_test::*;
-use crate::robot::urdf::urdf_loader::*;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins) //< --- bevy needs these in order to run

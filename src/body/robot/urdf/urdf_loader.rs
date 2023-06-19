@@ -47,7 +47,7 @@ pub enum UrdfError {
 //Robot that is spawned from UrdfRoot(OLD)
 #[derive(Resource, Default, Debug, AssetCollection)]
 pub struct SpawnedRobot {
-    #[asset(path = "diff_bot.xml")]
+    #[asset(path = "cube.xml")]
     pub urdf_handle: Handle<UrdfRoot>,
 }
 

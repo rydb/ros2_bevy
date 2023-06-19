@@ -70,15 +70,13 @@ impl ModelBundle {
 // }
 
 #[derive(Component)]
-pub struct Robot {
+pub struct BevyRobot {
     /// name of robot
     pub name: String,
     /// robot package root dir.
     pub root_dir: String,
     /// package which info of robot like urdfs/models, etc.. is stored in
     pub pkg_dir: String,
-    /// urdf file name + extension.
-    pub urdf_file: String,
 }
 
 
