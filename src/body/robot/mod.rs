@@ -94,7 +94,9 @@ impl Plugin for FeatureTestPlugin {
 
         // resources
         .insert_resource(CountDownTimer::new(2))
-        .add_system(handle_new_urdf_roots)
+        
+        .add_system(spawn_robots_from_urdf)
+        //.add_system(handle_new_urdf_roots)
         // Assets
         //.add_collection_to_loading_state::<UrdfRoot>()
         //.add_startup_system(spawn_cube)

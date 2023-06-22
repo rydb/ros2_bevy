@@ -229,17 +229,17 @@ pub struct BevyModel {
 }
 
 impl BevyModel {
-    pub fn add_bevy_components(&self, mut commands: EntityCommands, mesh_server: Res<Assets<Mesh>>) {
+    pub fn add_bevy_components(&self, mut commands: EntityCommands) {
         match &self.geometry {
             Geometry::Primitive(primitive) => {
                 
                 
                 println!("primtive model detected, spawning");
                 commands.insert((
-                    PbrBundle {
-                         mesh: mesh_server.add(primitive.bevy_equiv()),
-                        ..default()
-                    },
+                    // PbrBundle {
+                    //      mesh: mesh_server.add(primitive.bevy_equiv()),
+                    //     ..default()
+                    // },
                     primitive.clone(),
                     self.pose.clone(),
                     NameInWorkcell(self.name.clone()),

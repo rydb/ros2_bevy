@@ -5,7 +5,9 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 
-/// Bundle that contains everything for a model that interacts with the physical world.
+/// Bundle that contains everything a model to simulate interacting with physics.
+///
+///  Use ```new()``` to initialize this more easily.
 #[derive(Bundle)]
 pub struct ModelBundle {
     /// root model of robot. Stuff like wheels should probably attach to this. 
@@ -22,7 +24,6 @@ pub struct ModelBundle {
     external_forces: ExternalForce, 
     /// velocity of object. A model does not need this object to have a velocity, but `in order to read/write to the object's velocity, you need to have this object`
     velocity: Velocity,
-
 }
 
 impl ModelBundle {

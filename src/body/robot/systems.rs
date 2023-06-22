@@ -25,7 +25,7 @@ pub struct Part;
 
 
 /// get all robots, and spawn them from their urdfs
-pub fn spawn_robots_from_urdf(
+pub fn spawn_robots_from_urdfOLD(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -122,7 +122,7 @@ pub fn spawn_cube(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    assset_server: Res<AssetServer>,
+    //assset_server: Res<AssetServer>,
 
     model_query: Query<Entity, With<BevyRobot>>,
 ) {

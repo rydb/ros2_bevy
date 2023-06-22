@@ -1,4 +1,4 @@
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Handle, Mesh};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 
@@ -13,6 +13,14 @@ pub enum AssetSource {
 }
 
 impl AssetSource {
+    // fetch a mesh from its source dependant on its source type
+    // pub fn fetch_mesh_from_source(&self) -> Handle<Mesh> {
+    //     match self {
+    //         Self::Package(_) => 
+    //         _ => panic!("fetching mesh from, {:#?}, isn't implemented. Add an implementation to remove this error", self)
+    //     }
+    // }
+
     pub fn label(&self) -> &str {
         match self {
             Self::Local(_) => "Local",

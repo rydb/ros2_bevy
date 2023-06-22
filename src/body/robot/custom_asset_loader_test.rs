@@ -43,14 +43,6 @@ pub struct State {
     pub printed: bool,
 }
 
-// impl State {
-//     pub fn new() -> Self{
-//         return State {
-//             handle: Handle
-//         }
-//     }
-// }
-
 pub fn setup(mut state: ResMut<State>, asset_server: Res<AssetServer>) {
     state.handle = asset_server.load("asset.custom");
 }
