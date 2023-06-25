@@ -5,9 +5,10 @@ use bevy::asset::FileAssetIo;
 use bevy_rapier3d::prelude::*;
 
 
-use crate::body::robot::{components::*, self};
 
-use super::{resources::CountDownTimer, urdf::{urdf_to_bevy::UrdfRoot, urdf_loader::SpawnedRobot}};
+use crate::body::robot::{components::*, BevyRobot};
+
+use super::{resources::CountDownTimer, urdf::{urdf_to_bevy::UrdfRoot, urdf_loader::SpawnableRobots}};
 
 /// NOTE: NAME OF BEVY ASSET FOLDER. SHOULD BE REPLACED BY PROPER ASSET LOADER LATER.
 pub const ASSET_FOLDER: &str = "assets/";
@@ -24,107 +25,35 @@ pub const URDF_FOLDER: &str = "urdf/";/// A Robotics framework in the abstract
 pub struct Part;
 
 
-/// get all robots, and spawn them from their urdfs
-pub fn spawn_robots_from_urdfOLD(
+
+
+
+pub fn spawn_urdf_cube(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    mut asset_server: Res<AssetServer>,
-
-    mut model_query: Query<&BevyRobot>,
+    mut robots: Query<Entity, &BevyRobot>
 ) {
-    //fetch all entities which are robots, and spawn them from their urdfs.
-    for robot in model_query.iter_mut() {
-        // get path for urdf(hard coded until I figure out how asset loaders work?)
-        let urdf_folder_path = 
-        FileAssetIo::get_base_path() //path to root dir of project
-        .join(
-        ASSET_FOLDER.to_owned() //assets dir
-            + &robot.root_dir //robot dir
-            + SOURCE_FOLDER_FOR_ROBOT //src dir
-            + &robot.pkg_dir // pkg dir
-            + URDF_FOLDER //urdf dir
-            //+ &robot.urdf_file
-        ) // urdf file + extension
-        .to_str()
-        .unwrap()
-        .to_owned();
-
-        println!("{:#?}", urdf_folder_path);
-
-        let robot_urdf = urdf_rs::read_file(urdf_folder_path).unwrap();
-
-        println!("getting model...");
-        for links in robot_urdf.links {
-            //println!("LINK: {:#?}");
-            for visual in links.visual {
-                //println!("{:#?} ", visual)
-                match visual.geometry {
-                    urdf_rs::Geometry::Box { size } => println!("box detected!"),
-                    urdf_rs::Geometry::Cylinder { radius, length } => println!("Cylinder detected!"),
-                    urdf_rs::Geometry::Capsule { radius, length } => println!("Mesh detected!"),
-                    urdf_rs::Geometry::Sphere { radius } => println!("Sphere detected"),
-                    urdf_rs::Geometry::Mesh { filename, scale } => {
-                        let scale = scale
-                            .clone()
-                            .and_then(|s| Some(Vec3::from_array(
-                                s.map(|v| v as f32)
-                            )));
-                        //println!("package type + file name of mesh is: {:#}", filename);
-
-                        let mesh_path = robot.root_dir.clone() + SOURCE_FOLDER_FOR_ROBOT + &String::from(&AssetSource::from(&filename));
-                        
-                        //get urdf path urdf file
-                        println!("mesh file path is: {:#?}", mesh_path );
-                        
-                        //spawn geometry
-                        let mesh_handle: Handle<Mesh> = asset_server.load(mesh_path);
-                        let model = commands.spawn(
-
-                            (
-                                    PbrBundle {
-                                        mesh: mesh_handle,
-                                        material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-                                        transform: Transform::from_xyz(0.0, 5.0, 0.0),
-                                        ..default()
-                                    },
-                                    //physics properties
-                                    RigidBody::Dynamic, // set this object to be a dynamic rigid body
-                                    AsyncCollider(ComputedColliderShape::ConvexDecomposition
-                                        (
-                                            default()
-                                        )
-                                    ),
-                                    Part {}
-                                )
-                            ).id();
-                        println!("spawned: {:#?}", model);
-
-
-                    }//println!("Mesh detected!"),
-                
-                }
-            }    
-        }
-
+    for robot in robots.iter() {
+        println!("spawning robot");
+        commands.spawn(ModelBundle::new(
+            meshes.add(Mesh::from(shape::Cube {size: 1.0})),
+            Transform::from_xyz(0.0, 0.0, 0.0),
+        ));
     }
-    
-    //println!("Joints for robot {:#?}", robot_urdf.joints)
 }
-
-
 
 ///TODO
 /// 1. ADD ROBOT SPAWNING
 /// 2. ADD ROBOT MOVING
 
+
 pub fn spawn_cube(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    //mut materials: ResMut<Assets<StandardMaterial>>,
     //assset_server: Res<AssetServer>,
 
-    model_query: Query<Entity, With<BevyRobot>>,
+    //model_query: Query<Entity, With<BevyRobot>>,
 ) {
     let cube = commands.spawn(
         ModelBundle::new(
@@ -159,34 +88,34 @@ pub fn list_robots (
 /// 1. load urdf
 /// 2. load all sub models
 /// 3.
-pub fn load_diff_bot(
-    mut commands: Commands,
-    assets: Res<SpawnedRobot>,
-    // mut urdf_state: ResMut<SpawnedRobot>,
-    //asset_server: Res<AssetServer>,
-    urdf_assets: ResMut<Assets<UrdfRoot>>
-) {
-    //check to see if we can fetch urdf, if we can, proceed
-    match urdf_assets.get(&assets.urdf_handle) {
-        Some(urdf) => commands.spawn
-        (
-    (
-                BevyRobot {name: "diff_bot".to_owned(), root_dir: "group_robot_ros2".to_owned(), pkg_dir: "model_pkg".to_owned()},
-                urdf.to_owned(),
-            )    
+// pub fn load_diff_bot(
+//     mut commands: Commands,
+//     assets: Res<SpawnableRobots>,
+//     // mut urdf_state: ResMut<SpawnedRobot>,
+//     //asset_server: Res<AssetServer>,
+//     urdf_assets: ResMut<Assets<UrdfRoot>>
+// ) {
+//     //check to see if we can fetch urdf, if we can, proceed
+//     match urdf_assets.get(&assets.urdf_handle) {
+//         Some(urdf) => commands.spawn
+//         (
+//     (
+//                 BevyRobot {name: "diff_bot".to_owned(), root_dir: "group_robot_ros2".to_owned(), pkg_dir: "model_pkg".to_owned()},
+//                 urdf.to_owned(),
+//             )    
             
-        )/*println!("urdf is {:#?}", urdf)*/,
-        None => panic!("Failed to fetch urdf. Unable to retrieve urdf from handle, {:#?}", &assets.urdf_handle)
-    };
+//         )/*println!("urdf is {:#?}", urdf)*/,
+//         None => panic!("Failed to fetch urdf. Unable to retrieve urdf from handle, {:#?}", &assets.urdf_handle)
+//     };
     
-    // match urdf {
-    //     Some(v) => println!("urdf is {:#?}", urdf.unwrap()),
-    //     None => panic!("Failed to fetch urdf. Unable to retrieve urdf from the handle, {:#?} ", urdf_state.handle)
-    // }
-    //println!("urdf is: {:#?}", urdf.())
+//     // match urdf {
+//     //     Some(v) => println!("urdf is {:#?}", urdf.unwrap()),
+//     //     None => panic!("Failed to fetch urdf. Unable to retrieve urdf from the handle, {:#?} ", urdf_state.handle)
+//     // }
+//     //println!("urdf is: {:#?}", urdf.())
 
 
-}
+// }
 
 
 // moves all robots forward(knowing the total forces being exerted on the collider would be helpful? Mabye for establishing some kind of formula?)

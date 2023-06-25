@@ -12,6 +12,7 @@ pub mod urdf;
 
 use crate::body::robot::systems::*;
 use super::robot::urdf::urdf_loader::*;
+use super::robot::urdf::urdf_spawner::*;
 use super::robot::urdf::urdf_to_bevy::*;
 
 use bevy::prelude::*;
@@ -20,7 +21,7 @@ use bevy_rapier3d::prelude::*;
 use bevy_obj::*;
 
 
-use super::robot::urdf::urdf_spawner::*;
+//use super::robot::urdf::urdf_spawner::*;
 
 use self::{resources::CountDownTimer, custom_asset_loader_test::CustomAssetLoader, urdf::urdf_loader::UrdfLoader};
 
@@ -43,14 +44,15 @@ impl Plugin for AssetLoadersPlugin {
         
         // urdf loading stuff
         .add_asset_loader(UrdfLoader) // Enables loading urdfs via `UrdfRoot` Supports .xml (TODO) Add .urdf support?
-        .init_resource::<SpawnedRobot>()
+        .init_resource::<SpawnableRobots>()
         .add_asset::<UrdfRoot>()
+        //.add_system(stage_robots_to_initialize)
         .add_loading_state(
             LoadingState::new(AssetLoaderStates::AssetLoading).continue_to_state(AssetLoaderStates::Next)
         )
-        .add_collection_to_loading_state::<_, SpawnedRobot>(AssetLoaderStates::AssetLoading)
-        .add_system(load_diff_bot.in_schedule(OnEnter(AssetLoaderStates::Next)))
-        
+        .add_collection_to_loading_state::<_, SpawnableRobots>(AssetLoaderStates::AssetLoading)
+        .add_system(stage_robots_to_spawn_from_urdf.in_schedule(OnEnter(AssetLoaderStates::Next)))
+        .add_system(spawn_unspawned_robots)
         ;
     }
 }
@@ -80,7 +82,7 @@ impl Plugin for RobotTestPlugin {
     fn build(&self, app: &mut App){
         app
         .add_plugin(BasePlateWorld) // World type.
-        .add_startup_system(spawn_robots_from_urdf)
+        //.add_startup_system(spawn_robots_from_urdf)
         ;
     }
 }
@@ -95,7 +97,7 @@ impl Plugin for FeatureTestPlugin {
         // resources
         .insert_resource(CountDownTimer::new(2))
         
-        .add_system(spawn_robots_from_urdf)
+        //.add_system(spawn_robots_from_urdf)
         //.add_system(handle_new_urdf_roots)
         // Assets
         //.add_collection_to_loading_state::<UrdfRoot>()
