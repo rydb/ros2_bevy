@@ -6,7 +6,7 @@ use super::urdf_loader::BevyRobot;
 //use std::prelude::*;
 
 use bevy_asset_loader::prelude::*;
-use crate::body::robot::components::ModelBundle;
+use crate::body::robot::components::{ModelBundle, AssetSource};
 
 use crate::Mesh;
 use urdf_rs::Geometry::{Box, Cylinder, Capsule, Sphere, Mesh as UrdfMesh};
@@ -41,28 +41,36 @@ pub fn spawn_unspawned_robots(
                         //println!("spawning link: {:#?}", link);
                         for visual_link in &link.visual {
                             println!("spawning visual link, {:#?}", visual_link);
-                            let model_mesh_handle = match visual_link.geometry {
+                            let model_mesh_handle = match &visual_link.geometry {
                                 Box { size } => meshes.add(Mesh::from(shape::Box {
                                     min_x: -size[0] as f32, max_x: size[0] as f32,
                                     min_y: -size[1] as f32, max_y: size[1] as f32,
                                     min_z: -size[2]as f32, max_z: size[2] as f32,
                                 })),
                                 Cylinder { radius, length} => meshes.add(Mesh::from(shape::Cylinder{
-                                    radius: radius as f32,
-                                    height: length as f32,
+                                    radius: *radius as f32,
+                                    height: *length as f32,
                                     ..default()
                                 })),
                                 Capsule { radius, length } => meshes.add(Mesh::from(shape::Capsule {
-                                    radius: radius as f32,
-                                    depth: length as f32, // this is probably not right... leaving this to not throw an error in case it is...
+                                    radius: *radius as f32,
+                                    depth: *length as f32, // this is probably not right... leaving this to not throw an error in case it is...
                                     ..default()
                                 })),
                                 Sphere { radius} => meshes.add(Mesh::from(shape::Capsule {
-                                    radius: radius as f32,
+                                    radius: *radius as f32,
                                     depth: 0.0, // a capsule is a sphere if there is no mid section, and the icosphere doesnt work for Mesh::from....
                                     ..default()
                                 })),
-                                UrdfMesh { .. } => todo!("need to test this with model")//mesh_server.add(asset_server.load())
+                                UrdfMesh { filename, scale } => {
+                                    // set filename to asset source, then set it back to string so path can be trimmed just for the filename + extension.
+                                    // let asset_source= AssetSource::from(filename);
+                                    // let cleaned_path = String::from(&asset_source);
+                                    let split_paths: Vec<&str> = filename.split("/").collect();
+                                    let model_file = *split_paths.last().unwrap();
+                                    asset_server.load(unspawned_bot.models_dir_path.clone() + model_file)
+                                },
+                                //todo!("need to test this with model")//mesh_server.add(asset_server.load())
                     
                             };
                             let x = *visual_link.origin.xyz.get(0).unwrap() as f32;

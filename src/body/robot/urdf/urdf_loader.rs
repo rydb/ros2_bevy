@@ -131,7 +131,7 @@ pub fn stage_robots_to_spawn_from_urdf(
     let robot_pkg_path = "group_robot_ros2/src/model_pkg/";
     let diff_bot = BevyRobot {
         urdf_file: 
-            asset_server.load(robot_pkg_path.to_owned() + "urdf/cube.xml"),
+            asset_server.load(robot_pkg_path.to_owned() + "urdf/diff_bot.xml"),
         models_dir_path: robot_pkg_path.to_owned() + "models/"
     };
     commands.spawn(diff_bot);
