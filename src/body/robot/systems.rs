@@ -78,6 +78,7 @@ pub fn list_robots (
 ) {
     //println!("current robots are: ");
     for robot in model_query.iter() {
+        
         //println!("{:#?}", robot.name)
     }
 }

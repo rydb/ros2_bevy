@@ -24,6 +24,8 @@ pub struct ModelBundle {
     external_forces: ExternalForce, 
     /// velocity of object. A model does not need this object to have a velocity, but `in order to read/write to the object's velocity, you need to have this object`
     velocity: Velocity,
+    /// sets weather continous or discrete collision is the collision detection for this model. Continous = more accurate/more slow, discrete = faster/more innacurate
+    continous_collision_setting: Ccd, 
 }
 
 impl ModelBundle {
@@ -40,11 +42,12 @@ impl ModelBundle {
 
             },
             rigid_body: RigidBody::Dynamic,
+            
             async_collider: AsyncCollider(ComputedColliderShape::ConvexDecomposition
             (
                 default()
             )),
-            
+            continous_collision_setting: Ccd::enabled(),
             mass: AdditionalMassProperties::Mass(1.0),
             friction: Friction { coefficient: (1.0), combine_rule: (CoefficientCombineRule::Average) },
             external_forces: ExternalForce {
