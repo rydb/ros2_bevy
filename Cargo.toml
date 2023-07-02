@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = { version = "0.10.0", features = ["dynamic_linking"] }
+bevy = { version = "0.10.0", features = ["dynamic_linking"]}
 rand = "0.8.5"
 bevy_mod_picking = "0.12.0"
 bevy_flycam = "*"
@@ -15,10 +15,15 @@ bevy-inspector-egui = "0.18.3"
 rapier3d = "0.17.2"
 bevy_rapier3d = "0.21.0"
 bevy_obj = "0.10.0"
-urdf-rs = "0.6.9"
+urdf-rs = "0.7.1"
 bevy_common_assets = {version = "0.6.0", features = ["xml"] }
-serde = "1.0.160"
+serde = { version = "1.0", features = ["derive"]}
+serde_yaml = "0.9.21"
+serde_json = "*"
 bevy_asset_loader = "0.16.0"
+thiserror = "1.0.40"
+glam = "0.24.0"
+ron = "0.8.0"
 
 
 # Enable a small amount of optimization in debug mode
