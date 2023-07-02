@@ -3,12 +3,13 @@ use std::time::Duration;
 use bevy::prelude::*;
 use bevy::asset::FileAssetIo;
 use bevy_rapier3d::prelude::*;
-
-
+use crate::main;
+use crate::timers::resources::DespawnTimer;
+use bevy::math::Vec3Swizzles;
 
 use crate::body::robot::{components::*, BevyRobot};
 
-use super::{resources::CountDownTimer, urdf::{urdf_to_bevy::UrdfRoot, urdf_loader::SpawnableRobots}};
+use super::{urdf::{urdf_to_bevy::UrdfRoot, urdf_loader::SpawnableRobots}};
 
 /// NOTE: NAME OF BEVY ASSET FOLDER. SHOULD BE REPLACED BY PROPER ASSET LOADER LATER.
 pub const ASSET_FOLDER: &str = "assets/";
@@ -76,14 +77,39 @@ pub fn spawn_cube(
 pub fn list_robots (
     model_query: Query<&BevyRobot>,
 ) {
-    //println!("current robots are: ");
+    //println!("currentrobots are: ");
     for robot in model_query.iter() {
         
         //println!("{:#?}", robot.name)
     }
 }
 
+/// create a green point at point(with a despawn timer!!) to show where contacts happenw within a model
+pub fn display_contacts(
+    mut commands: Commands, 
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    rapier_context: Res<RapierContext>) {
 
+    for contact in rapier_context.contact_pairs() {
+        //println!("{:#?} and {:#?} collided with eachother", contact.collider1(), contact.collider2());
+        for manifold in contact.manifolds() {
+            for contact_point in manifold.points() {
+                commands.spawn(
+                    (
+                        ParticleBundle::new(
+                            meshes.add(shape::Cube{size: 0.1}.into()),
+                            materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+                            Transform::from_translation(contact_point.local_p1())
+                        ),
+                        DespawnTimer::new(1 as f32),
+                    )
+                );
+            }
+        }
+
+    }
+}
 
 /// Predicted steps:
 /// 1. load urdf
@@ -122,7 +148,7 @@ pub fn list_robots (
 // moves all robots forward(knowing the total forces being exerted on the collider would be helpful? Mabye for establishing some kind of formula?)
 pub fn move_robot_forward(
     mut model_query: Query<&mut ExternalForce, With<BevyRobot>>,
-    mut timer_query: ResMut<CountDownTimer>,
+    //mut timer_query: ResMut<CountDownTimer>,
     time: Res<Time>,
     
 ) {

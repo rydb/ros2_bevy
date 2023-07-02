@@ -4,6 +4,36 @@ use std::convert::From;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
+use crate::timers;
+
+/// bundle for spawning parcticles
+#[derive(Bundle)]
+pub struct ParticleBundle {
+    model: PbrBundle,
+}
+
+impl ParticleBundle {
+    /// reuturns a bundle for a particle that expires
+    pub fn new(
+        mesh_handle: Handle<Mesh>,
+        material_handle: Handle<StandardMaterial>,
+        transform: Transform,
+    ) -> Self {
+        Self {
+            model: PbrBundle {
+                mesh: mesh_handle,
+                material: material_handle,
+                transform: transform,
+                ..Default::default()
+            }
+        }
+    }
+    // pub fn particle_that_expires() ->  Self {
+    //     Self {
+    //         model.
+    //     }
+    // }
+}
 
 /// Bundle that contains everything a model to simulate interacting with physics.
 ///

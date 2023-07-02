@@ -1,4 +1,5 @@
 mod body;
+mod timers;
 
 use bevy::prelude::*;
 use body::robot::{FeatureTestPlugin, RobotTestPlugin};

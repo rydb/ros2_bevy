@@ -1,12 +1,9 @@
-use std::default;
-
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::LoadingState;
 use bevy_asset_loader::prelude::LoadingStateAppExt;
 
 pub mod components;
 mod systems;
-pub mod resources;
 pub mod custom_asset_loader_test;
 pub mod urdf;
 
@@ -14,8 +11,8 @@ use crate::body::robot::systems::*;
 use super::robot::urdf::urdf_loader::*;
 use super::robot::urdf::urdf_spawner::*;
 use super::robot::urdf::urdf_to_bevy::*;
+use crate::timers::resources::*;
 
-use bevy::prelude::*;
 use bevy_flycam::PlayerPlugin;
 use bevy_rapier3d::prelude::*;
 use bevy_obj::*;
@@ -23,7 +20,7 @@ use bevy_obj::*;
 
 //use super::robot::urdf::urdf_spawner::*;
 
-use self::{resources::CountDownTimer, custom_asset_loader_test::CustomAssetLoader, urdf::urdf_loader::UrdfLoader};
+use self::{custom_asset_loader_test::CustomAssetLoader, urdf::urdf_loader::UrdfLoader};
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash, Default, States)]
 enum AssetLoaderStates {
@@ -31,6 +28,18 @@ enum AssetLoaderStates {
     AssetLoading,
     Next,
 }
+
+/// plugin for managing timers and ticking them in general. If there is a timer that needs to be managed, add its relevant system here
+pub struct TimerManagerPlugin;
+
+impl Plugin for TimerManagerPlugin {
+    fn build(&self, app: &mut App) {
+        app
+        .add_system(tick_despawn_timer)
+        ;
+    }
+}
+
 /// plugin which contains all relevant custom asset loaders + initializes/adds all relevant
 /// resources required to load them.
 pub struct AssetLoadersPlugin;
@@ -41,7 +50,6 @@ impl Plugin for AssetLoadersPlugin {
         .add_state::<AssetLoaderStates>()
         .add_plugin(ObjPlugin) // .obj
         .add_asset_loader(CustomAssetLoader) // for loading CustomAsset Example
-        
         // urdf loading stuff
         .add_asset_loader(UrdfLoader) // Enables loading urdfs via `UrdfRoot` Supports .xml (TODO) Add .urdf support?
         .init_resource::<SpawnableRobots>()
@@ -53,6 +61,9 @@ impl Plugin for AssetLoadersPlugin {
         .add_collection_to_loading_state::<_, SpawnableRobots>(AssetLoaderStates::AssetLoading)
         .add_system(stage_robots_to_spawn_from_urdf.in_schedule(OnEnter(AssetLoaderStates::Next)))
         .add_system(spawn_unspawned_robots)
+        
+        // Timers
+        .add_plugin(TimerManagerPlugin)
         ;
     }
 }
@@ -71,6 +82,7 @@ impl Plugin for BasePlateWorld {
         
         //.add_plugin(CubePlugin)
         .add_startup_system(setup_physics)
+        .add_system(display_contacts)
         ;
     }
 }
@@ -93,9 +105,6 @@ impl Plugin for FeatureTestPlugin {
     fn build(&self, app: &mut App) {
         app
         .add_plugin(BasePlateWorld)
-
-        // resources
-        .insert_resource(CountDownTimer::new(2))
         
         //.add_system(spawn_robots_from_urdf)
         //.add_system(handle_new_urdf_roots)
