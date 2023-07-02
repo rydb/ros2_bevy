@@ -124,7 +124,7 @@ pub fn spawn_unspawned_robots(
                                 let z = *joint.origin.xyz.get(2).unwrap() as f32;
                                 
                                 //let trans = Vec3::new(x, y, z);
-                                let trans = Vec3::new((x.abs()/ x) *2.0, 1.0, 0.5);
+                                let trans = Vec3::new((x.abs()/ x) *0.75, 0.50, 0.40);
                                 println!("{:#?}",trans);
                                 let rot = Vec3::from_array(joint.origin.rpy.map(|t| t as f32));
                                 let rot = RapierRotation::from_euler_angles(rot[0], rot[1], rot[2]);
@@ -133,7 +133,7 @@ pub fn spawn_unspawned_robots(
                                         let axis = Vec3::from_array(joint.axis.xyz.map(|t| t as f32));
                                         println!("axis is {:#?}", axis);
                                         let joint = RevoluteJointBuilder::new(axis)
-                                            .local_anchor1(trans)
+                                            .local_anchor2(trans)
                                             .limits([joint.limit.lower as f32, joint.limit.upper as f32]);
                                             ;
                                         ImpulseJoint::new(*parent, joint)
