@@ -123,8 +123,8 @@ pub fn spawn_unspawned_robots(
                                 let y = *joint.origin.xyz.get(1).unwrap() as f32;
                                 let z = *joint.origin.xyz.get(2).unwrap() as f32;
                                 
-                                //let trans = Vec3::new(x, y, z);
-                                let trans = Vec3::new((x.abs()/ x) *0.75, 0.50, 0.40);
+                                let trans = Vec3::new(x, y, z);
+                                //let trans = Vec3::new((x.abs()/ x) *0.75, 0.50, 0.40);
                                 println!("{:#?}",trans);
                                 let rot = Vec3::from_array(joint.origin.rpy.map(|t| t as f32));
                                 let rot = RapierRotation::from_euler_angles(rot[0], rot[1], rot[2]);
