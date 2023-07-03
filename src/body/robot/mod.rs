@@ -7,6 +7,8 @@ mod systems;
 pub mod custom_asset_loader_test;
 pub mod urdf;
 
+
+use crate::mesh::example::*;
 use crate::body::robot::systems::*;
 use super::robot::urdf::urdf_loader::*;
 use super::robot::urdf::urdf_spawner::*;
@@ -80,7 +82,6 @@ impl Plugin for BasePlateWorld {
 
 
         
-        //.add_plugin(CubePlugin)
         .add_startup_system(setup_physics)
         .add_system(display_contacts)
         ;
@@ -94,7 +95,6 @@ impl Plugin for RobotTestPlugin {
     fn build(&self, app: &mut App){
         app
         .add_plugin(BasePlateWorld) // World type.
-        //.add_startup_system(spawn_robots_from_urdf)
         ;
     }
 }
@@ -105,18 +105,7 @@ impl Plugin for FeatureTestPlugin {
     fn build(&self, app: &mut App) {
         app
         .add_plugin(BasePlateWorld)
-        
-        //.add_system(spawn_robots_from_urdf)
-        //.add_system(handle_new_urdf_roots)
-        // Assets
-        //.add_collection_to_loading_state::<UrdfRoot>()
-        //.add_startup_system(spawn_cube)
-        //.add_startup_system(spawn_robots_from_urdf)
-        //.add_system(move_robot_forward)
-        //.add_system(list_robots)
-
-        //.add_startup_system(setup_diff_bot)
-        //.add_system(load_diff_bot) //<-- this needs to be run after setting up loading urdfs. or this will error from not finding the urdf
+        .add_plugin(CustomMeshTestPlugin)
         ;
     }
 }

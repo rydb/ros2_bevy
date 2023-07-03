@@ -1,33 +1,13 @@
-use std::time::Duration;
-
 use bevy::prelude::*;
-use bevy::asset::FileAssetIo;
 use bevy_rapier3d::prelude::*;
-use crate::main;
 use crate::timers::resources::DespawnTimer;
-use bevy::math::Vec3Swizzles;
 
 use crate::body::robot::{components::*, BevyRobot};
-
-use super::{urdf::{urdf_to_bevy::UrdfRoot, urdf_loader::SpawnableRobots}};
-
-/// NOTE: NAME OF BEVY ASSET FOLDER. SHOULD BE REPLACED BY PROPER ASSET LOADER LATER.
-pub const ASSET_FOLDER: &str = "assets/";
-
-/// Source dir after reaching into the robot's root folder which holds packages. keeping as const till a better idea comes up.
-pub const SOURCE_FOLDER_FOR_ROBOT: &str = "src/";
-
-// dir for urdf folder. 
-pub const URDF_FOLDER: &str = "urdf/";/// A Robotics framework in the abstract 
 
 // used to donote spawned model is a "part". Used to check
 // for any models that the part is "bound" to.
 #[derive(Component)]
 pub struct Part;
-
-
-
-
 
 pub fn spawn_urdf_cube(
     mut commands: Commands,
@@ -67,13 +47,6 @@ pub fn spawn_cube(
 
 }
 
-            // robot: Robot {
-            //     name: "diff_bot".to_owned(),
-            //     root_dir: "group_robot_ros2/".to_owned(),
-            //     pkg_dir: "model_pkg".to_owned(),
-            //     urdf_file: "diff_bot.xml".to_owned(),
-            // },
-
 pub fn list_robots (
     model_query: Query<&BevyRobot>,
 ) {
@@ -89,60 +62,75 @@ pub fn display_contacts(
     mut commands: Commands, 
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    entity_mesh_querry: Query<(Entity, &Handle<Mesh>)>,
     rapier_context: Res<RapierContext>) {
 
     for contact in rapier_context.contact_pairs() {
         //println!("{:#?} and {:#?} collided with eachother", contact.collider1(), contact.collider2());
         for manifold in contact.manifolds() {
             for contact_point in manifold.points() {
-                commands.spawn(
+                //contact_point.local_p1()
+                
+                //(todo) manually recoloring the triangles of the mesh is probably more efficient then spawning an entity every collision,
+                // but that will need someone experienced in that or a bevy plugin...
+                //https://github.com/bevyengine/bevy/blob/main/examples/animation/custom_skinned_mesh.rs
+
+                // let e_check = entity_mesh_querry.get(contact.collider1());
+                // match e_check {
+                //     Ok(e) => {
+                //         //println!("mesh is {:#?}", e.1);  
+                //         if let Some(mut mesh) = meshes.get(e.1){
+                //             //mesh.set_indices(indices)
+                //             //println!("mesh topology is {:#?}", .());
+                //         }  
+                //     }
+                //     Err(_) => {
+                //         //println!("WARNING: query did not match for displaying contacts. Will want to make this more detailed later?")
+                //     }
+                // }
+                
+                //println!("first collider mehs is {:#?}", e.unwrap())
+                let cube_size = 0.03 as f32;
+                // make dots, make them into joints to connect to root mesh
+                let collision_marker = commands.spawn(
                     (
                         ParticleBundle::new(
-                            meshes.add(shape::Cube{size: 0.1}.into()),
+                            meshes.add(shape::Cube{size: cube_size}.into()),
                             materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
                             Transform::from_translation(contact_point.local_p1())
                         ),
-                        DespawnTimer::new(1 as f32),
+                        DespawnTimer::new(0.3 as f32),
                     )
-                );
+                ).id();
+                // // commands.spawn(
+                // //     (
+                // //         ParticleBundle::new(
+                // //             meshes.add(shape::Cube{size: cube_size}.into()),
+                // //             materials.add(Color::rgb_u8(0, 191, 255).into()),
+                // //             Transform::from_translation(contact_point.local_p2())
+                // //         ),
+                // //         DespawnTimer::new(0.3 as f32),
+                // //     )
+                // // );
+                // let joint = FixedJointBuilder::new()
+                //     .local_anchor1(contact_point.local_p1())
+                //     //.local_anchor2(contact_point.local_p2())
+                //     //.local_basis2(contact_point..into())
+                //     ;
+                // let joint_data = ImpulseJoint::new(contact.collider1(), joint);
+                // commands.entity(contact.collider2()).with_children(|children| {
+                //     children
+                //         //.spawn(SpatialBundle::VISIBLE_IDENTITY)
+                //         .spawn(joint_data)
+                //         //.insert(Anchor::Pose3D(Pose { trans, rot }));
+                //         ;
+                // });
+                
             }
         }
 
     }
 }
-
-/// Predicted steps:
-/// 1. load urdf
-/// 2. load all sub models
-/// 3.
-// pub fn load_diff_bot(
-//     mut commands: Commands,
-//     assets: Res<SpawnableRobots>,
-//     // mut urdf_state: ResMut<SpawnedRobot>,
-//     //asset_server: Res<AssetServer>,
-//     urdf_assets: ResMut<Assets<UrdfRoot>>
-// ) {
-//     //check to see if we can fetch urdf, if we can, proceed
-//     match urdf_assets.get(&assets.urdf_handle) {
-//         Some(urdf) => commands.spawn
-//         (
-//     (
-//                 BevyRobot {name: "diff_bot".to_owned(), root_dir: "group_robot_ros2".to_owned(), pkg_dir: "model_pkg".to_owned()},
-//                 urdf.to_owned(),
-//             )    
-            
-//         )/*println!("urdf is {:#?}", urdf)*/,
-//         None => panic!("Failed to fetch urdf. Unable to retrieve urdf from handle, {:#?}", &assets.urdf_handle)
-//     };
-    
-//     // match urdf {
-//     //     Some(v) => println!("urdf is {:#?}", urdf.unwrap()),
-//     //     None => panic!("Failed to fetch urdf. Unable to retrieve urdf from the handle, {:#?} ", urdf_state.handle)
-//     // }
-//     //println!("urdf is: {:#?}", urdf.())
-
-
-// }
 
 
 // moves all robots forward(knowing the total forces being exerted on the collider would be helpful? Mabye for establishing some kind of formula?)
@@ -152,14 +140,5 @@ pub fn move_robot_forward(
     time: Res<Time>,
     
 ) {
-    // for mut robot in model_query.iter_mut() {
-    //     println!("timer is currently at {:#?}", timer_query.timer.elapsed_secs());
-    //     println!("time passed on timer: {:#?}" , timer_query.timer.elapsed());
-    //     timer_query.timer.tick(time.delta());
-    //     robot.force = Vec3::new(100.0 * timer_query.timer
-    //     .percent_left(),
-    //     0.0, 10.0);
-
-    //     println!("remaining external force on robot is {:#?}", robot.force)
-    // }
+    //todo!("not implemented")
 }

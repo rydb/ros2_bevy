@@ -9,8 +9,7 @@ use std::collections::{HashMap, HashSet};
 
 use bevy_rapier3d::na::geometry::Rotation as RapierRotation;
 
-use bevy_asset_loader::prelude::*;
-use crate::body::robot::components::{ModelBundle, AssetSource};
+use crate::body::robot::components::{ModelBundle};
 
 use crate::Mesh;
 use urdf_rs::Geometry::{Box, Cylinder, Capsule, Sphere, Mesh as UrdfMesh};
@@ -134,7 +133,7 @@ pub fn spawn_unspawned_robots(
                                         println!("axis is {:#?}", axis);
                                         let joint = RevoluteJointBuilder::new(axis)
                                             .local_anchor2(trans)
-                                            .limits([joint.limit.lower as f32, joint.limit.upper as f32]);
+                                            .limits([joint.limit.lower as f32, joint.limit.upper as f32])
                                             ;
                                         ImpulseJoint::new(*parent, joint)
                                     }

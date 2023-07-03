@@ -4,7 +4,6 @@ use std::convert::From;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use crate::timers;
 
 /// bundle for spawning parcticles
 #[derive(Bundle)]
@@ -13,7 +12,6 @@ pub struct ParticleBundle {
 }
 
 impl ParticleBundle {
-    /// reuturns a bundle for a particle that expires
     pub fn new(
         mesh_handle: Handle<Mesh>,
         material_handle: Handle<StandardMaterial>,
@@ -28,11 +26,6 @@ impl ParticleBundle {
             }
         }
     }
-    // pub fn particle_that_expires() ->  Self {
-    //     Self {
-    //         model.
-    //     }
-    // }
 }
 
 /// Bundle that contains everything a model to simulate interacting with physics.
@@ -91,28 +84,6 @@ impl ModelBundle {
         }
     }
 }
-
-
-
-
-// #[derive(Bundle)]
-// pub struct RobotBundle {
-//     /// model that the robot originates from.
-//     pub root_model: ModelBundle,
-//     /// robot struct. Anything related to the robot that is tied to the robot it self. Also used to identify non robot model from robot models.
-//     pub robot: Robot,
-// }
-
-// #[derive(Component)]
-// pub struct BevyRobot {
-//     /// name of robot
-//     pub name: String,
-//     /// robot package root dir.
-//     pub root_dir: String,
-//     /// package which info of robot like urdfs/models, etc.. is stored in
-//     pub pkg_dir: String,
-// }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Component))]
