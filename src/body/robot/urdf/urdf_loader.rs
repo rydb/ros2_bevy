@@ -128,7 +128,7 @@ pub fn stage_robots_to_spawn_from_urdf(
     urdf_server: Res<Assets<UrdfRoot>>,
     mut commands: Commands,) {    
     // add urdfs you want to be loaded here
-    let robot_pkg_path = "group_robot_ros2/src/model_pkg/";
+    let robot_pkg_path = "example_bot/src/model_pkg/";
     let diff_bot = BevyRobot {
         urdf_file: 
             asset_server.load(robot_pkg_path.to_owned() + "urdf/diff_bot.xml"),
