@@ -15,7 +15,7 @@ use urdf_rs::Robot;
 use super::model_properties::*;
 use super::recall::*;
 use super::asset_source::*;
-
+use bevy::reflect::TypePath;
 pub trait RefTrait: Ord + Eq + Copy + Send + Sync + 'static {}
 
 impl RefTrait for u32 {}
@@ -263,7 +263,7 @@ impl BevyModel {
 }
 
 
-#[derive(Component, Clone, Debug, Deref, DerefMut, TypeUuid)]
+#[derive(Component, Clone, Debug, Deref, DerefMut, TypePath, TypeUuid)]
 #[uuid = "fe707f9e-c6f3-11ed-afa1-0242ac120002"]
 pub struct UrdfRoot(pub Robot);
 

@@ -7,15 +7,14 @@ mod systems;
 pub mod custom_asset_loader_test;
 pub mod urdf;
 
-
-use crate::mesh::example::*;
+//use crate::mesh::example::*;
 use crate::body::robot::systems::*;
 use super::robot::urdf::urdf_loader::*;
 use super::robot::urdf::urdf_spawner::*;
 use super::robot::urdf::urdf_to_bevy::*;
 use crate::timers::resources::*;
 
-use bevy_flycam::PlayerPlugin;
+//use bevy_flycam::PlayerPlugin; // bevy 0.10
 use bevy_rapier3d::prelude::*;
 use bevy_obj::*;
 
@@ -37,7 +36,7 @@ pub struct TimerManagerPlugin;
 impl Plugin for TimerManagerPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_system(tick_despawn_timer)
+        .add_systems(Update, tick_despawn_timer)
         ;
     }
 }
@@ -50,7 +49,12 @@ impl Plugin for AssetLoadersPlugin {
     fn build(&self, app: &mut App) {
         app
         .add_state::<AssetLoaderStates>()
-        .add_plugin(ObjPlugin) // .obj
+        .add_plugins(
+            (
+                ObjPlugin, //adds support for .obj files 
+                TimerManagerPlugin
+            ) // manages timer functionality
+        )
         .add_asset_loader(CustomAssetLoader) // for loading CustomAsset Example
         // urdf loading stuff
         .add_asset_loader(UrdfLoader) // Enables loading urdfs via `UrdfRoot` Supports .xml (TODO) Add .urdf support?
@@ -61,11 +65,10 @@ impl Plugin for AssetLoadersPlugin {
             LoadingState::new(AssetLoaderStates::AssetLoading).continue_to_state(AssetLoaderStates::Next)
         )
         .add_collection_to_loading_state::<_, SpawnableRobots>(AssetLoaderStates::AssetLoading)
-        .add_system(stage_robots_to_spawn_from_urdf.in_schedule(OnEnter(AssetLoaderStates::Next)))
-        .add_system(spawn_unspawned_robots)
+        .add_systems(OnEnter(AssetLoaderStates::Next), stage_robots_to_spawn_from_urdf)
+        .add_systems(Update, spawn_unspawned_robots)
         
         // Timers
-        .add_plugin(TimerManagerPlugin)
         ;
     }
 }
@@ -75,15 +78,17 @@ pub struct BasePlateWorld;
 impl Plugin for BasePlateWorld {
     fn build(&self, app: &mut App) {
         app
-        .add_plugin(AssetLoadersPlugin)
-        .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
-        .add_plugin(RapierDebugRenderPlugin::default())
-        .add_plugin(PlayerPlugin)
-
-
+        .add_plugins(
+            (
+            AssetLoadersPlugin, // asset loaders
+            //physics stuff -V
+            RapierPhysicsPlugin::<NoUserData>::default(),
+            RapierDebugRenderPlugin::default()
+            )
+        )
         
-        .add_startup_system(setup_physics)
-        .add_system(display_contacts)
+        .add_systems(Startup, setup_physics)
+        .add_systems(Update, display_contacts)
         ;
     }
 }
@@ -94,7 +99,7 @@ pub struct RobotTestPlugin;
 impl Plugin for RobotTestPlugin {
     fn build(&self, app: &mut App){
         app
-        .add_plugin(BasePlateWorld) // World type.
+        .add_plugins(BasePlateWorld) // World type.
         ;
     }
 }
@@ -104,8 +109,8 @@ pub struct FeatureTestPlugin;
 impl Plugin for FeatureTestPlugin {
     fn build(&self, app: &mut App) {
         app
-        .add_plugin(BasePlateWorld)
-        .add_plugin(CustomMeshTestPlugin)
+        .add_plugins(BasePlateWorld)
+        //.add_plugin(CustomMeshTestPlugin)
         ;
     }
 }
@@ -115,5 +120,13 @@ fn setup_physics(mut commands: Commands) {
     commands
         .spawn(Collider::cuboid(100.0, 0.1, 100.0))
         .insert(TransformBundle::from(Transform::from_xyz(0.0, -2.0, 0.0)));
+
+    /* spawn simple camera */
+    commands.spawn(
+        Camera3dBundle {
+            transform: Transform::from_xyz(0.0, 0.0, 10.0),
+            ..default()
+        }
+    );
 
 }
