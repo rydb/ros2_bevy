@@ -12,6 +12,7 @@ use crate::body::robot::systems::*;
 use super::robot::urdf::urdf_loader::*;
 use super::robot::urdf::urdf_spawner::*;
 use super::robot::urdf::urdf_to_bevy::*;
+
 use crate::timers::resources::*;
 
 //use bevy_flycam::PlayerPlugin; // bevy 0.10
@@ -122,11 +123,13 @@ fn setup_physics(mut commands: Commands) {
         .insert(TransformBundle::from(Transform::from_xyz(0.0, -2.0, 0.0)));
 
     /* spawn simple camera */
-    commands.spawn(
-        Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 0.0, 10.0),
-            ..default()
-        }
-    );
+    // commands.spawn(
+    //     Camera3dBundle {
+    //         transform: Transform::from_xyz(0.0, 0.0, 10.0)
+    //             .with_rotation(Quat::from_rotation_y(3.12 / 2.0)),
+            
+    //         ..default()
+    //     }
+    // );
 
 }
