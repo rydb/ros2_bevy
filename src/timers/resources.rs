@@ -31,33 +31,3 @@ pub fn tick_despawn_timer(
         }
     }
 }
-
-
-// timer that counts down
-// #[derive(Component)]
-// pub struct CountDownTimer {
-//     pub timer: Timer,
-// }
-
-// impl CountDownTimer {
-//     pub fn new(seconds: f32) -> Self {
-//         Self {
-//             timer: Timer::from_seconds(seconds, TimerMode::Once)
-//         }
-//     }
-// }
-
-// pub fn tick_countdown_timer(
-//     time: Res<Time>,
-//     mut countdown_timer_query: Query<&CountDownTimer>,
-// ) {
-//     for countdown_timer in countdown_timer_query.iter_mut() {
-//         countdown_timer.timer.tick(time.delta());
-//     }
-// }
-
-// impl Default for CountDownTimer {
-//     // fn default() -> CountDownTimer {
-//     //     CountDownTimer { timer: Timer::from_seconds(ENEMY_SPAWN_TIME, TimerMode::Repeating) ,}
-//     // }
-// }
