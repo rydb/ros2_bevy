@@ -96,7 +96,7 @@ pub fn display_contacts(
                     (
                         ParticleBundle::new(
                             meshes.add(shape::Cube{size: cube_size}.into()),
-                            materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+                            materials.add(Color::rgb(0.1, 0.5, 0.3).into()),
                             Transform::from_translation(contact_point.local_p1())
                         ),
                         DespawnTimer::new(0.3 as f32),
