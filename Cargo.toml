@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 bevy = { version = "0.11", features = ["dynamic_linking"]}
 rand = "0.8.5"
+bevy_mod_raycast = "0.9"
 # bevy_mod_picking = {git = "https://github.com/aevyrie/bevy_mod_picking.git", rev = "e2d1a935ebc05634fa4e06bb417a208635a74c88"}
 # bevy_flycam = "*"
 bevy_flycam = { git = "https://github.com/sburris0/bevy_flycam.git", rev = "4ed8bcebac4210f30c7d757c3fd2fba7a1d275e2"  }

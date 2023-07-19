@@ -11,6 +11,7 @@ pub struct Part;
 
 pub fn spawn_urdf_cube(
     mut commands: Commands,
+    mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut robots: Query<Entity, &BevyRobot>
 ) {
@@ -19,6 +20,8 @@ pub fn spawn_urdf_cube(
         commands.spawn(ModelBundle::new(
             meshes.add(Mesh::from(shape::Cube {size: 1.0})),
             Transform::from_xyz(0.0, 0.0, 0.0),
+            materials.add(Color::PINK.into())
+
         ));
     }
 }
@@ -31,7 +34,7 @@ pub fn spawn_urdf_cube(
 pub fn spawn_cube(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    //mut materials: ResMut<Assets<StandardMaterial>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
     //assset_server: Res<AssetServer>,
 
     //model_query: Query<Entity, With<BevyRobot>>,
@@ -39,7 +42,8 @@ pub fn spawn_cube(
     let cube = commands.spawn(
         ModelBundle::new(
             meshes.add(Mesh::from(shape::Cube {size: 1.0})),
-            Transform::from_xyz(0.0, 0.0, 0.0),
+            Transform::from_xyz(0.0, 10.0, 0.0),
+            materials.add(Color::PINK.into())
         )
 
             

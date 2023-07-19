@@ -1,3 +1,4 @@
+use bevy_mod_raycast::RaycastMesh;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::convert::From;
@@ -49,27 +50,25 @@ pub struct ModelBundle {
     velocity: Velocity,
     /// sets weather continous or discrete collision is the collision detection for this model. Continous = more accurate/more slow, discrete = faster/more innacurate
     continous_collision_setting: Ccd, 
+    /// "for filtering what pair of colliders should have their contacts (or intersection test if at least one of the colliders is a sensor) computed by the narrow-phase. This filtering happens right after the broad-phase, at the beginning of the narrow phase."
+    collision_groups: CollisionGroups,
+    /// "A solver_groups for filtering what pair of colliders should have their contact forces computed. This filtering happens at the end of the narrow-phase, before the constraints solver"
+    solver_groups: SolverGroups,
+    /// raycast mesh for getting selected by raycasts that look for rigid bodies. Should be left initialized by ..default()
+    raycast_for_rigidbody: RaycastMesh<RigidBody>,
+
+    
 }
 
-impl ModelBundle {
-    pub fn new(
-        mesh_handle: Handle<Mesh>,
-        model_position: Transform,
-    ) -> Self {
-        return Self {
-            model: PbrBundle {
-                mesh: mesh_handle,
-                material: default(),
-                transform: model_position,
-                ..default()
-
-            },
+impl Default for ModelBundle {
+    fn default() -> Self{
+        Self {
+            model: PbrBundle::default(),
             rigid_body: RigidBody::Dynamic,
-            
             async_collider: AsyncCollider(ComputedColliderShape::ConvexDecomposition
-            (
-                default()
-            )),
+                (
+                    default()
+                )),
             continous_collision_setting: Ccd::enabled(),
             mass: AdditionalMassProperties::Mass(1.0),
             friction: Friction { coefficient: (1.0), combine_rule: (CoefficientCombineRule::Average) },
@@ -81,6 +80,34 @@ impl ModelBundle {
                 linvel: (Vec3::default()),
                 angvel: (Vec3::default()), 
             },
+            collision_groups: Default::default(),
+            solver_groups: Default::default(),
+            raycast_for_rigidbody: RaycastMesh::<RigidBody>::default()
+        }
+    }
+}
+
+impl ModelBundle {
+
+    
+    pub fn new(
+        mesh_handle: Handle<Mesh>,
+        model_position: Transform,
+        material_handle: Handle<StandardMaterial>,
+        // model_collision_groups: Option<CollisionGroups>,
+        // model_solver_groups: Option<SolverGroups>,
+    ) -> Self {
+        return Self {
+            model: PbrBundle {
+                mesh: mesh_handle,
+                material: material_handle,
+                transform: model_position,
+                ..default()
+
+            },
+            // collision_groups: model_collision_groups.unwrap_or_default(),
+            // solver_groups: model_solver_groups.unwrap_or_default(),
+            ..default()
         }
     }
 }

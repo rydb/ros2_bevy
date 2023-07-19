@@ -88,8 +88,8 @@ impl Plugin for BasePlateWorld {
             )
         )
         
-        .add_systems(Startup, setup_physics)
-        .add_systems(Update, display_contacts)
+        .add_systems(Startup, (setup_physics, spawn_cube ))
+        //.add_systems(Update, display_contacts)
         ;
     }
 }
@@ -115,6 +115,7 @@ impl Plugin for FeatureTestPlugin {
         ;
     }
 }
+
 
 fn setup_physics(mut commands: Commands) {
     /* Create the ground. */

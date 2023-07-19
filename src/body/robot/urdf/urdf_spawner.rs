@@ -22,6 +22,8 @@ use bevy_rapier3d::prelude::*;
 pub fn spawn_unspawned_robots(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+
     urdf_server: Res<Assets<UrdfRoot>>,
     asset_server: Res<AssetServer>,
     new_urdfs: Query<(Entity, &BevyRobot), Without<GlobalTransform>> 
@@ -86,9 +88,13 @@ pub fn spawn_unspawned_robots(
                             let z = *visual_link.origin.xyz.get(2).unwrap() as f32;
                             let model = ModelBundle::new(
                                 model_mesh_handle,
-                                Transform::from_xyz(x, y, z)
+                                Transform::from_xyz(x, y, z),
+                                materials.add(Color::PINK.into())
                             );
-                            let model_entity = commands.spawn(model).id();
+                            let model_entity = commands.spawn(model)
+                            //make model not collide with it self for debuggign joints
+                            .insert(CollisionGroups::new(Group::GROUP_1, Group::GROUP_10))
+                            .id();
                             commands.entity(e).add_child(model_entity);
                             
                             link_name_to_entity.insert(link.name.clone(), model_entity);
@@ -96,13 +102,6 @@ pub fn spawn_unspawned_robots(
 
 
                         }
-                        
-                        // let part = commands.spawn(
-                        //     (
-                        //         ModelBundle::new(urdf, link.)
-                        //     )
-                        // )
-
                     }
                     // take joints, and form joint with 
                     for joint in &urdf.joints {
@@ -124,13 +123,13 @@ pub fn spawn_unspawned_robots(
                                 
                                 let trans = Vec3::new(x, y, z);
                                 //let trans = Vec3::new((x.abs()/ x) *0.75, 0.50, 0.40);
-                                println!("{:#?}",trans);
+                                //println!("{:#?}",trans);
                                 let rot = Vec3::from_array(joint.origin.rpy.map(|t| t as f32));
                                 let rot = RapierRotation::from_euler_angles(rot[0], rot[1], rot[2]);
                                 let joint_data = match joint.joint_type {
                                     JointType::Revolute  | JointType::Continuous => {
                                         let axis = Vec3::from_array(joint.axis.xyz.map(|t| t as f32));
-                                        println!("axis is {:#?}", axis);
+                                        //println!("axis is {:#?}", axis);
                                         let joint = RevoluteJointBuilder::new(axis)
                                             .local_anchor2(trans)
                                             .limits([joint.limit.lower as f32, joint.limit.upper as f32])
@@ -189,7 +188,7 @@ pub fn spawn_unspawned_robots(
                         // if let Some(parent) = link_name_to_entity.get(&joint.parent.link) {
                         //     if let(Some)
                         // }
-                        println!("attaching joints for: {:#?}", joint);
+                        //println!("attaching joints for: {:#?}", joint);
                     }
             },
             None => println!("urdf not loaded yet for current bot. load attempt aborted")
