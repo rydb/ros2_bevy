@@ -29,6 +29,38 @@ impl ParticleBundle {
     }
 }
 
+/// Bundle for things that interact with physics objects, but aren't affected by physics them selves.
+/// Generally used to make a physics capable objects inert.
+// #[derive(Bundle)]
+// pub struct PhysicsDisabledBundle{
+//     rigid_body: RigidBody,
+
+// }
+
+// impl Default for PhysicsDisabledBundle {
+//     fn default() -> Self {
+        
+//     }
+// }
+
+/// Bundle for things that use Physics actively. Used for models to simulate physics
+// #[derive(Bundle)]
+// pub struct PhysicsBundle {}
+
+// impl PhysicsBundle {
+//     // disabled version of physics bundle. I.E: Physics object that interacts with physics objects, but isn't affected by physics
+//     pub fn default_disabled() -> Self {
+
+//     }
+//     pub fn default_enabled() -> Self {
+        
+//     }
+// }
+
+// impl Default for PhysicsBundle {
+
+// }
+
 /// Bundle that contains everything a model to simulate interacting with physics.
 ///
 ///  Use ```new()``` to initialize this more easily.
@@ -45,7 +77,7 @@ pub struct ModelBundle {
     /// friction rules for object. No clue how this works, and this should probably be abstracted away from the user's eyes through a "Material" component/resource?
     friction: Friction,
     /// external forces being applied on a robot. These are not implied(except gravity?), and must be manually set on robot initialization.
-    external_forces: ExternalForce, 
+    //external_forces: ExternalForce, 
     /// velocity of object. A model does not need this object to have a velocity, but `in order to read/write to the object's velocity, you need to have this object`
     velocity: Velocity,
     /// sets weather continous or discrete collision is the collision detection for this model. Continous = more accurate/more slow, discrete = faster/more innacurate
@@ -56,8 +88,7 @@ pub struct ModelBundle {
     solver_groups: SolverGroups,
     /// raycast mesh for getting selected by raycasts that look for rigid bodies. Should be left initialized by ..default()
     raycast_for_rigidbody: RaycastMesh<RigidBody>,
-
-    
+    // weather rigid body is selected    
 }
 
 impl Default for ModelBundle {
@@ -72,17 +103,17 @@ impl Default for ModelBundle {
             continous_collision_setting: Ccd::enabled(),
             mass: AdditionalMassProperties::Mass(1.0),
             friction: Friction { coefficient: (1.0), combine_rule: (CoefficientCombineRule::Average) },
-            external_forces: ExternalForce {
-                force: (Vec3::new(0.0, 0.0, 0.0)),
-                torque: (Vec3::new(0.0, 0.0, 0.0))
-                },
+            // external_forces: ExternalForce { /// Can't think of a reason to use external force, commenting out for now.
+            //     force: (Vec3::new(0.0, 0.0, 0.0)),
+            //     torque: (Vec3::new(0.0, 0.0, 0.0))
+            //     },
             velocity: Velocity{
                 linvel: (Vec3::default()),
                 angvel: (Vec3::default()), 
             },
             collision_groups: Default::default(),
             solver_groups: Default::default(),
-            raycast_for_rigidbody: RaycastMesh::<RigidBody>::default()
+            raycast_for_rigidbody: RaycastMesh::<RigidBody>::default(),
         }
     }
 }
