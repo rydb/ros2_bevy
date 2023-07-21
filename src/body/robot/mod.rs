@@ -117,20 +117,27 @@ impl Plugin for FeatureTestPlugin {
 }
 
 
-fn setup_physics(mut commands: Commands) {
+fn setup_physics(
+    mut commands: Commands,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+
+) {
+    println!("spawning ground");
+    let base_plate_size = 100.0;
     /* Create the ground. */
     commands
-        .spawn(Collider::cuboid(100.0, 0.1, 100.0))
-        .insert(TransformBundle::from(Transform::from_xyz(0.0, -2.0, 0.0)));
-
-    /* spawn simple camera */
-    // commands.spawn(
-    //     Camera3dBundle {
-    //         transform: Transform::from_xyz(0.0, 0.0, 10.0)
-    //             .with_rotation(Quat::from_rotation_y(3.12 / 2.0)),
-            
-    //         ..default()
-    //     }
-    // );
-
+        .spawn(
+            PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Plane{
+                size: base_plate_size * 2.0,
+                subdivisions: 0,
+            }
+            )),
+            material: materials.add(Color::WHITE.into()),
+            transform: Transform::from_xyz(0.0, -5.0, 0.0),
+            ..default()
+        })
+        .insert(Collider::cuboid(base_plate_size, 0.1, base_plate_size))
+        ;
 }

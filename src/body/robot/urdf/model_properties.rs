@@ -15,113 +15,11 @@
  *
 */
 
-use super::recall::{Recall};
+//use super::recall::{Recall};
 use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 use bevy::prelude::{Deref, DerefMut};
-pub const DEFAULT_LEVEL_HEIGHT: f32 = 3.0;
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Side {
-    Left,
-    Right,
-}
-
-impl Side {
-    pub fn label(&self) -> &'static str {
-        match self {
-            Side::Left => "Left",
-            Side::Right => "Right",
-        }
-    }
-
-    pub fn opposite(&self) -> Side {
-        match self {
-            Side::Left => Side::Right,
-            Side::Right => Side::Left,
-        }
-    }
-
-    pub fn index(&self) -> usize {
-        match self {
-            Side::Left => 0,
-            Side::Right => 1,
-        }
-    }
-
-    /// The popular convention for robotics is for "Forward" to be along the
-    /// +x axis, which means "Left" is +y and "Right" is -y. To conform with
-    /// that convention, this function gives back +1.0 for Left and -1.0 for y.
-    pub fn sign(&self) -> f32 {
-        match self {
-            Side::Left => 1.0,
-            Side::Right => -1.0,
-        }
-    }
-
-    /// When the pivot of a door is on this side, get the angle of the door
-    /// when it is closed.
-    pub fn pivot_closed_angle(&self) -> Angle {
-        Angle::Deg(self.index() as f32 * 180.0 - 90.0)
-    }
-}
-
-/// Enumeration for the faces of a rectangle. Conventionally:
-/// Front: +x
-/// Back: -x
-/// Left: +y
-/// Right: -y
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum RectFace {
-    Front,
-    Back,
-    Left,
-    Right,
-}
-
-impl RectFace {
-    pub fn iter_all() -> impl Iterator<Item = RectFace> {
-        [Self::Front, Self::Back, Self::Left, Self::Right].into_iter()
-    }
-
-    pub fn label(&self) -> &'static str {
-        match self {
-            Self::Front => "Front",
-            Self::Back => "Back",
-            Self::Left => "Left",
-            Self::Right => "Right",
-        }
-    }
-
-    /// A vector from the center of the rectangle towards this face.
-    pub fn u(&self) -> Vec3 {
-        match self {
-            Self::Front => Vec3::X,
-            Self::Back => Vec3::NEG_X,
-            Self::Left => Vec3::Y,
-            Self::Right => Vec3::NEG_Y,
-        }
-    }
-
-    /// A vector from the center of the rectange towards your "left-hand"
-    /// direction while looking at this face.
-    pub fn v(&self) -> Vec3 {
-        match self {
-            Self::Front => Vec3::Y,
-            Self::Back => Vec3::NEG_Y,
-            Self::Left => Vec3::NEG_X,
-            Self::Right => Vec3::X,
-        }
-    }
-
-    pub fn uv(&self) -> (Vec3, Vec3) {
-        (self.u(), self.v())
-    }
-
-    pub fn uv2(&self) -> (Vec2, Vec2) {
-        (self.u().truncate(), self.v().truncate())
-    }
-}
 
 // Removed `Serialized` and `Deserialize` macro here because its broken for glam::Vec3????
 #[derive(Component, Deref, DerefMut, PartialEq, Clone, Debug)]
@@ -387,20 +285,20 @@ pub struct RecallLabel {
     pub value: Option<String>,
 }
 
-impl Recall for RecallLabel {
-    type Source = Label;
+// impl Recall for RecallLabel {
+//     type Source = Label;
 
-    fn remember(&mut self, source: &Self::Source) {
-        match &source.0 {
-            Some(value) => {
-                self.value = Some(value.clone());
-            }
-            None => {
-                // Do nothing
-            }
-        }
-    }
-}
+//     fn remember(&mut self, source: &Self::Source) {
+//         match &source.0 {
+//             Some(value) => {
+//                 self.value = Some(value.clone());
+//             }
+//             None => {
+//                 // Do nothing
+//             }
+//         }
+//     }
+// }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[serde(transparent)]

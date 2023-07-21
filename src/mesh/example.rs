@@ -8,7 +8,7 @@ impl Plugin for CustomMeshTestPlugin {
     fn build(&self, app: &mut App) {
         app
         .insert_resource(Msaa::Sample4)
-        .add_startup_system(spawn_custom_mesh)    
+        .add_systems(Startup, spawn_custom_mesh)    
         ;
     }
 

@@ -16,7 +16,7 @@ use bevy::{
 
 //use crate::body::robot::components::ModelBundle;
 
-use super::urdf_to_bevy::{UrdfRoot};
+use super::urdf_to_bevy::UrdfRoot;
 
 use thiserror::Error;
 
@@ -123,9 +123,9 @@ impl BevyRobot {
 /// stages bevy robots to be spawned in the world by a later spawner function
 
 pub fn stage_robots_to_spawn_from_urdf(
-    mut robots: ResMut<SpawnableRobots>,
+    //mut robots: ResMut<SpawnableRobots>,
     asset_server: Res<AssetServer>,
-    urdf_server: Res<Assets<UrdfRoot>>,
+    //urdf_server: Res<Assets<UrdfRoot>>,
     mut commands: Commands,) {    
     // add urdfs you want to be loaded here
     let robot_pkg_path = "example_bot/src/model_pkg/";

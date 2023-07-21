@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 //use crate::body::robot::components::ModelBundle;
 
-use super::urdf_to_bevy::{UrdfRoot};
+use super::urdf_to_bevy::UrdfRoot;
 use super::urdf_loader::BevyRobot;
 //use std::prelude::*;
 
@@ -9,7 +9,7 @@ use std::collections::{HashMap, HashSet};
 
 use bevy_rapier3d::na::geometry::Rotation as RapierRotation;
 
-use crate::body::robot::components::{ModelBundle};
+use crate::body::robot::components::ModelBundle;
 
 use crate::Mesh;
 use urdf_rs::Geometry::{Box, Cylinder, Capsule, Sphere, Mesh as UrdfMesh};
@@ -39,14 +39,10 @@ pub fn spawn_unspawned_robots(
                 // keep a hash map of all links within the urdf for attaching joints later.
                 let mut link_name_to_entity = HashMap::new();
                 let mut root_links: HashSet<Entity> = HashSet::new();
-                let spawned_robot = commands.entity(e).insert(
-                    (
-                        SpatialBundle::default()
-                        // ComputedVisibility::HIDDEN,    
-                        // GlobalTransform::from_xyz(0.0, 0.0, 0.0),
-                        // //RigidBody::Dynamic
-                    )
-                    );
+                commands.entity(e).insert((
+                        SpatialBundle::default(),
+                )
+                    ).insert(                        GlobalTransform::from_xyz(0.0, 5.0,0.0));
                     for link in &urdf.links {                        // for each part, spawn a sub part to be linked to the main robot later.
                         //println!("spawning link: {:#?}", link);
                         for visual_link in &link.visual {
@@ -72,7 +68,7 @@ pub fn spawn_unspawned_robots(
                                     depth: 0.0, // a capsule is a sphere if there is no mid section, and the icosphere doesnt work for Mesh::from....
                                     ..default()
                                 })),
-                                UrdfMesh { filename, scale } => {
+                                UrdfMesh { filename, .. } => {
                                     // set filename to asset source, then set it back to string so path can be trimmed just for the filename + extension.
                                     // let asset_source= AssetSource::from(filename);
                                     // let cleaned_path = String::from(&asset_source);
@@ -114,8 +110,8 @@ pub fn spawn_unspawned_robots(
                         let checks = parent_check.zip(child_check);
                         match checks {
                             Some(..) => {
-                                ///(TODO) .dae to .obj HOT FIX. BLENDER OVER SCALES MODEL BY 10X,
-                                /// THIS SHOULD BE REPLACED BY A PLUGIN TO GET MODEL CONVERSIONS VIA A BLENDER/FREECAD PLUGIN!!!
+                                //(TODO) .dae to .obj HOT FIX. BLENDER OVER SCALES MODEL BY 10X,
+                                // THIS SHOULD BE REPLACED BY A PLUGIN TO GET MODEL CONVERSIONS VIA A BLENDER/FREECAD PLUGIN!!!
                                 let blender_obj_overscale_correction = 10.0;
                                 
                                 println!("creating joint between models");

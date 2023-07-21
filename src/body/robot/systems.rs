@@ -2,29 +2,12 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use crate::timers::resources::DespawnTimer;
 
-use crate::body::robot::{components::*, BevyRobot};
+use crate::body::robot::components::*;
 
 // used to donote spawned model is a "part". Used to check
 // for any models that the part is "bound" to.
 #[derive(Component)]
 pub struct Part;
-
-pub fn spawn_urdf_cube(
-    mut commands: Commands,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut robots: Query<Entity, &BevyRobot>
-) {
-    for robot in robots.iter() {
-        println!("spawning robot");
-        commands.spawn(ModelBundle::new(
-            meshes.add(Mesh::from(shape::Cube {size: 1.0})),
-            Transform::from_xyz(0.0, 0.0, 0.0),
-            materials.add(Color::PINK.into())
-
-        ));
-    }
-}
 
 ///TODO
 /// 1. ADD ROBOT SPAWNING
@@ -39,34 +22,23 @@ pub fn spawn_cube(
 
     //model_query: Query<Entity, With<BevyRobot>>,
 ) {
-    let cube = commands.spawn(
+    commands.spawn(
         ModelBundle::new(
             meshes.add(Mesh::from(shape::Cube {size: 1.0})),
             Transform::from_xyz(0.0, 10.0, 0.0),
             materials.add(Color::PINK.into())
-        )
+        )   
+    );
 
-            
-    ).id();
-
-}
-
-pub fn list_robots (
-    model_query: Query<&BevyRobot>,
-) {
-    //println!("currentrobots are: ");
-    for robot in model_query.iter() {
-        
-        //println!("{:#?}", robot.name)
-    }
 }
 
 /// create a green point at point(with a despawn timer!!) to show where contacts happenw within a model
+#[allow(dead_code)]
 pub fn display_contacts(
     mut commands: Commands, 
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    entity_mesh_querry: Query<(Entity, &Handle<Mesh>)>,
+    //entity_mesh_querry: Query<(Entity, &Handle<Mesh>)>,
     rapier_context: Res<RapierContext>) {
 
     for contact in rapier_context.contact_pairs() {
@@ -96,16 +68,17 @@ pub fn display_contacts(
                 //println!("first collider mehs is {:#?}", e.unwrap())
                 let cube_size = 0.03 as f32;
                 // make dots, make them into joints to connect to root mesh
-                let collision_marker = commands.spawn(
+                commands.spawn(
                     (
-                        ParticleBundle::new(
-                            meshes.add(shape::Cube{size: cube_size}.into()),
-                            materials.add(Color::rgb(0.1, 0.5, 0.3).into()),
-                            Transform::from_translation(contact_point.local_p1())
-                        ),
+                        PbrBundle {
+                            mesh: meshes.add(shape::Cube{size: cube_size}.into()),
+                            material: materials.add(Color::rgb(0.1, 0.5, 0.3).into()),
+                            transform: Transform::from_translation(contact_point.local_p1()),
+                            ..default()
+                        },
                         DespawnTimer::new(0.3 as f32),
                     )
-                ).id();
+                );
                 // // commands.spawn(
                 // //     (
                 // //         ParticleBundle::new(
@@ -139,9 +112,9 @@ pub fn display_contacts(
 
 // moves all robots forward(knowing the total forces being exerted on the collider would be helpful? Mabye for establishing some kind of formula?)
 pub fn move_robot_forward(
-    mut model_query: Query<&mut ExternalForce, With<BevyRobot>>,
+    //mut model_query: Query<&mut ExternalForce>,
     //mut timer_query: ResMut<CountDownTimer>,
-    time: Res<Time>,
+    //time: Res<Time>,
     
 ) {
     //todo!("not implemented")

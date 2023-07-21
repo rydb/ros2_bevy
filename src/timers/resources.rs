@@ -25,7 +25,7 @@ pub fn tick_despawn_timer(
         //println!("ticking timer");
         timer.timer.tick(time.delta());
 
-        if(timer.timer.finished()) {
+        if timer.timer.finished() {
             //println!("despawning particle");
             commands.entity(e).despawn();
         }

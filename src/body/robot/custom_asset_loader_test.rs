@@ -43,10 +43,12 @@ pub struct State {
     pub printed: bool,
 }
 
+#[allow(dead_code)]
 pub fn setup(mut state: ResMut<State>, asset_server: Res<AssetServer>) {
     state.handle = asset_server.load("asset.custom");
 }
 
+#[allow(dead_code)]
 pub fn print_on_load(mut state: ResMut<State>, custom_assets: ResMut<Assets<CustomAsset>>) {
     let custom_asset = custom_assets.get(&state.handle);
     if state.printed || custom_asset.is_none() {

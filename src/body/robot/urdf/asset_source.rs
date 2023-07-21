@@ -1,4 +1,4 @@
-use bevy::prelude::{Component, Handle, Mesh};
+use bevy::prelude::Component;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 

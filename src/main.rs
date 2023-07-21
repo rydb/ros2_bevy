@@ -1,7 +1,6 @@
 mod body;
 mod timers;
 mod mesh;
-mod cameras;
 
 use std::f32::consts::PI;
 
@@ -9,13 +8,11 @@ use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
 use bevy_rapier3d::prelude::{RigidBody, GravityScale};
 use body::robot::{FeatureTestPlugin, RobotTestPlugin};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use bevy_inspector_egui::prelude::*;
 use bevy_flycam::prelude::*;
 use bevy_mod_raycast::{
     print_intersections, DefaultPluginState, DefaultRaycastingPlugin, RaycastMesh, RaycastMethod,
     RaycastSource, RaycastSystem,
 };
-use rapier3d::crossbeam::channel::Select;
 //use crate::body::cube::components::*;
 
 fn main() {

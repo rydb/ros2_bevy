@@ -13,20 +13,20 @@ pub struct ParticleBundle {
 }
 
 impl ParticleBundle {
-    pub fn new(
-        mesh_handle: Handle<Mesh>,
-        material_handle: Handle<StandardMaterial>,
-        transform: Transform,
-    ) -> Self {
-        Self {
-            model: PbrBundle {
-                mesh: mesh_handle,
-                material: material_handle,
-                transform: transform,
-                ..Default::default()
-            }
-        }
-    }
+    // pub fn new(
+    //     mesh_handle: Handle<Mesh>,
+    //     material_handle: Handle<StandardMaterial>,
+    //     transform: Transform,
+    // ) -> Self {
+    //     Self {
+    //         model: PbrBundle {
+    //             mesh: mesh_handle,
+    //             material: material_handle,
+    //             transform: transform,
+    //             ..Default::default()
+    //         }
+    //     }
+    // }
 }
 
 /// Bundle for things that interact with physics objects, but aren't affected by physics them selves.
@@ -102,7 +102,7 @@ impl Default for ModelBundle {
                 )),
             continous_collision_setting: Ccd::enabled(),
             mass: AdditionalMassProperties::Mass(1.0),
-            friction: Friction { coefficient: (1.0), combine_rule: (CoefficientCombineRule::Average) },
+            friction: Friction { coefficient: (99.0), combine_rule: (CoefficientCombineRule::Average) },
             // external_forces: ExternalForce { /// Can't think of a reason to use external force, commenting out for now.
             //     force: (Vec3::new(0.0, 0.0, 0.0)),
             //     torque: (Vec3::new(0.0, 0.0, 0.0))
@@ -119,7 +119,6 @@ impl Default for ModelBundle {
 }
 
 impl ModelBundle {
-
     
     pub fn new(
         mesh_handle: Handle<Mesh>,

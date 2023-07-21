@@ -1,20 +1,18 @@
 //! Convert a urdf_rs bot to a bevy bot
 //! 
 
-use std::collections::{BTreeMap, HashSet};
-use std::io;
+use std::collections::HashSet;
 
-use bevy::ecs::system::EntityCommands;
+//use bevy::ecs::system::EntityCommands;
 use bevy::prelude::*;
-use bevy::reflect::{TypeUuid, Reflect, };
-use bevy::ecs::reflect::*;
+use bevy::reflect::TypeUuid;
 
 use glam::Vec3;
 use serde::{Deserialize, Serialize};
 use urdf_rs::Robot;
 use super::model_properties::*;
-use super::recall::*;
-use super::asset_source::*;
+//use super::recall::*;
+//use super::asset_source::*;
 use bevy::reflect::TypePath;
 pub trait RefTrait: Ord + Eq + Copy + Send + Sync + 'static {}
 
@@ -105,42 +103,42 @@ pub enum MeshPrimitive {
 }
 
 impl MeshPrimitive {
-    /// returns the bevy mesh equivilent of this enum variant..
-    pub fn bevy_equiv(&self) -> Mesh{
-        match &self {
-            Self::Box { size } => Mesh::from(shape::Box {
-                min_x: -size[0], max_x: size[0],
-                min_y: -size[1], max_y: size[1],
-                min_z: -size[2], max_z: size[2],
-            }),
-            Self::Cylinder { radius, length} => Mesh::from(shape::Cylinder{
-                radius: *radius,
-                height: *length,
-                ..default()
-            }),
-            Self::Capsule { radius, length } => Mesh::from(shape::Capsule {
-                radius: *radius,
-                depth: *length, // this is probably not right... leaving this to not throw an error in case it is...
-                ..default()
-            }),
-            Self::Sphere { radius} => Mesh::from(shape::Capsule {
-                radius: *radius,
-                depth: 0.0, // a capsule is a sphere if there is no mid section, and the icosphere doesnt work for Mesh::from....
-                ..default()
-            }),
+    // returns the bevy mesh equivilent of this enum variant..
+    // pub fn bevy_equiv(&self) -> Mesh{
+    //     match &self {
+    //         Self::Box { size } => Mesh::from(shape::Box {
+    //             min_x: -size[0], max_x: size[0],
+    //             min_y: -size[1], max_y: size[1],
+    //             min_z: -size[2], max_z: size[2],
+    //         }),
+    //         Self::Cylinder { radius, length} => Mesh::from(shape::Cylinder{
+    //             radius: *radius,
+    //             height: *length,
+    //             ..default()
+    //         }),
+    //         Self::Capsule { radius, length } => Mesh::from(shape::Capsule {
+    //             radius: *radius,
+    //             depth: *length, // this is probably not right... leaving this to not throw an error in case it is...
+    //             ..default()
+    //         }),
+    //         Self::Sphere { radius} => Mesh::from(shape::Capsule {
+    //             radius: *radius,
+    //             depth: 0.0, // a capsule is a sphere if there is no mid section, and the icosphere doesnt work for Mesh::from....
+    //             ..default()
+    //         }),
 
-        }
-    }
+    //     }
+    // }
 
-    pub fn label(&self) -> String {
-        match &self {
-            MeshPrimitive::Box { .. } => "Box",
-            MeshPrimitive::Cylinder { .. } => "Cylinder",
-            MeshPrimitive::Capsule { .. } => "Capsule",
-            MeshPrimitive::Sphere { .. } => "Sphere",
-        }
-        .to_string()
-    }
+    // pub fn label(&self) -> String {
+    //     match &self {
+    //         MeshPrimitive::Box { .. } => "Box",
+    //         MeshPrimitive::Cylinder { .. } => "Cylinder",
+    //         MeshPrimitive::Capsule { .. } => "Capsule",
+    //         MeshPrimitive::Sphere { .. } => "Sphere",
+    //     }
+    //     .to_string()
+    // }
 }
 
 
@@ -155,55 +153,55 @@ pub struct RecallMeshPrimitive {
     pub sphere_radius: Option<f32>,
 }
 
-impl Recall for RecallMeshPrimitive {
-    type Source = MeshPrimitive;
+// impl Recall for RecallMeshPrimitive {
+//     type Source = MeshPrimitive;
 
-    fn remember(&mut self, source: &MeshPrimitive) {
-        match source {
-            MeshPrimitive::Box { size } => {
-                self.box_size = Some(*size);
-            }
-            MeshPrimitive::Cylinder { radius, length } => {
-                self.cylinder_radius = Some(*radius);
-                self.cylinder_length = Some(*length);
-            }
-            MeshPrimitive::Capsule { radius, length } => {
-                self.capsule_radius = Some(*radius);
-                self.capsule_length = Some(*length);
-            }
-            MeshPrimitive::Sphere { radius } => {
-                self.sphere_radius = Some(*radius);
-            }
-        }
-    }
-}
+//     fn remember(&mut self, source: &MeshPrimitive) {
+//         match source {
+//             MeshPrimitive::Box { size } => {
+//                 self.box_size = Some(*size);
+//             }
+//             MeshPrimitive::Cylinder { radius, length } => {
+//                 self.cylinder_radius = Some(*radius);
+//                 self.cylinder_length = Some(*length);
+//             }
+//             MeshPrimitive::Capsule { radius, length } => {
+//                 self.capsule_radius = Some(*radius);
+//                 self.capsule_length = Some(*length);
+//             }
+//             MeshPrimitive::Sphere { radius } => {
+//                 self.sphere_radius = Some(*radius);
+//             }
+//         }
+//     }
+// }
 
 impl RecallMeshPrimitive {
-    pub fn assume_box(&self, current: &MeshPrimitive) -> MeshPrimitive {
-        MeshPrimitive::Box {
-            size: self.box_size.unwrap_or_default(),
-        }
-    }
+    // pub fn assume_box(&self, current: &MeshPrimitive) -> MeshPrimitive {
+    //     MeshPrimitive::Box {
+    //         size: self.box_size.unwrap_or_default(),
+    //     }
+    // }
 
-    pub fn assume_cylinder(&self, current: &MeshPrimitive) -> MeshPrimitive {
-        MeshPrimitive::Cylinder {
-            radius: self.cylinder_radius.unwrap_or_default(),
-            length: self.cylinder_length.unwrap_or_default(),
-        }
-    }
+    // pub fn assume_cylinder(&self, current: &MeshPrimitive) -> MeshPrimitive {
+    //     MeshPrimitive::Cylinder {
+    //         radius: self.cylinder_radius.unwrap_or_default(),
+    //         length: self.cylinder_length.unwrap_or_default(),
+    //     }
+    // }
 
-    pub fn assume_capsule(&self, current: &MeshPrimitive) -> MeshPrimitive {
-        MeshPrimitive::Capsule {
-            radius: self.capsule_radius.unwrap_or_default(),
-            length: self.capsule_length.unwrap_or_default(),
-        }
-    }
+    // pub fn assume_capsule(&self, current: &MeshPrimitive) -> MeshPrimitive {
+    //     MeshPrimitive::Capsule {
+    //         radius: self.capsule_radius.unwrap_or_default(),
+    //         length: self.capsule_length.unwrap_or_default(),
+    //     }
+    // }
 
-    pub fn assume_sphere(&self, current: &MeshPrimitive) -> MeshPrimitive {
-        MeshPrimitive::Sphere {
-            radius: self.sphere_radius.unwrap_or_default(),
-        }
-    }
+    // pub fn assume_sphere(&self, current: &MeshPrimitive) -> MeshPrimitive {
+    //     MeshPrimitive::Sphere {
+    //         radius: self.sphere_radius.unwrap_or_default(),
+    //     }
+    // }
 }
 
 impl Default for Geometry {
@@ -229,37 +227,37 @@ pub struct BevyModel {
 }
 
 impl BevyModel {
-    pub fn add_bevy_components(&self, mut commands: EntityCommands) {
-        match &self.geometry {
-            Geometry::Primitive(primitive) => {
+    // pub fn add_bevy_components(&self, mut commands: EntityCommands) {
+    //     match &self.geometry {
+    //         Geometry::Primitive(primitive) => {
                 
                 
-                println!("primtive model detected, spawning");
-                commands.insert((
-                    // PbrBundle {
-                    //      mesh: mesh_server.add(primitive.bevy_equiv()),
-                    //     ..default()
-                    // },
-                    primitive.clone(),
-                    self.pose.clone(),
-                    NameInWorkcell(self.name.clone()),
-                ));
-            }
-            Geometry::Mesh { filename, scale } => {
-                println!("mesh model detected, loading and spawning");
-                println!("Setting pose of {:?} to {:?}", filename, self.pose);
-                let scale = Scale(scale.unwrap_or_default());
-                // TODO(luca) Make a bundle for workcell models to avoid manual insertion here
-                commands.insert((
-                    NameInWorkcell(self.name.clone()),
-                    AssetSource::from(filename),
-                    self.pose.clone(),
-                    ConstraintDependents::default(),
-                    scale,
-                ));
-            }
-        }
-    }
+    //             println!("primtive model detected, spawning");
+    //             commands.insert((
+    //                 // PbrBundle {
+    //                 //      mesh: mesh_server.add(primitive.bevy_equiv()),
+    //                 //     ..default()
+    //                 // },
+    //                 primitive.clone(),
+    //                 self.pose.clone(),
+    //                 NameInWorkcell(self.name.clone()),
+    //             ));
+    //         }
+    //         Geometry::Mesh { filename, scale } => {
+    //             println!("mesh model detected, loading and spawning");
+    //             println!("Setting pose of {:?} to {:?}", filename, self.pose);
+    //             let scale = Scale(scale.unwrap_or_default());
+    //             // TODO(luca) Make a bundle for workcell models to avoid manual insertion here
+    //             commands.insert((
+    //                 NameInWorkcell(self.name.clone()),
+    //                 AssetSource::from(filename),
+    //                 self.pose.clone(),
+    //                 ConstraintDependents::default(),
+    //                 scale,
+    //             ));
+    //         }
+    //     }
+    // }
 }
 
 
