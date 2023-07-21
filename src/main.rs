@@ -9,6 +9,7 @@ use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
 use bevy_rapier3d::prelude::{RigidBody, GravityScale};
 use body::robot::{FeatureTestPlugin, RobotTestPlugin};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_inspector_egui::prelude::*;
 use bevy_flycam::prelude::*;
 use bevy_mod_raycast::{
     print_intersections, DefaultPluginState, DefaultRaycastingPlugin, RaycastMesh, RaycastMethod,
@@ -62,8 +63,6 @@ enum SelectedForEdit {
     Off,   
 }
 
-
-
 /// editor for selected rigid bodies
 fn rigid_body_editor(
     mut commands: Commands,
@@ -73,8 +72,15 @@ fn rigid_body_editor(
     // translation to be added after collecting all pressed key translation additions
     // some of these are definatly wrong and will need tweaking...
 
+    // if reset rotation key is pressed, this should reset rotation to zero when set to true.
+    let mut reset_rotation = false;
+
+    // if this is enabled, model will be deselected during seelction checks for models.
+    let mut deselect = false;
     //vertical/horizontal rotations
     let mut trans_to_add = Transform::from_xyz(0.0, 0.0, 0.0);
+    
+
     if keys.pressed(KeyCode::Space) {
         trans_to_add.translation += Vec3::new(0.0, 0.1, 0.0)
     }
@@ -94,20 +100,20 @@ fn rigid_body_editor(
         trans_to_add.translation += Vec3::new(-0.0, 0.0, -0.1)
     }
     if keys.pressed( KeyCode::Numpad4) {
-        trans_to_add.rotate(Quat::from_rotation_x(0.1))
-    }
-    if keys.pressed( KeyCode::Numpad6) {
-        trans_to_add.rotate(Quat::from_rotation_x(-0.1))
-    }
-    if keys.pressed( KeyCode::Numpad8) {
         trans_to_add.rotate(Quat::from_rotation_y(0.1))
     }
-    if keys.pressed( KeyCode::Numpad2) {
+    if keys.pressed( KeyCode::Numpad6) {
         trans_to_add.rotate(Quat::from_rotation_y(-0.1))
+    }
+    if keys.pressed( KeyCode::Numpad8) {
+        trans_to_add.rotate(Quat::from_rotation_z(-0.1))
+    }
+    if keys.pressed( KeyCode::Numpad2) {
+        trans_to_add.rotate(Quat::from_rotation_z(0.1))
     }
     // diagonal rotations
     if keys.pressed( KeyCode::Numpad7) {
-        trans_to_add.rotate(Quat::from_axis_angle(Vec3::new(1.0, 1.0, 0.0), 0.1))
+        trans_to_add.rotate(Quat::from_axis_angle(Vec3::new(1.0, 1.0, 0.0), -0.1))
     }
     if keys.pressed( KeyCode::Numpad9) {
         trans_to_add.rotate(Quat::from_axis_angle( Vec3::new(1.0, 1.0, 0.0),-0.1))
@@ -118,12 +124,18 @@ fn rigid_body_editor(
     if keys.pressed( KeyCode::Numpad3) {
         trans_to_add.rotate(Quat::from_axis_angle( Vec3::new(-1.0, 1.0, 0.0),-0.1))
     }
+    if keys.pressed(KeyCode::ControlLeft) {
+        reset_rotation = true;
+    }
 
     for (e, rigidbody, selected, mut trans) in selected_models.iter_mut() {
         match selected {
             SelectedForEdit::On => {
                 trans.translation += trans_to_add.translation;
                 trans.rotate(trans_to_add.rotation);
+                if reset_rotation == true {
+                    trans.rotation = Quat::IDENTITY;
+                }
             }
             SelectedForEdit::Off => {}
         }

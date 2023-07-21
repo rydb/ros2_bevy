@@ -78,6 +78,8 @@ pub fn spawn_unspawned_robots(
                                     // let cleaned_path = String::from(&asset_source);
                                     let split_paths: Vec<&str> = filename.split("/").collect();
                                     let model_file = *split_paths.last().unwrap();
+                                    println!("loaded urdf model from: {:#?}", unspawned_bot.models_dir_path.clone() + model_file);
+
                                     asset_server.load(unspawned_bot.models_dir_path.clone() + model_file)
                                 },
                                 //todo!("need to test this with model")//mesh_server.add(asset_server.load())
@@ -94,6 +96,7 @@ pub fn spawn_unspawned_robots(
                             let model_entity = commands.spawn(model)
                             //make model not collide with it self for debuggign joints
                             .insert(CollisionGroups::new(Group::GROUP_1, Group::GROUP_10))
+                            //.insert(Transform::from_scale(0.0)) //for debug
                             .id();
                             commands.entity(e).add_child(model_entity);
                             
@@ -111,6 +114,10 @@ pub fn spawn_unspawned_robots(
                         let checks = parent_check.zip(child_check);
                         match checks {
                             Some(..) => {
+                                ///(TODO) .dae to .obj HOT FIX. BLENDER OVER SCALES MODEL BY 10X,
+                                /// THIS SHOULD BE REPLACED BY A PLUGIN TO GET MODEL CONVERSIONS VIA A BLENDER/FREECAD PLUGIN!!!
+                                let blender_obj_overscale_correction = 10.0;
+                                
                                 println!("creating joint between models");
                                 
                                 let parent = parent_check.unwrap();
@@ -121,18 +128,18 @@ pub fn spawn_unspawned_robots(
                                 let y = *joint.origin.xyz.get(1).unwrap() as f32;
                                 let z = *joint.origin.xyz.get(2).unwrap() as f32;
                                 
-                                let trans = Vec3::new(x, y, z);
+                                let trans = Vec3::new(x * blender_obj_overscale_correction, z * blender_obj_overscale_correction, y* blender_obj_overscale_correction);
                                 //let trans = Vec3::new((x.abs()/ x) *0.75, 0.50, 0.40);
                                 //println!("{:#?}",trans);
                                 let rot = Vec3::from_array(joint.origin.rpy.map(|t| t as f32));
                                 let rot = RapierRotation::from_euler_angles(rot[0], rot[1], rot[2]);
                                 let joint_data = match joint.joint_type {
-                                    JointType::Revolute  | JointType::Continuous => {
+                                    JointType::Revolute => {
                                         let axis = Vec3::from_array(joint.axis.xyz.map(|t| t as f32));
                                         //println!("axis is {:#?}", axis);
                                         let joint = RevoluteJointBuilder::new(axis)
-                                            .local_anchor2(trans)
-                                            .limits([joint.limit.lower as f32, joint.limit.upper as f32])
+                                            //.local_anchor1(trans)
+                                            .limits([(joint.limit.lower * 10.0) as f32  * blender_obj_overscale_correction, joint.limit.upper as f32 * blender_obj_overscale_correction])
                                             ;
                                         ImpulseJoint::new(*parent, joint)
                                     }
@@ -141,7 +148,7 @@ pub fn spawn_unspawned_robots(
                                         let joint = PrismaticJointBuilder::new(axis)
                                             .local_anchor2(trans)
                                             .local_axis2(axis)
-                                            .limits([joint.limit.lower as f32, joint.limit.upper as f32]);
+                                            .limits([joint.limit.lower as f32 * blender_obj_overscale_correction, joint.limit.upper as f32 * blender_obj_overscale_correction]);
                                         ImpulseJoint::new(*parent, joint)
                                     }
                                     JointType::Fixed => {
@@ -149,6 +156,15 @@ pub fn spawn_unspawned_robots(
                                             .local_anchor1(trans)
                                             .local_anchor2(trans)
                                             .local_basis2(rot.into())
+                                            ;
+                                        ImpulseJoint::new(*parent, joint)
+                                    }
+                                    JointType::Continuous => {
+                                        let axis = Vec3::from_array(joint.axis.xyz.map(|t| t as f32));
+                                        //println!("axis is {:#?}", axis);
+                                        let joint = RevoluteJointBuilder::new(axis)
+                                            .local_anchor1(trans)
+                                            //.limits([joint.limit.lower as f32, joint.limit.upper as f32])
                                             ;
                                         ImpulseJoint::new(*parent, joint)
                                     }
