@@ -9,7 +9,7 @@ use std::collections::{HashMap, HashSet};
 
 use bevy_rapier3d::na::geometry::Rotation as RapierRotation;
 
-use crate::body::robot::components::ModelBundle;
+use crate::body::robot::components::{ModelBundle, Wheel};
 
 use crate::Mesh;
 use urdf_rs::Geometry::{Box, Cylinder, Capsule, Sphere, Mesh as UrdfMesh};
@@ -161,7 +161,11 @@ pub fn spawn_unspawned_robots(
                                         let joint = RevoluteJointBuilder::new(axis)
                                             .local_anchor1(trans)
                                             //.limits([joint.limit.lower as f32, joint.limit.upper as f32])
+                                            .motor_velocity(1.0, 0.5)
                                             ;
+                                        commands.entity(*child)
+                                        .insert(Wheel {});
+//
                                         ImpulseJoint::new(*parent, joint)
                                     }
                                     _ => {

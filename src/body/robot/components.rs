@@ -6,60 +6,11 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 
-/// bundle for spawning parcticles
-#[derive(Bundle)]
-pub struct ParticleBundle {
-    model: PbrBundle,
-}
 
-impl ParticleBundle {
-    // pub fn new(
-    //     mesh_handle: Handle<Mesh>,
-    //     material_handle: Handle<StandardMaterial>,
-    //     transform: Transform,
-    // ) -> Self {
-    //     Self {
-    //         model: PbrBundle {
-    //             mesh: mesh_handle,
-    //             material: material_handle,
-    //             transform: transform,
-    //             ..Default::default()
-    //         }
-    //     }
-    // }
-}
+// denotes entity is "wheel", for sending drive instructions.
+#[derive(Component)]
+pub struct Wheel {}
 
-/// Bundle for things that interact with physics objects, but aren't affected by physics them selves.
-/// Generally used to make a physics capable objects inert.
-// #[derive(Bundle)]
-// pub struct PhysicsDisabledBundle{
-//     rigid_body: RigidBody,
-
-// }
-
-// impl Default for PhysicsDisabledBundle {
-//     fn default() -> Self {
-        
-//     }
-// }
-
-/// Bundle for things that use Physics actively. Used for models to simulate physics
-// #[derive(Bundle)]
-// pub struct PhysicsBundle {}
-
-// impl PhysicsBundle {
-//     // disabled version of physics bundle. I.E: Physics object that interacts with physics objects, but isn't affected by physics
-//     pub fn default_disabled() -> Self {
-
-//     }
-//     pub fn default_enabled() -> Self {
-        
-//     }
-// }
-
-// impl Default for PhysicsBundle {
-
-// }
 
 /// Bundle that contains everything a model to simulate interacting with physics.
 ///
