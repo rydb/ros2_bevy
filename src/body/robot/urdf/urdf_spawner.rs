@@ -150,8 +150,8 @@ pub fn spawn_unspawned_robots(
                                     JointType::Fixed => {
                                         let joint = FixedJointBuilder::new()
                                             .local_anchor1(trans)
-                                            .local_anchor2(trans)
-                                            .local_basis2(rot.into())
+                                            //.local_anchor2(trans)
+                                            //.local_basis2(rot.into())
                                             ;
                                         ImpulseJoint::new(*parent, joint)
                                     }
@@ -160,8 +160,8 @@ pub fn spawn_unspawned_robots(
                                         //println!("axis is {:#?}", axis);
                                         let joint = RevoluteJointBuilder::new(axis)
                                             .local_anchor1(trans)
-                                            //.limits([joint.limit.lower as f32, joint.limit.upper as f32])
-                                            .motor_velocity(1.0, 0.5)
+                                            //.limits([(joint.limit.lower * 10.0) as f32  * blender_obj_overscale_correction, joint.limit.upper as f32 * blender_obj_overscale_correction])
+                                            .motor_velocity(1.0, 0.1)
                                             ;
                                         commands.entity(*child)
                                         .insert(Wheel {});

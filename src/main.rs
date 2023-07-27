@@ -30,5 +30,12 @@ fn main() {
 
             )
         )
+        //.add_systems(Update, drive_wheels)
         .run();
 }
+
+// //drive wheels forward
+// fn drive_wheels(
+//     commands: Commands,
+//     wheel_query: Query<(Entity,)
+// ) {}
