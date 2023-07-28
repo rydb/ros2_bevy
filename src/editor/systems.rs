@@ -8,6 +8,10 @@ use bevy_rapier3d::prelude::{RigidBody, GravityScale};
 //use body::robot::{FeatureTestPlugin, RobotTestPlugin};
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_flycam::prelude::*;
+use bevy::prelude::*;
+use bevy_egui::EguiPlugin;
+use bevy_inspector_egui::prelude::*;
+use std::any::TypeId;
 
 
 // Update our `RaycastSource` with the current cursor position every frame.
@@ -58,18 +62,18 @@ pub fn rigid_body_editor(
     if keys.pressed(KeyCode::ShiftLeft) {
         trans_to_add.translation += Vec3::new(0.0, -0.1, 0.0)
     }
-    if keys.pressed(KeyCode::Left) {
-        trans_to_add.translation += Vec3::new(0.1, 0.0, 0.0)
-    }
-    if keys.pressed(KeyCode::Right) {
-        trans_to_add.translation += Vec3::new(-0.1, 0.0, 0.0)
-    }
-    if keys.pressed(KeyCode::Up) {
-        trans_to_add.translation += Vec3::new(0.0, 0.0, 0.1)
-    }
-    if keys.pressed(KeyCode::Down) {
-        trans_to_add.translation += Vec3::new(-0.0, 0.0, -0.1)
-    }
+    // if keys.pressed(KeyCode::Left) {
+    //     trans_to_add.translation += Vec3::new(0.1, 0.0, 0.0)
+    // }
+    // if keys.pressed(KeyCode::Right) {
+    //     trans_to_add.translation += Vec3::new(-0.1, 0.0, 0.0)
+    // }
+    // if keys.pressed(KeyCode::Up) {
+    //     trans_to_add.translation += Vec3::new(0.0, 0.0, 0.1)
+    // }
+    // if keys.pressed(KeyCode::Down) {
+    //     trans_to_add.translation += Vec3::new(-0.0, 0.0, -0.1)
+    // }
     if keys.pressed( KeyCode::Numpad4) {
         trans_to_add.rotate(Quat::from_rotation_y(0.1))
     }
@@ -164,7 +168,7 @@ pub fn spawn_debug_cam(mut commands:Commands) {
     commands.insert_resource(DefaultPluginState::<RigidBody>::default().with_debug_cursor());
     commands.spawn(
 Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 4.0, 5.0).with_rotation(Quat::from_rotation_z(PI / 2.0)),
+            transform: Transform::from_xyz(0.0, 4.0, 20.0).with_rotation(Quat::from_rotation_z(PI / 2.0)),
             ..default()
         }
         

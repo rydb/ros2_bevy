@@ -53,7 +53,7 @@ impl Default for ModelBundle {
                 )),
             continous_collision_setting: Ccd::enabled(),
             mass: AdditionalMassProperties::Mass(1.0),
-            friction: Friction { coefficient: (99.0), combine_rule: (CoefficientCombineRule::Average) },
+            friction: Friction { coefficient: (1000.0), combine_rule: (CoefficientCombineRule::Average) },
             // external_forces: ExternalForce { /// Can't think of a reason to use external force, commenting out for now.
             //     force: (Vec3::new(0.0, 0.0, 0.0)),
             //     torque: (Vec3::new(0.0, 0.0, 0.0))

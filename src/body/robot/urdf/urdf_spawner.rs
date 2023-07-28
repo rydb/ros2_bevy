@@ -42,7 +42,7 @@ pub fn spawn_unspawned_robots(
                 commands.entity(e).insert((
                         SpatialBundle::default(),
                 )
-                    ).insert(                        GlobalTransform::from_xyz(0.0, 5.0,0.0));
+                    ).insert(                        GlobalTransform::from_xyz(0.0, 10.0,0.0));
                     for link in &urdf.links {                        // for each part, spawn a sub part to be linked to the main robot later.
                         //println!("spawning link: {:#?}", link);
                         for visual_link in &link.visual {
@@ -92,6 +92,7 @@ pub fn spawn_unspawned_robots(
                             let model_entity = commands.spawn(model)
                             //make model not collide with it self for debuggign joints
                             .insert(CollisionGroups::new(Group::GROUP_1, Group::GROUP_10))
+                            .insert(Damping{linear_damping: 0.0, angular_damping: 100.0})
                             //.insert(Transform::from_scale(0.0)) //for debug
                             .id();
                             commands.entity(e).add_child(model_entity);
@@ -161,7 +162,7 @@ pub fn spawn_unspawned_robots(
                                         let joint = RevoluteJointBuilder::new(axis)
                                             .local_anchor1(trans)
                                             //.limits([(joint.limit.lower * 10.0) as f32  * blender_obj_overscale_correction, joint.limit.upper as f32 * blender_obj_overscale_correction])
-                                            .motor_velocity(1.0, 0.1)
+                                            //.motor_velocity(1.0, 0.1)
                                             ;
                                         commands.entity(*child)
                                         .insert(Wheel {});

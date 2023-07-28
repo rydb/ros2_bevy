@@ -88,8 +88,8 @@ impl Plugin for BasePlateWorld {
             )
         )
         
-        .add_systems(Startup, (setup_physics, spawn_cube ))
-        //.add_systems(Update, display_contacts)
+        .add_systems(Startup, (setup_physics, /*spawn_cube*/ ))
+        .add_systems(Update, display_contacts)
         ;
     }
 }
@@ -139,5 +139,6 @@ fn setup_physics(
             ..default()
         })
         .insert(Collider::cuboid(base_plate_size, 0.1, base_plate_size))
+        .insert(Friction {coefficient: 1000.0, combine_rule: CoefficientCombineRule::Average})
         ;
 }
