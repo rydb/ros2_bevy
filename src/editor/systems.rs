@@ -6,13 +6,10 @@ use crate::DefaultPluginState;
 use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
 use bevy_rapier3d::prelude::{RigidBody, GravityScale};
 //use body::robot::{FeatureTestPlugin, RobotTestPlugin};
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_flycam::prelude::*;
-use bevy::prelude::*;
-use bevy_egui::EguiPlugin;
-use bevy_inspector_egui::prelude::*;
-use std::any::TypeId;
-
+use bevy_window::PrimaryWindow;
+use bevy_egui::EguiContext;
+use bevy::reflect::TypeUuid;
 
 // Update our `RaycastSource` with the current cursor position every frame.
 pub fn update_raycast_with_cursor(
@@ -32,11 +29,10 @@ pub fn update_raycast_with_cursor(
 }
 
 /// weather component is selected to be movable by build tool
-#[derive(Component)]
-pub enum SelectedForEdit {
-    On,
-    Off,   
-}
+#[derive(Component, Reflect, TypeUuid)]
+#[uuid = "52ad446b-c48e-42a1-884f-7a0e0b74081e"]
+
+pub struct SelectedForEdit;
 
 /// editor for selected rigid bodies
 pub fn rigid_body_editor(
@@ -104,18 +100,11 @@ pub fn rigid_body_editor(
     }
 
     for (e, rigidbody, selected, mut trans) in selected_models.iter_mut() {
-        match selected {
-            SelectedForEdit::On => {
-                trans.translation += trans_to_add.translation;
-                trans.rotate(trans_to_add.rotation);
-                if reset_rotation == true {
-                    trans.rotation = Quat::IDENTITY;
-                }
-            }
-            SelectedForEdit::Off => {}
+        trans.translation += trans_to_add.translation;
+        trans.rotate(trans_to_add.rotation);
+        if reset_rotation == true {
+            trans.rotation = Quat::IDENTITY;
         }
-
-
     }
 }
 
@@ -127,23 +116,23 @@ pub fn select_rigid_body(
     mut commands: Commands,
 ) {
     if buttons.just_pressed(MouseButton::Left) {
-        for (e, intersection) in selected_meshes.iter().flat_map(|m| m.intersections()) {
+        for (e, intersection) in selected_meshes.iter().flat_map(|m| m.get_nearest_intersection()) {
             println!("clicked on {:#?}, at {:#?}", e, intersection.position());
-            if let Ok(clicked_model) = material_query.get_component::<Handle<StandardMaterial>>(*e) {
+            if let Ok(clicked_model) = material_query.get_component::<Handle<StandardMaterial>>(e) {
                 // attempt to fetch color from model
                 if let Some(material_properties) = materials.get_mut(clicked_model) {
                     // use model ligting on and off as stand in for being selected.
                     if material_properties.unlit == false{
                         material_properties.unlit = true;
 
-                        commands.entity(*e).insert(SelectedForEdit::On {})
+                        commands.entity(e).insert(SelectedForEdit)
                         .insert(RigidBody::Fixed);
                         // spawn collisionless sphere thing that conveys build direction?
 
                     } else if material_properties.unlit == true {
                         material_properties.unlit = false;
                         println!("turning off build mode");
-                        commands.entity(*e).insert(SelectedForEdit::Off {})
+                        commands.entity(e).remove::<SelectedForEdit>()
                         .insert(RigidBody::Dynamic)
                         ;
                     }
@@ -178,3 +167,37 @@ Camera3dBundle {
     ;
 }
 
+/// code taken from: https://github.com/jakobhellermann/bevy-inspector-egui/blob/main/crates/bevy-inspector-egui/examples/basic/resource_inspector_manual.rs
+/// shows selected parts in side ui 
+pub fn inspector_ui(
+    world: &mut World,
+    mut disabled: Local<bool>,
+) {
+    // let space_pressed = world
+    //     .resource::<Input<KeyCode>>()
+    //     .just_pressed(KeyCode::Space);
+    // if space_pressed {
+    //     *disabled = !*disabled;
+    // }
+    // if *disabled {
+    //     return;
+    // }
+
+
+    // }
+    let mut egui_context = world
+        .query_filtered::<&mut EguiContext, With<PrimaryWindow>>()
+        .single(world)
+        .clone();
+
+    // the usual `ResourceInspector` code
+    egui::SidePanel::new(egui::panel::Side::Right,"Resource Inspector").show(egui_context.get_mut(), |ui| {
+        egui::ScrollArea::vertical().show(ui, |ui| {
+            bevy_inspector_egui::bevy_inspector::ui_for_world_entities_filtered::<With<SelectedForEdit>>(world, ui, true);
+            ui.heading("Inspector");
+
+            ui.separator();
+            ui.label("Press space to toggle");
+        });
+    });
+}

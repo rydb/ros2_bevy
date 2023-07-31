@@ -47,20 +47,20 @@ pub fn display_contacts(
         for manifold in contact.manifolds() {
             //println!("contact points are: {:#?}", manifold.points());
             for contact_point in manifold.points() {
-                let collider1_transform = transforms.get(contact.collider2()).unwrap().translation();
-                let contact_global = contact_point.local_p1();
-                let collision_point = collider1_transform * contact_global;
-                let cube_size = 0.5 as f32;
+                let collider1_transform = transforms.get(contact.collider2()).unwrap();
+                let local_contact_point = contact_point.local_p2();
+                let collision_point = collider1_transform.transform_point(local_contact_point);
+                let cube_size = 0.1 as f32;
 
                 println!("collider global transform is: {:#?}", collider1_transform);
-                println!("contact point is {:#?}", contact_global);
+                println!("contact point is {:#?}", local_contact_point);
                 println!("collision happened at: {:#?}", collision_point);
                 commands.spawn(
                     (
                         PbrBundle {
                             mesh: meshes.add(shape::Cube{size: cube_size}.into()),
                             material: materials.add(Color::RED.into()),
-                            transform: Transform::from_translation(collider1_transform),
+                            transform: Transform::from_translation(collider1_transform.translation()),
                             ..default()
                         },
                         DespawnTimer::new(0.3 as f32),
@@ -71,7 +71,7 @@ pub fn display_contacts(
                         PbrBundle {
                             mesh: meshes.add(shape::Cube{size: cube_size}.into()),
                             material: materials.add(Color::PURPLE.into()),
-                            transform: Transform::from_translation(contact_global),
+                            transform: Transform::from_translation(collision_point),
                             ..default()
                         },
                         DespawnTimer::new(0.3 as f32),
@@ -82,7 +82,7 @@ pub fn display_contacts(
                         PbrBundle {
                             mesh: meshes.add(shape::Cube{size: cube_size}.into()),
                             material: materials.add(Color::GREEN.into()),
-                            transform: Transform::from_translation(collision_point),
+                            transform: Transform::from_translation(local_contact_point),
                             ..default()
                         },
                         DespawnTimer::new(0.3 as f32),

@@ -9,7 +9,6 @@ edition = "2021"
 bevy = { version = "0.11", features = ["dynamic_linking"]}
 rand = "0.8.5"
 bevy_mod_raycast = "0.9"
-bevy_egui = "0.21"
 # bevy_editor_pls = "0.4"
 # bevy_mod_picking = {git = "https://github.com/aevyrie/bevy_mod_picking.git", rev = "e2d1a935ebc05634fa4e06bb417a208635a74c88"}
 # bevy_flycam = "*"
@@ -27,6 +26,9 @@ bevy_asset_loader = "0.17.0"
 thiserror = "1.0.40"
 glam = "0.24.0"
 ron = "0.8.0"
+bevy_egui = "0.21.0"
+bevy_window = "0.11.0"
+egui = "0.22.0"
 
 
 # Enable a small amount of optimization in debug mode
