@@ -5,13 +5,12 @@ use bevy_asset_loader::prelude::LoadingStateAppExt;
 pub mod components;
 mod systems;
 pub mod custom_asset_loader_test;
-pub mod urdf;
 
 //use crate::mesh::example::*;
 use crate::body::robot::systems::*;
-use super::robot::urdf::urdf_loader::*;
-use super::robot::urdf::urdf_spawner::*;
-use super::robot::urdf::urdf_to_bevy::*;
+use crate::urdf::urdf_loader::*;
+use crate::urdf::urdf_spawner::*;
+use crate::urdf::urdf_to_bevy::*;
 
 use crate::timers::resources::*;
 
@@ -22,7 +21,7 @@ use bevy_obj::*;
 
 //use super::robot::urdf::urdf_spawner::*;
 
-use self::{custom_asset_loader_test::CustomAssetLoader, urdf::urdf_loader::UrdfLoader};
+use self::{custom_asset_loader_test::CustomAssetLoader, UrdfLoader};
 
 #[derive(Clone, Eq, PartialEq, Debug, Hash, Default, States)]
 enum AssetLoaderStates {

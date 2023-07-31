@@ -2,6 +2,7 @@ mod body;
 mod timers;
 mod mesh;
 mod editor;
+mod urdf;
 
 use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
 use bevy_rapier3d::prelude::{RigidBody, GravityScale, ImpulseJoint};

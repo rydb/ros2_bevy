@@ -48,12 +48,12 @@ pub fn display_contacts(
             //println!("contact points are: {:#?}", manifold.points());
             for contact_point in manifold.points() {
                 let collider1_transform = transforms.get(contact.collider2()).unwrap().translation();
-                let contact_point = contact_point.local_p2().normalize();
-                let collision_point = collider1_transform * contact_point;
+                let contact_global = contact_point.local_p1();
+                let collision_point = collider1_transform * contact_global;
                 let cube_size = 0.5 as f32;
 
                 println!("collider global transform is: {:#?}", collider1_transform);
-                println!("contact point is {:#?}", contact_point);
+                println!("contact point is {:#?}", contact_global);
                 println!("collision happened at: {:#?}", collision_point);
                 commands.spawn(
                     (
@@ -71,7 +71,7 @@ pub fn display_contacts(
                         PbrBundle {
                             mesh: meshes.add(shape::Cube{size: cube_size}.into()),
                             material: materials.add(Color::PURPLE.into()),
-                            transform: Transform::from_translation(contact_point),
+                            transform: Transform::from_translation(contact_global),
                             ..default()
                         },
                         DespawnTimer::new(0.3 as f32),
