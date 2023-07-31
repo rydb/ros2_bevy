@@ -6,6 +6,7 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_egui::EguiPlugin;
 
 use super::systems::*;
+use super::ui::*;
 
 /// plugin to click on stuff. Consolidates raycasts  into single plugin.
 pub struct SelecterPlugin;
@@ -22,7 +23,7 @@ impl Plugin for SelecterPlugin {
         .add_systems(
             First,update_raycast_with_cursor.before(RaycastSystem::BuildRays::<RigidBody>)
         )
-        .add_systems(Update, inspector_ui)
+        .add_systems(Update, (inspector_ui, build_menu))
         ;
     }
 }

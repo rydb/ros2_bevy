@@ -9,11 +9,6 @@ use crate::body::robot::components::*;
 #[derive(Component)]
 pub struct Part;
 
-///TODO
-/// 1. ADD ROBOT SPAWNING
-/// 2. ADD ROBOT MOVING
-
-
 pub fn spawn_cube(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -52,20 +47,20 @@ pub fn display_contacts(
                 let collision_point = collider1_transform.transform_point(local_contact_point);
                 let cube_size = 0.1 as f32;
 
-                println!("collider global transform is: {:#?}", collider1_transform);
-                println!("contact point is {:#?}", local_contact_point);
-                println!("collision happened at: {:#?}", collision_point);
-                commands.spawn(
-                    (
-                        PbrBundle {
-                            mesh: meshes.add(shape::Cube{size: cube_size}.into()),
-                            material: materials.add(Color::RED.into()),
-                            transform: Transform::from_translation(collider1_transform.translation()),
-                            ..default()
-                        },
-                        DespawnTimer::new(0.3 as f32),
-                    )
-                ); 
+                //println!("collider global transform is: {:#?}", collider1_transform);
+                //println!("contact point is {:#?}", local_contact_point);
+                //println!("collision happened at: {:#?}", collision_point);
+                // commands.spawn(
+                //     (
+                //         PbrBundle {
+                //             mesh: meshes.add(shape::Cube{size: cube_size}.into()),
+                //             material: materials.add(Color::RED.into()),
+                //             transform: Transform::from_translation(collider1_transform.translation()),
+                //             ..default()
+                //         },
+                //         DespawnTimer::new(0.3 as f32),
+                //     )
+                // ); 
                 commands.spawn(
                     (
                         PbrBundle {
@@ -77,17 +72,17 @@ pub fn display_contacts(
                         DespawnTimer::new(0.3 as f32),
                     )
                 );   
-                commands.spawn(
-                    (
-                        PbrBundle {
-                            mesh: meshes.add(shape::Cube{size: cube_size}.into()),
-                            material: materials.add(Color::GREEN.into()),
-                            transform: Transform::from_translation(local_contact_point),
-                            ..default()
-                        },
-                        DespawnTimer::new(0.3 as f32),
-                    )
-                );        
+                // commands.spawn(
+                //     (
+                //         PbrBundle {
+                //             mesh: meshes.add(shape::Cube{size: cube_size}.into()),
+                //             material: materials.add(Color::GREEN.into()),
+                //             transform: Transform::from_translation(local_contact_point),
+                //             ..default()
+                //         },
+                //         DespawnTimer::new(0.3 as f32),
+                //     )
+                // );        
             }
         }
 
