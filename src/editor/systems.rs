@@ -57,19 +57,19 @@ pub fn rigid_body_editor(
     if keys.pressed(KeyCode::ShiftLeft) {
         trans_to_add.translation += Vec3::new(0.0, -0.1, 0.0)
     }
-    if keys.just_pressed(KeyCode::AltLeft) {
-        for (e, rigidbody, ..) in selected_models.iter_mut(){
-            println!("pausing model in place");
-            match *rigidbody {
-                RigidBody::Dynamic => commands.entity(e).insert(RigidBody::Fixed),
-                RigidBody::Fixed => commands.entity(e).insert(RigidBody::Dynamic),
-                _ => todo!("other RigidBodyies besides dynamic/fixed not implemented. ")
-            };
-            // commands.entity(e)
-            // .insert(RigidBody::Fixed)
-            // ;
-        }
-    }
+    // if keys.just_pressed(KeyCode::AltLeft) {
+    //     for (e, rigidbody, ..) in selected_models.iter_mut(){
+    //         println!("pausing model in place");
+    //         match *rigidbody {
+    //             RigidBody::Dynamic => commands.entity(e).insert(RigidBody::Fixed),
+    //             RigidBody::Fixed => commands.entity(e).insert(RigidBody::Dynamic),
+    //             _ => todo!("other RigidBodyies besides dynamic/fixed not implemented. ")
+    //         };
+    //         // commands.entity(e)
+    //         // .insert(RigidBody::Fixed)
+    //         // ;
+    //     }
+    // }
     // if keys.pressed(KeyCode::Left) {
     //     trans_to_add.translation += Vec3::new(0.1, 0.0, 0.0)
     // }
@@ -138,14 +138,14 @@ pub fn select_rigid_body(
                         material_properties.unlit = true;
 
                         commands.entity(e).insert(SelectedForEdit)
-                        //.insert(RigidBody::Fixed);
+                        .insert(RigidBody::Fixed);
                         // spawn collisionless sphere thing that conveys build direction?
                         ;
                     } else if material_properties.unlit == true {
                         material_properties.unlit = false;
                         println!("turning off build mode");
                         commands.entity(e).remove::<SelectedForEdit>()
-                        //.insert(RigidBody::Dynamic)
+                        .insert(RigidBody::Dynamic)
                         ;
                     }
                 }
