@@ -66,7 +66,7 @@ impl Plugin for AssetLoadersPlugin {
         )
         .add_collection_to_loading_state::<_, SpawnableRobots>(AssetLoaderStates::AssetLoading)
         .add_systems(OnEnter(AssetLoaderStates::Next), stage_robots_to_spawn_from_urdf)
-        .add_systems(Update, spawn_unspawned_robots)
+        //.add_systems(Update, spawn_unspawned_robots)
         
         // Timers
         ;

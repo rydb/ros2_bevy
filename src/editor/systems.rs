@@ -27,6 +27,9 @@ pub fn update_raycast_with_cursor(
     }
 }
 
+// move models that are selected when hovering over the model
+//pub fn move_selected_model()
+
 /// weather component is selected to be movable by build tool
 #[derive(Component, Reflect, TypeUuid)]
 #[uuid = "52ad446b-c48e-42a1-884f-7a0e0b74081e"]
@@ -119,38 +122,102 @@ pub fn rigid_body_editor(
         }
     }
 }
-
+/// Checks bodies that intersect with a raycast source, and if they are selectable, selects them.
 pub fn select_rigid_body(    
-    selected_meshes: Query<&RaycastSource<RigidBody>>,
+    raycast_sources: Query<&RaycastSource<RigidBody>>,
     buttons: Res<Input<MouseButton>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    material_query: Query<&Handle<StandardMaterial>>,
+    valid_meshes: Query<(&Transform, &Handle<StandardMaterial>)>,
+    selected_meshes: Query<&SelectedForEdit>,
     mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+
 ) {
     if buttons.just_pressed(MouseButton::Left) {
-        for (e, intersection) in selected_meshes.iter().flat_map(|m| m.get_nearest_intersection()) {
-            println!("clicked on {:#?}, at {:#?}", e, intersection.position());
-            if let Ok(clicked_model) = material_query.get_component::<Handle<StandardMaterial>>(e) {
+        for (e, intersection) in raycast_sources.iter().flat_map(|m| m.get_nearest_intersection()) {
+            //println!("clicked on {:#?}, at {:#?}", e, intersection.position());
+            
+            if let Ok((trans, material)) = valid_meshes.get(e) {
                 // attempt to fetch color from model
-                if let Some(material_properties) = materials.get_mut(clicked_model) {
+                if let Some(material_properties) = materials.get_mut(material) {
                     // use model ligting on and off as stand in for being selected.
-                    if material_properties.unlit == false{
-                        material_properties.unlit = true;
-
-                        commands.entity(e).insert(SelectedForEdit)
-                        .insert(RigidBody::Fixed);
-                        // spawn collisionless sphere thing that conveys build direction?
-                        ;
-                    } else if material_properties.unlit == true {
+                    if let Ok(..) = selected_meshes.get(e){
                         material_properties.unlit = false;
+                        
                         println!("turning off build mode");
                         commands.entity(e).remove::<SelectedForEdit>()
                         .insert(RigidBody::Dynamic)
                         ;
+                        
+
+                    } else {
+                        material_properties.unlit = true;
+
+                        commands.entity(e).insert(SelectedForEdit)
+                        .insert(RigidBody::Fixed)
+                        // spawn collisionless sphere thing that conveys build direction?
+                        ;
+
+                        let cube_size = 0.3;
+
+                        let dist = 2.0;
+
+                        let cube_mesh = meshes.add(shape::Cube{size: cube_size}.into());
+                        // spawn edit widget, x = red, y = green, z = blue
+                        commands.spawn(
+                                PbrBundle {
+                                    mesh: cube_mesh.clone(),
+                                    material: materials.add(Color::GREEN.into()),
+                                    transform: Transform::from_translation(trans.translation + Vec3::new(0.0,dist,0.0)),
+                                    ..default()
+                                },
+                        );
+                        commands.spawn(
+                                PbrBundle {
+                                    mesh: cube_mesh.clone(),
+                                    material: materials.add(Color::GREEN.into()),
+                                    transform: Transform::from_translation(trans.translation + Vec3::new(0.0,-dist,0.0)),
+                                    ..default()
+                                },
+                        );
+                        commands.spawn(
+                                PbrBundle {
+                                    mesh: cube_mesh.clone(),
+                                    material: materials.add(Color::RED.into()),
+                                    transform: Transform::from_translation(trans.translation + Vec3::new(dist,0.0,0.0)),
+                                    ..default()
+                                },
+                        );
+                        commands.spawn(
+                            PbrBundle {
+                                mesh: cube_mesh.clone(),
+                                material: materials.add(Color::RED.into()),
+                                transform: Transform::from_translation(trans.translation + Vec3::new(-dist,0.0,0.0)),
+                                ..default()
+                            },
+                        );
+                        commands.spawn(
+                            PbrBundle {
+                                mesh: cube_mesh.clone(),
+                                material: materials.add(Color::BLUE.into()),
+                                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,dist)),
+                                ..default()
+                            },
+                        );
+                        commands.spawn(
+                            PbrBundle {
+                                mesh: cube_mesh.clone(),
+                                material: materials.add(Color::BLUE.into()),
+                                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,-dist)),
+                                ..default()
+                            }
+                        );
+
+
                     }
                 }
                 else {
-                    println!("failed to fetch standard material from handle")
+                    println!("failed to fetch standard material from handle, not selecting mesh for stability sake.")
                 }
             }
             else {
