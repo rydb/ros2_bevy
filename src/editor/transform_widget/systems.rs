@@ -1,6 +1,10 @@
 use bevy::prelude::*;
 use crate::editor::systems::SelectedForEdit;
 use std::f32::consts::PI;
+use bevy::reflect::TypeUuid;
+use crate::RaycastSource;
+use crate::RaycastMethod;
+
 // marker that states: WHICH transform widget entity has its transform based on. 
 #[derive(Component)]
 pub struct TransformWidgetMarker {
@@ -9,9 +13,31 @@ pub struct TransformWidgetMarker {
     entity_to_transform: Entity, 
 }
 
+// Interaction check for widget.
+/// Registers component for widget related events.
+#[derive(Component, Reflect, TypeUuid)]
+#[uuid = "9e31f3e9-34e2-4e47-b113-606a4b91af58"]
+pub struct SelectedForWidget{}
+
+/// adds raycast to mouse to click on gizmos
+pub fn add_gizmo_raycast (
+    mut cursor: EventReader<CursorMoved>,
+    mut query: Query<&mut RaycastSource<SelectedForWidget>>,
+
+) {
+    // Grab the most recent cursor event if it exists:
+    let Some(cursor_moved) = cursor.iter().last() else { return };
+    for mut pick_source in &mut query {
+        pick_source.cast_method = RaycastMethod::Screenspace(cursor_moved.position);
+        
+
+        println!("hovering over gizmos!")
+        
+    }
+}
 /// Manage the existence of transform widgets. Spawn transform widgets on selected models, and despawn transform widgets on unseleted models.
 pub fn transform_widget_existence (
-    models_without_widget: Query<(Entity, &SelectedForEdit), Without<TransformWidgetMarker>>,
+    models_without_widget: Query<(Entity, &Transform, &SelectedForEdit), Without<TransformWidgetMarker>>,
     widgets_to_despawn: Query<(Entity, &TransformWidgetMarker), Without<SelectedForEdit>>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -20,7 +46,7 @@ pub fn transform_widget_existence (
 
 ) {
     //spawn transform widgets on selected entities
-    for (e, ..) in models_without_widget.iter() {
+    for (e, trans,..) in models_without_widget.iter() {
         
 
         
@@ -42,72 +68,96 @@ pub fn transform_widget_existence (
         
         // some these are probably wrong and will need tweaking...
         let y_tug = commands.spawn(
+        (
                 PbrBundle {
                     mesh: cube_mesh.clone(),
                     material: materials.add(Color::GREEN.into()),
-                    transform: Transform::from_translation(Vec3::new(0.0,dist,0.0)),
+                    transform: Transform::from_translation(trans.translation + Vec3::new(0.0,dist,0.0)),
                     ..default()
                 },
+                SelectedForWidget{}
+            )
         ).id();
         let y_tug_negative = commands.spawn(
+            (
                 PbrBundle {
                     mesh: cube_mesh.clone(),
                     material: materials.add(Color::GREEN.into()),
-                    transform: Transform::from_translation(Vec3::new(0.0,-dist,0.0)),
+                    transform: Transform::from_translation(trans.translation + Vec3::new(0.0,-dist,0.0)),
                     ..default()
                 },
+                SelectedForWidget{}
+            )
         ).id();
         let x_tug = commands.spawn(
+            (
                 PbrBundle {
                     mesh: cube_mesh.clone(),
                     material: materials.add(Color::RED.into()),
-                    transform: Transform::from_translation(Vec3::new(dist,0.0,0.0)),
+                    transform: Transform::from_translation(trans.translation + Vec3::new(dist,0.0,0.0)),
                     ..default()
                 },
+                SelectedForWidget{}
+            )
         ).id();
         let x_tug_negative = commands.spawn(
+        (
             PbrBundle {
                 mesh: cube_mesh.clone(),
                 material: materials.add(Color::RED.into()),
-                transform: Transform::from_translation(Vec3::new(-dist,0.0,0.0)),
+                transform: Transform::from_translation(trans.translation + Vec3::new(-dist,0.0,0.0)),
                 ..default()
             },
+            SelectedForWidget{}
+        )
         ).id();
         let z_tug = commands.spawn(
+            (
             PbrBundle {
                 mesh: cube_mesh.clone(),
                 material: materials.add(Color::BLUE.into()),
-                transform: Transform::from_translation(Vec3::new(0.0,0.0,dist)),
+                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,dist)),
                 ..default()
             },
+            SelectedForWidget {}
+        )
         ).id();
         let z_tug_negative = commands.spawn(
+            (
             PbrBundle {
                 mesh: cube_mesh.clone(),
                 material: materials.add(Color::BLUE.into()),
-                transform: Transform::from_translation(Vec3::new(0.0,0.0,-dist)),
+                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,-dist)),
                 ..default()
-            }
+            },
+            SelectedForWidget {}
+        )
         ).id();
         // discs
     
         // side ring
         let y_axis_ring = commands.spawn(
+            (
             PbrBundle {
                 mesh: disc_mesh.clone(),
                 material: materials.add(Color::BLUE.into()),
-                transform: Transform::from_translation(Vec3::new(0.0,0.0,0.0)),
+                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,0.0)),
                 ..default()
-            }
+            },
+            SelectedForWidget{}
+        )
         ).id();
         // top ring
         let z_axis_ring = commands.spawn(
+            (
             PbrBundle {
                 mesh: disc_mesh.clone(),
                 material: materials.add(Color::BLUE.into()),
-                transform: Transform::from_translation(Vec3::new(0.0,0.0,0.0)).with_rotation(Quat::from_rotation_x(PI / 2.0)),
+                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,0.0)).with_rotation(Quat::from_rotation_x(PI / 2.0)),
                 ..default()
-            }
+            },
+            SelectedForWidget{}
+        )
         ).id();
 
 
@@ -144,15 +194,11 @@ pub fn transform_widget_existence (
 }
 
 
-// Interaction check for widget.
-#[derive(Component)]
-pub struct SelectedForWidget{
 
-}
 
 // read which transform gizmos have been interacted with, and execute their interactions.
 pub fn transform_gizmo (
-    // raycast_sources: Query<&RaycastSource<RigidBody>>,
+    // raycast_sources: Query<&RaycastSource<SelectedForWidget>>,
     // buttons: Res<Input<MouseButton>>,
     // mut materials: ResMut<Assets<StandardMaterial>>,
     // valid_meshes: Query<(&Transform, &Handle<StandardMaterial>)>,
