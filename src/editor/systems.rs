@@ -40,6 +40,8 @@ pub struct SelectedForEdit;
 pub fn rigid_body_editor(
     mut commands: Commands,
     mut selected_models: Query<(Entity, &RigidBody, &SelectedForEdit, &mut Transform)>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+
     keys: Res<Input<KeyCode>>,
 ) {
     // translation to be added after collecting all pressed key translation additions
@@ -122,6 +124,9 @@ pub fn rigid_body_editor(
         }
     }
 }
+
+
+
 /// Checks bodies that intersect with a raycast source, and if they are selectable, selects them.
 pub fn select_rigid_body(    
     raycast_sources: Query<&RaycastSource<RigidBody>>,
@@ -157,61 +162,6 @@ pub fn select_rigid_body(
                         .insert(RigidBody::Fixed)
                         // spawn collisionless sphere thing that conveys build direction?
                         ;
-
-                        let cube_size = 0.3;
-
-                        let dist = 2.0;
-
-                        let cube_mesh = meshes.add(shape::Cube{size: cube_size}.into());
-                        // spawn edit widget, x = red, y = green, z = blue
-                        commands.spawn(
-                                PbrBundle {
-                                    mesh: cube_mesh.clone(),
-                                    material: materials.add(Color::GREEN.into()),
-                                    transform: Transform::from_translation(trans.translation + Vec3::new(0.0,dist,0.0)),
-                                    ..default()
-                                },
-                        );
-                        commands.spawn(
-                                PbrBundle {
-                                    mesh: cube_mesh.clone(),
-                                    material: materials.add(Color::GREEN.into()),
-                                    transform: Transform::from_translation(trans.translation + Vec3::new(0.0,-dist,0.0)),
-                                    ..default()
-                                },
-                        );
-                        commands.spawn(
-                                PbrBundle {
-                                    mesh: cube_mesh.clone(),
-                                    material: materials.add(Color::RED.into()),
-                                    transform: Transform::from_translation(trans.translation + Vec3::new(dist,0.0,0.0)),
-                                    ..default()
-                                },
-                        );
-                        commands.spawn(
-                            PbrBundle {
-                                mesh: cube_mesh.clone(),
-                                material: materials.add(Color::RED.into()),
-                                transform: Transform::from_translation(trans.translation + Vec3::new(-dist,0.0,0.0)),
-                                ..default()
-                            },
-                        );
-                        commands.spawn(
-                            PbrBundle {
-                                mesh: cube_mesh.clone(),
-                                material: materials.add(Color::BLUE.into()),
-                                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,dist)),
-                                ..default()
-                            },
-                        );
-                        commands.spawn(
-                            PbrBundle {
-                                mesh: cube_mesh.clone(),
-                                material: materials.add(Color::BLUE.into()),
-                                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,-dist)),
-                                ..default()
-                            }
-                        );
 
 
                     }

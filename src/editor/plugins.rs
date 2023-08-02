@@ -7,7 +7,7 @@ use bevy_egui::EguiPlugin;
 
 use super::systems::*;
 use super::ui::*;
-
+use crate::editor::transform_widget::plugins::*;
 /// plugin to click on stuff. Consolidates raycasts  into single plugin.
 pub struct SelecterPlugin;
 
@@ -18,6 +18,7 @@ impl Plugin for SelecterPlugin {
             (
             DefaultRaycastingPlugin::<RigidBody>::default(),
             EguiPlugin,
+            TransformWidgetPlugin,
             )
         )
         .add_systems(
