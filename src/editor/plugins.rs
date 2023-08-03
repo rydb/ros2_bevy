@@ -4,6 +4,7 @@ use bevy_mod_raycast::RaycastSystem;
 use crate::DefaultRaycastingPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_egui::EguiPlugin;
+use crate::body::robot::components::Selectable;
 
 use super::systems::*;
 use super::ui::*;
@@ -16,13 +17,13 @@ impl Plugin for SelecterPlugin {
         app
         .add_plugins(
             (
-            DefaultRaycastingPlugin::<RigidBody>::default(),
+            DefaultRaycastingPlugin::<Selectable>::default(),
             EguiPlugin,
             TransformWidgetPlugin,
             )
         )
         .add_systems(
-            First,update_raycast_with_cursor.before(RaycastSystem::BuildRays::<RigidBody>)
+            First,update_raycast_with_cursor.before(RaycastSystem::BuildRays::<Selectable>)
         )
         .add_systems(Update, (inspector_ui, build_menu))
         ;

@@ -3,7 +3,9 @@ use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
 use bevy_window::PrimaryWindow;
 use bevy_egui::EguiContext;
 use egui::{Align, Align2, Pos2, Widget, Button};
-use crate::editor::systems::SelectedForEdit;
+
+use crate::body::robot::components::Selected;
+
 
 /// ui for build menu
 pub fn build_menu(
@@ -63,7 +65,7 @@ pub fn inspector_ui(
         egui::ScrollArea::vertical().show(ui, |ui| {
             ui.heading(menu_name);
             
-            bevy_inspector_egui::bevy_inspector::ui_for_world_entities_filtered::<With<SelectedForEdit>>(world, ui, true);
+            bevy_inspector_egui::bevy_inspector::ui_for_world_entities_filtered::<With<Selected>>(world, ui, true);
 
             ui.separator();
         });

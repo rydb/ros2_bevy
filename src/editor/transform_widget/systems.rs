@@ -1,11 +1,17 @@
 use bevy::prelude::*;
-use crate::editor::systems::SelectedForEdit;
 use std::f32::consts::PI;
 use bevy::reflect::TypeUuid;
 use crate::RaycastSource;
 use crate::RaycastMethod;
+use crate::body::robot::components::Selected;
+use crate::body::robot::components::MakeSelectableBundle;
 
-// marker that states: WHICH transform widget entity has its transform based on. 
+
+/// marks that entity is widget. Used to prevent spawning widgets ontop of widgets.
+#[derive(Component)]
+pub struct Widget;
+
+/// marker that states: WHICH transform widget entity has its transform based on. 
 #[derive(Component)]
 pub struct TransformWidgetMarker {
     transform_widget_entity: Entity,
@@ -15,30 +21,30 @@ pub struct TransformWidgetMarker {
 
 // Interaction check for widget.
 /// Registers component for widget related events.
-#[derive(Component, Reflect, TypeUuid)]
-#[uuid = "9e31f3e9-34e2-4e47-b113-606a4b91af58"]
-pub struct SelectedForWidget{}
+// #[derive(Component, Reflect, TypeUuid)]
+// #[uuid = "9e31f3e9-34e2-4e47-b113-606a4b91af58"]
+// pub struct SelectedForWidget{}
 
-/// adds raycast to mouse to click on gizmos
-pub fn add_gizmo_raycast (
-    mut cursor: EventReader<CursorMoved>,
-    mut query: Query<&mut RaycastSource<SelectedForWidget>>,
+// /// adds raycast to mouse to click on gizmos
+// pub fn add_gizmo_raycast (
+//     mut cursor: EventReader<CursorMoved>,
+//     mut query: Query<&mut RaycastSource<SelectedForWidget>>,
 
-) {
-    // Grab the most recent cursor event if it exists:
-    let Some(cursor_moved) = cursor.iter().last() else { return };
-    for mut pick_source in &mut query {
-        pick_source.cast_method = RaycastMethod::Screenspace(cursor_moved.position);
+// ) {
+//     // Grab the most recent cursor event if it exists:
+//     let Some(cursor_moved) = cursor.iter().last() else { return };
+//     for mut pick_source in &mut query {
+//         pick_source.cast_method = RaycastMethod::Screenspace(cursor_moved.position);
         
 
-        println!("hovering over gizmos!")
+//         println!("hovering over gizmos!")
         
-    }
-}
+//     }
+// }
 /// Manage the existence of transform widgets. Spawn transform widgets on selected models, and despawn transform widgets on unseleted models.
 pub fn transform_widget_existence (
-    models_without_widget: Query<(Entity, &Transform, &SelectedForEdit), Without<TransformWidgetMarker>>,
-    widgets_to_despawn: Query<(Entity, &TransformWidgetMarker), Without<SelectedForEdit>>,
+    models_without_widget: Query<(Entity, &Transform, &Selected), (Without<Widget>, Without<TransformWidgetMarker>)>,
+    widgets_to_despawn: Query<(Entity, &TransformWidgetMarker), Without<Selected>>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -75,7 +81,8 @@ pub fn transform_widget_existence (
                     transform: Transform::from_translation(trans.translation + Vec3::new(0.0,dist,0.0)),
                     ..default()
                 },
-                SelectedForWidget{}
+                MakeSelectableBundle::default(),
+                Widget,
             )
         ).id();
         let y_tug_negative = commands.spawn(
@@ -86,7 +93,8 @@ pub fn transform_widget_existence (
                     transform: Transform::from_translation(trans.translation + Vec3::new(0.0,-dist,0.0)),
                     ..default()
                 },
-                SelectedForWidget{}
+                MakeSelectableBundle::default(),
+                Widget,
             )
         ).id();
         let x_tug = commands.spawn(
@@ -97,7 +105,8 @@ pub fn transform_widget_existence (
                     transform: Transform::from_translation(trans.translation + Vec3::new(dist,0.0,0.0)),
                     ..default()
                 },
-                SelectedForWidget{}
+                MakeSelectableBundle::default(),
+                Widget,
             )
         ).id();
         let x_tug_negative = commands.spawn(
@@ -108,7 +117,8 @@ pub fn transform_widget_existence (
                 transform: Transform::from_translation(trans.translation + Vec3::new(-dist,0.0,0.0)),
                 ..default()
             },
-            SelectedForWidget{}
+            MakeSelectableBundle::default(),
+            Widget,
         )
         ).id();
         let z_tug = commands.spawn(
@@ -119,7 +129,8 @@ pub fn transform_widget_existence (
                 transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,dist)),
                 ..default()
             },
-            SelectedForWidget {}
+            MakeSelectableBundle::default(),
+            Widget,
         )
         ).id();
         let z_tug_negative = commands.spawn(
@@ -130,7 +141,8 @@ pub fn transform_widget_existence (
                 transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,-dist)),
                 ..default()
             },
-            SelectedForWidget {}
+            MakeSelectableBundle::default(),
+            Widget,
         )
         ).id();
         // discs
@@ -144,7 +156,8 @@ pub fn transform_widget_existence (
                 transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,0.0)),
                 ..default()
             },
-            SelectedForWidget{}
+            MakeSelectableBundle::default(),
+            Widget,
         )
         ).id();
         // top ring
@@ -156,7 +169,8 @@ pub fn transform_widget_existence (
                 transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,0.0)).with_rotation(Quat::from_rotation_x(PI / 2.0)),
                 ..default()
             },
-            SelectedForWidget{}
+            MakeSelectableBundle::default(),
+            Widget,
         )
         ).id();
 

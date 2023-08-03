@@ -4,13 +4,40 @@ use std::path::Path;
 use std::convert::From;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
+use bevy::reflect::TypeUuid;
 
 
+/// denotes that component can be selected by selecting raycasts.
+/// weather component is selected to be movable by build tool
+#[derive(Component, Reflect, TypeUuid)]
+#[uuid = "52ad446b-c48e-42a1-884f-7a0e0b74081e"]
+pub struct Selectable;
+
+/// denotes thing has been selected.
+#[derive(Component, Reflect, TypeUuid)]
+#[uuid = "9e31f3e9-34e2-4e47-b113-606a4b91af58"]
+pub struct Selected;
 
 // denotes entity is "wheel", for sending drive instructions.
 #[derive(Component)]
 pub struct Wheel {}
 
+
+/// bundle that contains everything(!!!EXCEPT MESH!!!) that something needs to be selectable
+#[derive(Bundle)]
+pub struct MakeSelectableBundle {
+    raycast_reciever_mesh: RaycastMesh<Selectable>,
+    selectable: Selectable,
+}
+
+impl Default for MakeSelectableBundle {
+    fn default() -> Self{
+        Self {
+            raycast_reciever_mesh: RaycastMesh::<Selectable>::default(),
+            selectable: Selectable {}
+        }
+    }
+}
 
 /// Bundle that contains everything a model to simulate interacting with physics.
 ///
@@ -37,9 +64,8 @@ pub struct ModelBundle {
     collision_groups: CollisionGroups,
     /// "A solver_groups for filtering what pair of colliders should have their contact forces computed. This filtering happens at the end of the narrow-phase, before the constraints solver"
     solver_groups: SolverGroups,
-    /// raycast mesh for getting selected by raycasts that look for rigid bodies. Should be left initialized by ..default()
-    raycast_for_rigidbody: RaycastMesh<RigidBody>,
-    // weather rigid body is selected    
+    /// add bundle for making this model selectable
+    selectable_bundle: MakeSelectableBundle,
 }
 
 impl Default for ModelBundle {
@@ -64,7 +90,7 @@ impl Default for ModelBundle {
             },
             collision_groups: Default::default(),
             solver_groups: Default::default(),
-            raycast_for_rigidbody: RaycastMesh::<RigidBody>::default(),
+            selectable_bundle: MakeSelectableBundle::default(),
         }
     }
 }

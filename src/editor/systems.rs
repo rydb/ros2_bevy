@@ -3,6 +3,8 @@ use std::f32::consts::PI;
 use crate::RaycastSource;
 use crate::RaycastMethod;
 use crate::DefaultPluginState;
+use crate::body::robot::components::Selectable;
+use crate::body::robot::components::Selected;
 use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
 use bevy_rapier3d::prelude::{RigidBody, GravityScale};
 //use body::robot::{FeatureTestPlugin, RobotTestPlugin};
@@ -13,14 +15,14 @@ use bevy::reflect::TypeUuid;
 // Update our `RaycastSource` with the current cursor position every frame.
 pub fn update_raycast_with_cursor(
     mut cursor: EventReader<CursorMoved>,
-    mut query: Query<&mut RaycastSource<RigidBody>>,
+    mut query: Query<&mut RaycastSource<Selectable>>,
 
 ) {
     // Grab the most recent cursor event if it exists:
     let Some(cursor_moved) = cursor.iter().last() else { return };
     for mut pick_source in &mut query {
         pick_source.cast_method = RaycastMethod::Screenspace(cursor_moved.position);
-        
+            //println!("casting ray at {:#?}", cursor_moved.position);
 
  
         
@@ -31,15 +33,15 @@ pub fn update_raycast_with_cursor(
 //pub fn move_selected_model()
 
 /// weather component is selected to be movable by build tool
-#[derive(Component, Reflect, TypeUuid)]
-#[uuid = "52ad446b-c48e-42a1-884f-7a0e0b74081e"]
+// #[derive(Component, Reflect, TypeUuid)]
+// #[uuid = "52ad446b-c48e-42a1-884f-7a0e0b74081e"]
 
-pub struct SelectedForEdit;
+// pub struct SelectedForEdit;
 
 /// editor for selected rigid bodies
 pub fn rigid_body_editor(
     mut commands: Commands,
-    mut selected_models: Query<(Entity, &RigidBody, &SelectedForEdit, &mut Transform)>,
+    mut selected_models: Query<(Entity, &RigidBody, &Selected, &mut Transform)>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 
     keys: Res<Input<KeyCode>>,
@@ -129,11 +131,11 @@ pub fn rigid_body_editor(
 
 /// Checks bodies that intersect with a raycast source, and if they are selectable, selects them.
 pub fn select_rigid_body(    
-    raycast_sources: Query<&RaycastSource<RigidBody>>,
+    raycast_sources: Query<&RaycastSource<Selectable>>,
     buttons: Res<Input<MouseButton>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     valid_meshes: Query<(&Transform, &Handle<StandardMaterial>)>,
-    selected_meshes: Query<&SelectedForEdit>,
+    selected_meshes: Query<&Selected>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
 
@@ -150,7 +152,7 @@ pub fn select_rigid_body(
                         material_properties.unlit = false;
                         
                         println!("turning off build mode");
-                        commands.entity(e).remove::<SelectedForEdit>()
+                        commands.entity(e).remove::<Selected>()
                         .insert(RigidBody::Dynamic)
                         ;
                         
@@ -158,7 +160,7 @@ pub fn select_rigid_body(
                     } else {
                         material_properties.unlit = true;
 
-                        commands.entity(e).insert(SelectedForEdit)
+                        commands.entity(e).insert(Selected)
                         .insert(RigidBody::Fixed)
                         // spawn collisionless sphere thing that conveys build direction?
                         ;
@@ -183,7 +185,7 @@ pub fn select_rigid_body(
 
 ///spawns camera for debug
 pub fn spawn_debug_cam(mut commands:Commands) {
-    commands.insert_resource(DefaultPluginState::<RigidBody>::default().with_debug_cursor());
+    commands.insert_resource(DefaultPluginState::<Selectable>::default().with_debug_cursor());
     commands.spawn(
 Camera3dBundle {
             transform: Transform::from_xyz(0.0, 4.0, 20.0).with_rotation(Quat::from_rotation_z(PI / 2.0)),
@@ -192,7 +194,7 @@ Camera3dBundle {
         
     )
     .insert(FlyCam)
-    .insert(RaycastSource::<RigidBody>::new())
+    .insert(RaycastSource::<Selectable>::new())
     ;
 }
 
