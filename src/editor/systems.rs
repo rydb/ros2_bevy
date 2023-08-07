@@ -12,6 +12,8 @@ use bevy_flycam::prelude::*;
 
 use bevy::reflect::TypeUuid;
 
+use super::components::*;
+
 // Update our `RaycastSource` with the current cursor position every frame.
 pub fn update_raycast_with_cursor(
     mut cursor: EventReader<CursorMoved>,
@@ -19,13 +21,12 @@ pub fn update_raycast_with_cursor(
 
 ) {
     // Grab the most recent cursor event if it exists:
-    let Some(cursor_moved) = cursor.iter().last() else { return };
-    for mut pick_source in &mut query {
-        pick_source.cast_method = RaycastMethod::Screenspace(cursor_moved.position);
-            //println!("casting ray at {:#?}", cursor_moved.position);
-
- 
-        
+    for mut pick_source in &mut query.iter_mut() {
+        // Grab the most recent cursor event if it exists:
+        if let Some(cursor_latest) = cursor.iter().last() {
+            pick_source.cast_method =
+                bevy_mod_raycast::RaycastMethod::Screenspace(cursor_latest.position);
+        }
     }
 }
 
@@ -41,7 +42,7 @@ pub fn update_raycast_with_cursor(
 /// editor for selected rigid bodies
 pub fn rigid_body_editor(
     mut commands: Commands,
-    mut selected_models: Query<(Entity, &RigidBody, &Selected, &mut Transform)>,
+    mut selected_models: Query<(Entity, &RigidBody, &Selected, &mut Transform), Without<Widget>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 
     keys: Res<Input<KeyCode>>,
@@ -140,6 +141,9 @@ pub fn select_rigid_body(
     mut meshes: ResMut<Assets<Mesh>>,
 
 ) {
+    // for raycast_y_pos in raycast_sources.iter() {
+    //     println!("raycast_pos is {:#?}", raycast_y_pos.ray.unwrap())
+    // }
     if buttons.just_pressed(MouseButton::Left) {
         for (e, intersection) in raycast_sources.iter().flat_map(|m| m.get_nearest_intersection()) {
             //println!("clicked on {:#?}, at {:#?}", e, intersection.position());

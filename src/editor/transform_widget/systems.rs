@@ -2,15 +2,14 @@ use bevy::prelude::*;
 use std::f32::consts::PI;
 use bevy::reflect::TypeUuid;
 use crate::RaycastSource;
-use crate::RaycastMethod;
 use crate::body::robot::components::Selected;
 use crate::body::robot::components::MakeSelectableBundle;
+use crate::editor::components::*;
+use super::components::*;
+use crate::body::robot::components::Selectable;
 
-
-/// marks that entity is widget. Used to prevent spawning widgets ontop of widgets.
-#[derive(Component)]
-pub struct Widget;
-
+use bevy_window::PrimaryWindow;
+use bevy::input::mouse::MouseMotion;
 /// marker that states: WHICH transform widget entity has its transform based on. 
 #[derive(Component)]
 pub struct TransformWidgetMarker {
@@ -78,11 +77,12 @@ pub fn transform_widget_existence (
                 PbrBundle {
                     mesh: cube_mesh.clone(),
                     material: materials.add(Color::GREEN.into()),
-                    transform: Transform::from_translation(trans.translation + Vec3::new(0.0,dist,0.0)),
+                    transform: Transform::from_translation(Vec3::new(0.0,dist,0.0)),
                     ..default()
                 },
                 MakeSelectableBundle::default(),
                 Widget,
+                y_tug_flag,
             )
         ).id();
         let y_tug_negative = commands.spawn(
@@ -90,11 +90,12 @@ pub fn transform_widget_existence (
                 PbrBundle {
                     mesh: cube_mesh.clone(),
                     material: materials.add(Color::GREEN.into()),
-                    transform: Transform::from_translation(trans.translation + Vec3::new(0.0,-dist,0.0)),
+                    transform: Transform::from_translation(Vec3::new(0.0,-dist,0.0)),
                     ..default()
                 },
                 MakeSelectableBundle::default(),
                 Widget,
+                y_tug_flag,
             )
         ).id();
         let x_tug = commands.spawn(
@@ -102,11 +103,12 @@ pub fn transform_widget_existence (
                 PbrBundle {
                     mesh: cube_mesh.clone(),
                     material: materials.add(Color::RED.into()),
-                    transform: Transform::from_translation(trans.translation + Vec3::new(dist,0.0,0.0)),
+                    transform: Transform::from_translation(Vec3::new(dist,0.0,0.0)),
                     ..default()
                 },
                 MakeSelectableBundle::default(),
                 Widget,
+                x_tug_flag,
             )
         ).id();
         let x_tug_negative = commands.spawn(
@@ -114,11 +116,12 @@ pub fn transform_widget_existence (
             PbrBundle {
                 mesh: cube_mesh.clone(),
                 material: materials.add(Color::RED.into()),
-                transform: Transform::from_translation(trans.translation + Vec3::new(-dist,0.0,0.0)),
+                transform: Transform::from_translation(Vec3::new(-dist,0.0,0.0)),
                 ..default()
             },
             MakeSelectableBundle::default(),
             Widget,
+            x_tug_flag,
         )
         ).id();
         let z_tug = commands.spawn(
@@ -126,11 +129,12 @@ pub fn transform_widget_existence (
             PbrBundle {
                 mesh: cube_mesh.clone(),
                 material: materials.add(Color::BLUE.into()),
-                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,dist)),
+                transform: Transform::from_translation(Vec3::new(0.0,0.0,dist)),
                 ..default()
             },
             MakeSelectableBundle::default(),
             Widget,
+            z_tug_flag,
         )
         ).id();
         let z_tug_negative = commands.spawn(
@@ -138,11 +142,12 @@ pub fn transform_widget_existence (
             PbrBundle {
                 mesh: cube_mesh.clone(),
                 material: materials.add(Color::BLUE.into()),
-                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,-dist)),
+                transform: Transform::from_translation(Vec3::new(0.0,0.0,-dist)),
                 ..default()
             },
             MakeSelectableBundle::default(),
             Widget,
+            z_tug_flag,
         )
         ).id();
         // discs
@@ -153,11 +158,12 @@ pub fn transform_widget_existence (
             PbrBundle {
                 mesh: disc_mesh.clone(),
                 material: materials.add(Color::BLUE.into()),
-                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,0.0)),
+                transform: Transform::from_translation(Vec3::new(0.0,0.0,0.0)),
                 ..default()
             },
             MakeSelectableBundle::default(),
             Widget,
+            y_ring_flag,
         )
         ).id();
         // top ring
@@ -166,17 +172,19 @@ pub fn transform_widget_existence (
             PbrBundle {
                 mesh: disc_mesh.clone(),
                 material: materials.add(Color::BLUE.into()),
-                transform: Transform::from_translation(trans.translation + Vec3::new(0.0,0.0,0.0)).with_rotation(Quat::from_rotation_x(PI / 2.0)),
+                transform: Transform::from_translation(Vec3::new(0.0,0.0,0.0)).with_rotation(Quat::from_rotation_x(PI / 2.0)),
                 ..default()
             },
             MakeSelectableBundle::default(),
             Widget,
+            z_ring_flag,
         )
         ).id();
 
 
         let transform_widget = commands.spawn_empty()
-        .insert(SpatialBundle::default())
+        // set widget root transform to equal model the widget is spawning around
+        .insert(SpatialBundle::from_transform(Transform::from_translation(trans.translation)))
         .add_child(y_tug)
         .add_child(y_tug_negative)
         .add_child(x_tug)
@@ -207,18 +215,95 @@ pub fn transform_widget_existence (
     }
 }
 
+//find selected y tugs, and move them to match raycast y pos for mouse raycast
+pub fn manage_y_tugs(
+    mut commands: Commands,
+    raycast_sources: Query<&RaycastSource<Selectable>>,
+    mut y_tugs: Query<(Entity, &mut Transform, ), (With<Selected>, With<y_tug_flag>)>,
+    lastmouse_interactions: Query<&LastMouseInteraction>,
+    q_windows: Query<&Window, With<PrimaryWindow>>,
+    buttons: Res<Input<MouseButton>>,
+    time: Res<Time>,
 
 
+) {
+    for raycastsource in raycast_sources.iter() {
+        if let Some(ray) = raycastsource.ray {
+            //println!("raycast origin is {:#?}", ray);
+            for (e, mut tug) in y_tugs.iter_mut() {
+                if let Some(mouse_pos) = q_windows.single().cursor_position() {
+                    let mouse_inteaction = LastMouseInteraction {
+                        mouse_pos: mouse_pos,
+                        time_of_interaction: time.delta_seconds_f64()
+                    };
+                    let mut last_mouse_interaction = LastMouseInteraction::default();
+                    if let Ok(mouse_check) = lastmouse_interactions.get(e) {
+                        last_mouse_interaction = *mouse_check
+                    } 
+                    let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
 
-// read which transform gizmos have been interacted with, and execute their interactions.
-pub fn transform_gizmo (
+                    // println!("Cursor is inside the primary window, at {:?}", position);
+                    // println!("ray is origin is: {}", ray.origin() );
+                    // println!("ray to_transform is: {}", ray.to_transform());
+                // let vec1 = tug.translation;
+                // let vec2 = ray.origin();
+                // // vec project onto tub, try other way around.
+                // // let vector_projection = (
+                // //     (vec1 * vec2) 
+                // //     /
+                // //     (vec2.length() * vec2.length())
+                // // ) * vec2;
+                // let vector_projection = (
+                //     (vec2 * vec1)
+                //     /
+                //     (vec1.length() * vec1.length())
+                // ) * vec1;
+                // println!("raycast origin is: {}", ray.origin());
+                // println!("y tug origin is: {}", tug.translation);
+                // println!("projecting tug to x: {}", vector_projection);
+                // let mouse_delta = widget.last_mos_pos - mouse_pos;
+                //println!("mouse delta is {}", mouse_delta);
+                if (buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0){
+                    tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
+
+                }
+
+                // register this mouse interaction as the last one thats happened.
+                commands.entity(e).insert((mouse_inteaction));
+                } 
+
+
+            }
+
+        } 
+    }
+}
+
+
+// read which transform widgets have been interacted with, execute the behavour of the selected widgets parts.
+pub fn transform_widget_behaviour (
     // raycast_sources: Query<&RaycastSource<SelectedForWidget>>,
     // buttons: Res<Input<MouseButton>>,
     // mut materials: ResMut<Assets<StandardMaterial>>,
     // valid_meshes: Query<(&Transform, &Handle<StandardMaterial>)>,
     // selected_meshes: Query<&SelectedForEdit>,
-    // mut commands: Commands,
-    // mut meshes: ResMut<Assets<Mesh>>,
-){
+    mut commands: Commands,
+    models_with_widget: Query<(Entity, &GlobalTransform, &TransformWidgetMarker)>,
+    transform_querry: Query<(&Transform)>,
 
+){
+    for (e,trans, widget_marker) in models_with_widget.iter() {
+    
+        // set widget translation to equal model translation
+        //commands.entity(widget_marker.transform_widget_entity).insert(Transform::from_translation(trans.translation()));
+        // set model transform to equal gizmo transform
+        if let Ok (transform_widget_transform) = transform_querry.get(widget_marker.transform_widget_entity){
+            //println!("setting {:#?} to match global transform for widget at {:#?}", e, transform_widget_transform.translation);
+            commands.entity(e).insert(*transform_widget_transform);
+        }else {
+            //println!("failed to get global transform of transform widget because ???");
+        }
+
+    
+    }
 }

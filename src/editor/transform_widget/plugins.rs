@@ -15,7 +15,7 @@ impl Plugin for TransformWidgetPlugin {
         // .add_systems(
         //     First,add_gizmo_raycast.before(RaycastSystem::BuildRays::<SelectedForEdit>)
         // )
-        .add_systems(Update, (transform_widget_existence, transform_gizmo))
+        .add_systems(Update, (transform_widget_existence, transform_widget_behaviour, manage_y_tugs))
         ;
     }
 }
