@@ -1,4 +1,6 @@
+use bevy::ecs::query::QueryParIter;
 use bevy::prelude::*;
+use bevy::transform;
 use std::f32::consts::PI;
 use bevy::reflect::TypeUuid;
 use crate::RaycastSource;
@@ -204,6 +206,7 @@ pub fn transform_widget_existence (
 
             }
         );
+
         // commands.entity(e)
         // .add_child(transform_widget);
     }
@@ -216,21 +219,28 @@ pub fn transform_widget_existence (
 }
 
 //find selected y tugs, and move them to match raycast y pos for mouse raycast
+
+///
+/// NOTE 
+/// 
+/// We want to start from the parent and derive components from there. Transforms/Global Transforms shoul be gotten with .get to avoid double linked list
+/// problem from occuring (parent <--> child, unsafe), (parent --> child, safe)
 pub fn manage_y_tugs(
     mut commands: Commands,
     raycast_sources: Query<&RaycastSource<Selectable>>,
-    mut y_tugs: Query<(Entity, &mut Transform, ), (With<Selected>, With<y_tug_flag>)>,
+    mut y_tugs: Query<(Entity), (With<Selected>, With<y_tug_flag>)>,
     lastmouse_interactions: Query<&LastMouseInteraction>,
     q_windows: Query<&Window, With<PrimaryWindow>>,
     buttons: Res<Input<MouseButton>>,
     time: Res<Time>,
-
+    transform_querry: Query<(&Transform)>,
+    mut parent_querry: Query<(&Parent)>,
 
 ) {
     for raycastsource in raycast_sources.iter() {
         if let Some(ray) = raycastsource.ray {
             //println!("raycast origin is {:#?}", ray);
-            for (e, mut tug) in y_tugs.iter_mut() {
+            for (e) in y_tugs.iter() {
                 if let Some(mouse_pos) = q_windows.single().cursor_position() {
                     let mouse_inteaction = LastMouseInteraction {
                         mouse_pos: mouse_pos,
@@ -264,8 +274,30 @@ pub fn manage_y_tugs(
                 // let mouse_delta = widget.last_mos_pos - mouse_pos;
                 //println!("mouse delta is {}", mouse_delta);
                 if (buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0){
-                    tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
+                    //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
+                    if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
+                        let tug_transform = transform_querry.get(e).unwrap();
+                        let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
 
+                        commands.entity(root_ancestor).insert(
+                            (
+                                Transform::from_xyz(
+                                    widget_root_transform.translation.x,
+                                    widget_root_transform.translation.y + mouse_delta.y / 20.0, //* 2.0;
+                                    widget_root_transform.translation.z,
+                                )
+                            )
+
+                        );
+                        // println!("widget root global transform is {:#?}", ancestor);
+                        // println!("ancestors of iterator are: {:#?}", parent_querry.iter_ancestors(e).collect::<Vec<_>>())
+                        //
+                    }
+                    //commands.entity(entity).
+                    // commands.entity(e).insert((
+                    //     GlobalTransform:Otug.translation().y + mouse_delta.y / 20.0
+                    // )
+                    // )
                 }
 
                 // register this mouse interaction as the last one thats happened.

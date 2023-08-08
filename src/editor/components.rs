@@ -4,7 +4,7 @@ use std::default;
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct Widget;
+pub struct Widget ;
 
 // impl Default for Widget {
 //     fn default() -> Self {
@@ -30,6 +30,21 @@ impl Default for LastMouseInteraction {
             mouse_pos: Vec2::default(),
             time_of_interaction: 0.0,
             //hold_duration: None,
+        }
+    }
+}
+
+/// Marks the original spawn parent of this entity. If the parent the entity is attached to changes, things relying on this will probably break too...
+#[derive(Component)]
+pub struct SpawnParent {
+    /// whcih entity is the child of.
+    pub parent: Entity
+}
+
+impl SpawnParent {
+    pub fn new(parent_entity: Entity) -> Self {
+        Self {
+            parent: parent_entity
         }
     }
 }
