@@ -43,7 +43,7 @@ impl Plugin for EditorPlugin {
         )
         //.add_systems(RaycastSystem::BuildRays::<RigidBody>, update_raycast_with_cursor)
         .add_systems(Startup, (spawn_debug_cam))
-        .add_systems(Update, (select_rigid_body, /*rigid_body_editor*/))
+        .add_systems(Update, (manage_selection_behaviour, visualize_selected_things/*rigid_body_editor*/))
         ;
     }
 }

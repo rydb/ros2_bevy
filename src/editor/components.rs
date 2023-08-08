@@ -1,5 +1,5 @@
 use std::default;
-
+use bevy::reflect::TypeUuid;
 /// marks that entity is widget. Used to prevent spawning widgets ontop of widgets.
 use bevy::prelude::*;
 

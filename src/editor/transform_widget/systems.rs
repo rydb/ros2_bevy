@@ -20,28 +20,7 @@ pub struct TransformWidgetMarker {
     entity_to_transform: Entity, 
 }
 
-// Interaction check for widget.
-/// Registers component for widget related events.
-// #[derive(Component, Reflect, TypeUuid)]
-// #[uuid = "9e31f3e9-34e2-4e47-b113-606a4b91af58"]
-// pub struct SelectedForWidget{}
 
-// /// adds raycast to mouse to click on gizmos
-// pub fn add_gizmo_raycast (
-//     mut cursor: EventReader<CursorMoved>,
-//     mut query: Query<&mut RaycastSource<SelectedForWidget>>,
-
-// ) {
-//     // Grab the most recent cursor event if it exists:
-//     let Some(cursor_moved) = cursor.iter().last() else { return };
-//     for mut pick_source in &mut query {
-//         pick_source.cast_method = RaycastMethod::Screenspace(cursor_moved.position);
-        
-
-//         println!("hovering over gizmos!")
-        
-//     }
-// }
 /// Manage the existence of transform widgets. Spawn transform widgets on selected models, and despawn transform widgets on unseleted models.
 pub fn transform_widget_existence (
     models_without_widget: Query<(Entity, &Transform, &Selected), (Without<Widget>, Without<TransformWidgetMarker>)>,
@@ -227,88 +206,232 @@ pub fn transform_widget_existence (
 /// problem from occuring (parent <--> child, unsafe), (parent --> child, safe)
 pub fn manage_y_tugs(
     mut commands: Commands,
-    raycast_sources: Query<&RaycastSource<Selectable>>,
-    mut y_tugs: Query<(Entity), (With<Selected>, With<y_tug_flag>)>,
+    y_tugs: Query<Entity, (With<Selected>, With<y_tug_flag>)>,
     lastmouse_interactions: Query<&LastMouseInteraction>,
     q_windows: Query<&Window, With<PrimaryWindow>>,
     buttons: Res<Input<MouseButton>>,
     time: Res<Time>,
-    transform_querry: Query<(&Transform)>,
-    mut parent_querry: Query<(&Parent)>,
+    transform_querry: Query<&Transform>,
+    parent_querry: Query<&Parent>,
 
 ) {
-    for raycastsource in raycast_sources.iter() {
-        if let Some(ray) = raycastsource.ray {
-            //println!("raycast origin is {:#?}", ray);
-            for (e) in y_tugs.iter() {
-                if let Some(mouse_pos) = q_windows.single().cursor_position() {
-                    let mouse_inteaction = LastMouseInteraction {
-                        mouse_pos: mouse_pos,
-                        time_of_interaction: time.delta_seconds_f64()
-                    };
-                    let mut last_mouse_interaction = LastMouseInteraction::default();
-                    if let Ok(mouse_check) = lastmouse_interactions.get(e) {
-                        last_mouse_interaction = *mouse_check
-                    } 
-                    let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
 
-                    // println!("Cursor is inside the primary window, at {:?}", position);
-                    // println!("ray is origin is: {}", ray.origin() );
-                    // println!("ray to_transform is: {}", ray.to_transform());
-                // let vec1 = tug.translation;
-                // let vec2 = ray.origin();
-                // // vec project onto tub, try other way around.
-                // // let vector_projection = (
-                // //     (vec1 * vec2) 
-                // //     /
-                // //     (vec2.length() * vec2.length())
-                // // ) * vec2;
-                // let vector_projection = (
-                //     (vec2 * vec1)
-                //     /
-                //     (vec1.length() * vec1.length())
-                // ) * vec1;
-                // println!("raycast origin is: {}", ray.origin());
-                // println!("y tug origin is: {}", tug.translation);
-                // println!("projecting tug to x: {}", vector_projection);
-                // let mouse_delta = widget.last_mos_pos - mouse_pos;
-                //println!("mouse delta is {}", mouse_delta);
-                if (buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0){
-                    //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
-                    if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
-                        let tug_transform = transform_querry.get(e).unwrap();
-                        let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
+    for e in y_tugs.iter() {
 
-                        commands.entity(root_ancestor).insert(
-                            (
-                                Transform::from_xyz(
-                                    widget_root_transform.translation.x,
-                                    widget_root_transform.translation.y + mouse_delta.y / 20.0, //* 2.0;
-                                    widget_root_transform.translation.z,
-                                )
-                            )
+        if let Some(mouse_pos) = q_windows.single().cursor_position() {
+            let mouse_inteaction = LastMouseInteraction {
+                mouse_pos: mouse_pos,
+                time_of_interaction: time.delta_seconds_f64()
+            };
+            let mut last_mouse_interaction = LastMouseInteraction::default();
+            if let Ok(mouse_check) = lastmouse_interactions.get(e) {
+                last_mouse_interaction = *mouse_check
+            } 
+            let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
 
-                        );
-                        // println!("widget root global transform is {:#?}", ancestor);
-                        // println!("ancestors of iterator are: {:#?}", parent_querry.iter_ancestors(e).collect::<Vec<_>>())
-                        //
-                    }
-                    //commands.entity(entity).
-                    // commands.entity(e).insert((
-                    //     GlobalTransform:Otug.translation().y + mouse_delta.y / 20.0
-                    // )
-                    // )
-                }
+        if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
+            //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
+            if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
+                let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
 
-                // register this mouse interaction as the last one thats happened.
-                commands.entity(e).insert((mouse_inteaction));
-                } 
+                commands.entity(root_ancestor).insert(
+                Transform::from_xyz(
+                    widget_root_transform.translation.x,
+                    widget_root_transform.translation.y + mouse_delta.y / 20.0, //* 2.0;
+                    widget_root_transform.translation.z,
+                )
 
-
+                );
             }
+        }
 
+        // register this mouse interaction as the last one thats happened.
+        commands.entity(e).insert(mouse_inteaction);
+        } 
+    }     
+}
+
+pub fn manage_x_tugs (
+    mut commands: Commands,
+    y_tugs: Query<Entity, (With<Selected>, With<x_tug_flag>)>,
+    lastmouse_interactions: Query<&LastMouseInteraction>,
+    q_windows: Query<&Window, With<PrimaryWindow>>,
+    buttons: Res<Input<MouseButton>>,
+    time: Res<Time>,
+    transform_querry: Query<&Transform>,
+    parent_querry: Query<&Parent>,  
+) {
+
+    for e in y_tugs.iter() {
+
+        if let Some(mouse_pos) = q_windows.single().cursor_position() {
+            let mouse_inteaction = LastMouseInteraction {
+                mouse_pos: mouse_pos,
+                time_of_interaction: time.delta_seconds_f64()
+            };
+            let mut last_mouse_interaction = LastMouseInteraction::default();
+            if let Ok(mouse_check) = lastmouse_interactions.get(e) {
+                last_mouse_interaction = *mouse_check
+            } 
+            let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
+    
+        if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
+            //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
+            if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
+                let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
+    
+                commands.entity(root_ancestor).insert(
+                Transform::from_xyz(
+                    widget_root_transform.translation.x + -mouse_delta.x / 20.0,
+                    widget_root_transform.translation.y , //* 2.0;
+                    widget_root_transform.translation.z,
+                )
+    
+                );
+            }
+        }
+    
+        // register this mouse interaction as the last one thats happened.
+        commands.entity(e).insert(mouse_inteaction);
         } 
     }
+    
+}
+
+pub fn manage_z_tugs (
+    mut commands: Commands,
+    y_tugs: Query<Entity, (With<Selected>, With<z_tug_flag>)>,
+    lastmouse_interactions: Query<&LastMouseInteraction>,
+    q_windows: Query<&Window, With<PrimaryWindow>>,
+    buttons: Res<Input<MouseButton>>,
+    time: Res<Time>,
+    transform_querry: Query<&Transform>,
+    parent_querry: Query<&Parent>,  
+) {
+
+    for e in y_tugs.iter() {
+
+        if let Some(mouse_pos) = q_windows.single().cursor_position() {
+            let mouse_inteaction = LastMouseInteraction {
+                mouse_pos: mouse_pos,
+                time_of_interaction: time.delta_seconds_f64()
+            };
+            let mut last_mouse_interaction = LastMouseInteraction::default();
+            if let Ok(mouse_check) = lastmouse_interactions.get(e) {
+                last_mouse_interaction = *mouse_check
+            } 
+            let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
+    
+        if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
+            //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
+            if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
+                let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
+    
+                commands.entity(root_ancestor).insert(
+                Transform::from_xyz(
+                    widget_root_transform.translation.x,
+                    widget_root_transform.translation.y , //* 2.0;
+                    widget_root_transform.translation.z + -mouse_delta.y / 20.0,
+                )
+    
+                );
+            }
+        }
+    
+        // register this mouse interaction as the last one thats happened.
+        commands.entity(e).insert(mouse_inteaction);
+        } 
+    }
+    
+}
+
+pub fn manage_y_rings(
+    mut commands: Commands,
+    y_tugs: Query<Entity, (With<Selected>, With<y_ring_flag>)>,
+    lastmouse_interactions: Query<&LastMouseInteraction>,
+    q_windows: Query<&Window, With<PrimaryWindow>>,
+    buttons: Res<Input<MouseButton>>,
+    time: Res<Time>,
+    transform_querry: Query<&Transform>,
+    parent_querry: Query<&Parent>,
+
+) {
+
+    for e in y_tugs.iter() {
+
+        if let Some(mouse_pos) = q_windows.single().cursor_position() {
+            let mouse_inteaction = LastMouseInteraction {
+                mouse_pos: mouse_pos,
+                time_of_interaction: time.delta_seconds_f64()
+            };
+            let mut last_mouse_interaction = LastMouseInteraction::default();
+            if let Ok(mouse_check) = lastmouse_interactions.get(e) {
+                last_mouse_interaction = *mouse_check
+            } 
+            let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
+
+        if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
+            //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
+            if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
+                let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
+
+                // take transform of widget, and rotate root widget based on that.
+                let mut new_transform = *widget_root_transform;
+                new_transform.rotate_y(-mouse_delta.x * 0.02); 
+
+                commands.entity(root_ancestor).insert(new_transform);
+                println!("new transform is {:#?}", new_transform)
+            }
+        }
+
+        // register this mouse interaction as the last one thats happened.
+        commands.entity(e).insert(mouse_inteaction);
+        } 
+    }     
+}
+pub fn manage_z_rings(
+    mut commands: Commands,
+    y_tugs: Query<Entity, (With<Selected>, With<z_ring_flag>)>,
+    lastmouse_interactions: Query<&LastMouseInteraction>,
+    q_windows: Query<&Window, With<PrimaryWindow>>,
+    buttons: Res<Input<MouseButton>>,
+    time: Res<Time>,
+    transform_querry: Query<&Transform>,
+    parent_querry: Query<&Parent>,
+
+) {
+
+    for e in y_tugs.iter() {
+
+        if let Some(mouse_pos) = q_windows.single().cursor_position() {
+            let mouse_inteaction = LastMouseInteraction {
+                mouse_pos: mouse_pos,
+                time_of_interaction: time.delta_seconds_f64()
+            };
+            let mut last_mouse_interaction = LastMouseInteraction::default();
+            if let Ok(mouse_check) = lastmouse_interactions.get(e) {
+                last_mouse_interaction = *mouse_check
+            } 
+            let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
+
+        if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
+            //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
+            if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
+                let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
+
+                // take transform of widget, and rotate root widget based on that.
+                let mut new_transform = *widget_root_transform;
+                new_transform.rotate_z(mouse_delta.y * 0.02); 
+
+                commands.entity(root_ancestor).insert(new_transform);
+                println!("new transform is {:#?}", new_transform)
+            }
+        }
+
+        // register this mouse interaction as the last one thats happened.
+        commands.entity(e).insert(mouse_inteaction);
+        } 
+    }     
 }
 
 

@@ -128,10 +128,47 @@ pub fn rigid_body_editor(
     }
 }
 
+/// find things that have been selected, and draw a gizmo over them to represent that
+pub fn visualize_selected_things(
+    mut gizmos: Gizmos,
+    selected_things_querry: Query<(&GlobalTransform, &Handle<Mesh>), With<Selected>>,
+    meshes: Res<Assets<Mesh>>,
+) {
+    // for (e, mesh_handle) in mesh_querry.iter() {
 
+    // }
+    // padding to make wireframe not hug meshes too tightly
+    let wireframe_padding = 0.01;
+    for (trans, mesh_handle) in selected_things_querry.iter() {
+        if let Some(mesh) = meshes.get(mesh_handle) {
+            //println!("got mesh from mesh handle");
+            // get bounding box for cuboid wirefram ebased on mesh "aabb"
+            if let Some(aabb) = mesh.compute_aabb() {
+                gizmos.cuboid(
+                    Transform::from_translation(trans.translation()).with_scale(Vec3::new(
+                        (aabb.half_extents.x * 2.0) + wireframe_padding,
+                        (aabb.half_extents.y * 2.0) + wireframe_padding,
+                        (aabb.half_extents.y * 2.0) + wireframe_padding,
+                    )
+                    ),
+                    Color::GREEN,
+                );
+            } else {
+                println!("unable to compute mesh aabb")
+            }
+            //println!("unable to get mesh from mesh handle")
+        }
 
-/// Checks bodies that intersect with a raycast source, and if they are selectable, selects them.
-pub fn select_rigid_body(    
+            //     println!("found mesh handle for: {:#?} {:#?} ", e, mesh)
+
+        // }
+
+    }
+
+}
+
+/// checks for selectable things, and then selects/deselects them on various criteria
+pub fn manage_selection_behaviour(    
     raycast_sources: Query<&RaycastSource<Selectable>>,
     buttons: Res<Input<MouseButton>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -139,12 +176,16 @@ pub fn select_rigid_body(
     selected_meshes: Query<&Selected>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
+    rigidbody_querry: Query<&RigidBody>,
+    widget_querry: Query<(Entity), With<Widget>>,
 
 ) {
+
     // for raycast_y_pos in raycast_sources.iter() {
     //     println!("raycast_pos is {:#?}", raycast_y_pos.ray.unwrap())
     // }
     if buttons.just_pressed(MouseButton::Left) {
+        // pick nearest rigid body that camera with selector ray picks.
         for (e, intersection) in raycast_sources.iter().flat_map(|m| m.get_nearest_intersection()) {
             //println!("clicked on {:#?}, at {:#?}", e, intersection.position());
             
@@ -153,16 +194,28 @@ pub fn select_rigid_body(
                 if let Some(material_properties) = materials.get_mut(material) {
                     // use model ligting on and off as stand in for being selected.
                     if let Ok(..) = selected_meshes.get(e){
-                        material_properties.unlit = false;
+                        //material_properties.unlit = false;
                         
                         println!("turning off build mode");
                         commands.entity(e).remove::<Selected>()
-                        .insert(RigidBody::Dynamic)
-                        ;
+                        
+                        // if let Ok(rigidbody) = rigidbody_querry.get(e){
+
+                        // }
+
+                        .insert(RigidBody::Dynamic)                        ;
+
+
                         
 
                     } else {
-                        material_properties.unlit = true;
+                        // check if selected thing is a widget, if it is, deselect all other widgets.
+                        if let Ok(_) = widget_querry.get(e) {
+                            for widget in widget_querry.iter() {
+                                commands.entity(widget).remove::<Selected>();
+                            }
+                        }
+                        //material_properties.unlit = true;
 
                         commands.entity(e).insert(Selected)
                         .insert(RigidBody::Fixed)
