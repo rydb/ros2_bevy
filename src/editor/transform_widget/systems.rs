@@ -21,8 +21,20 @@ pub struct TransformWidgetMarker {
 }
 
 
-/// Manage the existence of transform widgets. Spawn transform widgets on selected models, and despawn transform widgets on unseleted models.
-pub fn transform_widget_existence (
+// despawn transform widgets around things that have been de selected
+pub fn widget_despawn_for_deselected(
+    widgets_to_despawn: Query<(Entity, &TransformWidgetMarker), Without<Selected>>,
+    mut commands: Commands,
+) {
+    for (e, widget_marker) in widgets_to_despawn.iter() {
+        commands.entity(widget_marker.transform_widget_entity)
+        .despawn_recursive();
+        commands.entity(e).remove::<TransformWidgetMarker>();
+    }
+}
+
+/// spawn widgets around things that have been selected
+pub fn widget_spawn_for_selected (
     models_without_widget: Query<(Entity, &Transform, &Selected), (Without<Widget>, Without<TransformWidgetMarker>)>,
     widgets_to_despawn: Query<(Entity, &TransformWidgetMarker), Without<Selected>>,
     mut commands: Commands,
@@ -31,6 +43,7 @@ pub fn transform_widget_existence (
 
 
 ) {
+    //println!("transform widget existence called");
     //spawn transform widgets on selected entities
     for (e, trans,..) in models_without_widget.iter() {
         
@@ -190,11 +203,7 @@ pub fn transform_widget_existence (
         // .add_child(transform_widget);
     }
     //despawn transform widgets on deselected entites.
-    for (e, widget_marker) in widgets_to_despawn.iter() {
-        commands.entity(widget_marker.transform_widget_entity)
-        .despawn_recursive();
-        commands.entity(e).remove::<TransformWidgetMarker>();
-    }
+
 }
 
 //find selected y tugs, and move them to match raycast y pos for mouse raycast
@@ -229,24 +238,28 @@ pub fn manage_y_tugs(
             } 
             let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
 
+        println!("entity is {:#?}", e);
+
         if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
             //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
             if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
                 let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
 
-                commands.entity(root_ancestor).insert(
-                Transform::from_xyz(
+
+                commands.entity(root_ancestor)
+                .insert(
+            Transform::from_xyz(
                     widget_root_transform.translation.x,
                     widget_root_transform.translation.y + mouse_delta.y / 20.0, //* 2.0;
                     widget_root_transform.translation.z,
-                )
+                    )
 
                 );
             }
         }
 
         // register this mouse interaction as the last one thats happened.
-        commands.entity(e).insert(mouse_inteaction);
+        //commands.entity(e).insert(mouse_inteaction);
         } 
     }     
 }

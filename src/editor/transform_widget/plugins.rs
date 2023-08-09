@@ -11,13 +11,10 @@ pub struct TransformWidgetPlugin;
 impl Plugin for TransformWidgetPlugin {
     fn build(&self, app: &mut App) {
         app
-        //.add_plugins(DefaultRaycastingPlugin::<SelectedForWidget>::default())
-        // .add_systems(
-        //     First,add_gizmo_raycast.before(RaycastSystem::BuildRays::<SelectedForEdit>)
-        // )
-        .add_systems(Update, (transform_widget_existence, transform_widget_behaviour,
+        .add_systems(Update, widget_despawn_for_deselected)
+        .add_systems(Update, (widget_spawn_for_selected,
             manage_x_tugs, manage_y_tugs, manage_z_tugs,
-            manage_y_rings, manage_z_rings))
+            manage_y_rings, manage_z_rings).after(widget_despawn_for_deselected)) // transform widget must exist while composing systems are running.
         ;
     }
 }
