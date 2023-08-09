@@ -157,7 +157,8 @@ pub fn widget_spawn_for_selected (
             },
             MakeSelectableBundle::default(),
             Widget,
-            y_ring_flag,
+            //y_ring_flag,
+            ring::new(0.0, 1.0, 0.0),
         )
         ).id();
         // top ring
@@ -171,7 +172,8 @@ pub fn widget_spawn_for_selected (
             },
             MakeSelectableBundle::default(),
             Widget,
-            z_ring_flag,
+            //z_ring_flag,
+            ring::new(0.0, 0.0, 1.0),
         )
         ).id();
 
@@ -257,9 +259,10 @@ pub fn manage_tugs(
     }
 }
 
-pub fn manage_y_rings(
+/// Correlate movements of selected rings into rotations into rotation of bound object. 
+pub fn manage_rings(
     mut commands: Commands,
-    y_tugs: Query<Entity, (With<Selected>, With<y_ring_flag>)>,
+    rings: Query<(Entity, &ring), With<Selected>>,
     lastmouse_interactions: Query<&LastMouseInteraction>,
     q_windows: Query<&Window, With<PrimaryWindow>>,
     buttons: Res<Input<MouseButton>>,
@@ -268,8 +271,9 @@ pub fn manage_y_rings(
     parent_querry: Query<&Parent>,
 
 ) {
-
-    for e in y_tugs.iter() {
+    // how sensitive rings are to mouse drags for rotation
+    let ring_sensitivity_divisor = 20.0;
+    for (e, ring) in rings.iter() {
 
         if let Some(mouse_pos) = q_windows.single().cursor_position() {
             let mouse_inteaction = LastMouseInteraction {
@@ -289,10 +293,15 @@ pub fn manage_y_rings(
 
                 // take transform of widget, and rotate root widget based on that.
                 let mut new_transform = *widget_root_transform;
-                new_transform.rotate_y(-mouse_delta.x * 0.02); 
-
+                //new_transform.rotate_y(-mouse_delta.x * 0.02); 
+                
+                // give mouse delta with z, for dot product purpose
+                let mouse_delta_with_z = Vec3::new(mouse_delta.x, mouse_delta.y, mouse_delta.y);
+                // how do we make ring axis rotations add up and stil be commutive???
+                println!("rotating ring");
+                new_transform.rotate_axis(ring.axis, (ring.axis.dot(mouse_delta_with_z)) / ring_sensitivity_divisor);
                 commands.entity(root_ancestor).insert(new_transform);
-                println!("new transform is {:#?}", new_transform)
+                //println!("new transform is {:#?}", new_transform)
             }
         }
 
@@ -301,51 +310,6 @@ pub fn manage_y_rings(
         } 
     }     
 }
-pub fn manage_z_rings(
-    mut commands: Commands,
-    y_tugs: Query<Entity, (With<Selected>, With<z_ring_flag>)>,
-    lastmouse_interactions: Query<&LastMouseInteraction>,
-    q_windows: Query<&Window, With<PrimaryWindow>>,
-    buttons: Res<Input<MouseButton>>,
-    time: Res<Time>,
-    transform_querry: Query<&Transform>,
-    parent_querry: Query<&Parent>,
-
-) {
-
-    for e in y_tugs.iter() {
-
-        if let Some(mouse_pos) = q_windows.single().cursor_position() {
-            let mouse_inteaction = LastMouseInteraction {
-                mouse_pos: mouse_pos,
-                time_of_interaction: time.delta_seconds_f64()
-            };
-            let mut last_mouse_interaction = LastMouseInteraction::default();
-            if let Ok(mouse_check) = lastmouse_interactions.get(e) {
-                last_mouse_interaction = *mouse_check
-            } 
-            let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
-
-        if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
-            //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
-            if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
-                let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
-
-                // take transform of widget, and rotate root widget based on that.
-                let mut new_transform = *widget_root_transform;
-                new_transform.rotate_z(mouse_delta.y * 0.02); 
-
-                commands.entity(root_ancestor).insert(new_transform);
-                println!("new transform is {:#?}", new_transform)
-            }
-        }
-
-        // register this mouse interaction as the last one thats happened.
-        commands.entity(e).insert(mouse_inteaction);
-        } 
-    }     
-}
-
 
 // read which transform widgets have been interacted with, execute the behavour of the selected widgets parts.
 pub fn transform_widget_behaviour (

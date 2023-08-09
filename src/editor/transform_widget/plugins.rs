@@ -13,8 +13,7 @@ impl Plugin for TransformWidgetPlugin {
     fn build(&self, app: &mut App) {
         app
         .add_systems(Update, widget_despawn_for_deselected)
-        .add_systems(Update, (manage_tugs, widget_spawn_for_selected, transform_widget_behaviour,
-            manage_y_rings, manage_z_rings)
+        .add_systems(Update, (manage_tugs, manage_rings, widget_spawn_for_selected, transform_widget_behaviour)
             .before(widget_despawn_for_deselected)) 
             // COMPOSED SYSTEMS MUST RUN BEFORE DESPAWn BEHAVIOUR RUNS,
             // OTHERWISE, A CRASH FROM FAILING TO .insert(<thing>) INTO ENTITY WILL OCCUR

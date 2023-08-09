@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-// flag + direction of of tug, when dragged, things with tug pull their widget in their direction.
+/// flag + direction of tug, when dragged, things with tug pull their widget in this components direction.
 #[derive(Component)]
 pub struct tug {
     pub pull: Vec3,
@@ -8,8 +8,22 @@ pub struct tug {
 
 impl tug {
     pub fn new(x: f32,y: f32 ,z: f32) -> Self {
-        return Self {
+        Self {
             pull: Vec3::new(x, y, z)
+        }
+    }
+}
+
+/// flag + axis of ring, when dragged, things will rotate by their widget in this component's axis 
+#[derive(Component)]
+pub struct ring {
+    pub axis: Vec3,
+}
+
+impl ring {
+    pub fn new(x: f32, y: f32, z: f32) -> Self {
+        Self {
+            axis: Vec3::new(x, y, z)
         }
     }
 }
