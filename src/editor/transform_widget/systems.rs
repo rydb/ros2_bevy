@@ -76,7 +76,7 @@ pub fn widget_spawn_for_selected (
                 },
                 MakeSelectableBundle::default(),
                 Widget,
-                y_tug_flag,
+                tug::new(0.0,1.0,0.0),
             )
         ).id();
         let y_tug_negative = commands.spawn(
@@ -89,7 +89,7 @@ pub fn widget_spawn_for_selected (
                 },
                 MakeSelectableBundle::default(),
                 Widget,
-                y_tug_flag,
+                tug::new(0.0,1.0,0.0),
             )
         ).id();
         let x_tug = commands.spawn(
@@ -102,7 +102,7 @@ pub fn widget_spawn_for_selected (
                 },
                 MakeSelectableBundle::default(),
                 Widget,
-                x_tug_flag,
+                tug::new(1.0,0.0,0.0),
             )
         ).id();
         let x_tug_negative = commands.spawn(
@@ -115,7 +115,7 @@ pub fn widget_spawn_for_selected (
             },
             MakeSelectableBundle::default(),
             Widget,
-            x_tug_flag,
+            tug::new(1.0,0.0,0.0),
         )
         ).id();
         let z_tug = commands.spawn(
@@ -128,7 +128,7 @@ pub fn widget_spawn_for_selected (
             },
             MakeSelectableBundle::default(),
             Widget,
-            z_tug_flag,
+            tug::new(0.0,0.0,1.0),
         )
         ).id();
         let z_tug_negative = commands.spawn(
@@ -141,7 +141,7 @@ pub fn widget_spawn_for_selected (
             },
             MakeSelectableBundle::default(),
             Widget,
-            z_tug_flag,
+            tug::new(0.0,0.0,1.0),
         )
         ).id();
         // discs
@@ -206,16 +206,10 @@ pub fn widget_spawn_for_selected (
 
 }
 
-//find selected y tugs, and move them to match raycast y pos for mouse raycast
-
-///
-/// NOTE 
-/// 
-/// We want to start from the parent and derive components from there. Transforms/Global Transforms shoul be gotten with .get to avoid double linked list
-/// problem from occuring (parent <--> child, unsafe), (parent --> child, safe)
-pub fn manage_y_tugs(
+// 
+pub fn manage_tugs(
     mut commands: Commands,
-    y_tugs: Query<Entity, (With<Selected>, With<y_tug_flag>)>,
+    selected_tugs: Query<(Entity, &tug), (With<Selected>, With<tug>)>,
     lastmouse_interactions: Query<&LastMouseInteraction>,
     q_windows: Query<&Window, With<PrimaryWindow>>,
     buttons: Res<Input<MouseButton>>,
@@ -224,9 +218,10 @@ pub fn manage_y_tugs(
     parent_querry: Query<&Parent>,  
 
 ) {
+    /// how much pull of tugs should be reduced
+    let tug_sensitivity_divisor = 20.0;
 
-
-    for e in y_tugs.iter() {
+    for (e, tug) in selected_tugs.iter() {
 
         if let Some(mouse_pos) = q_windows.single().cursor_position() {
             let mouse_inteaction = LastMouseInteraction {
@@ -247,9 +242,9 @@ pub fn manage_y_tugs(
                 //println!("inserting transform for x tug at time{:#?}", time.delta());
                 commands.entity(root_ancestor).insert(
                 Transform::from_xyz(
-                    widget_root_transform.translation.x,
-                    widget_root_transform.translation.y  + mouse_delta.y / 20.0, //* 2.0;
-                    widget_root_transform.translation.z,
+                    widget_root_transform.translation.x + (tug.pull.x * (-mouse_delta.x / tug_sensitivity_divisor)),
+                    widget_root_transform.translation.y + (tug.pull.y * (mouse_delta.y / tug_sensitivity_divisor)), //* 2.0;
+                    widget_root_transform.translation.z + (tug.pull.z * (-mouse_delta.y / tug_sensitivity_divisor))
                 )
     
                 );
@@ -260,101 +255,6 @@ pub fn manage_y_tugs(
         commands.entity(e).insert(mouse_inteaction);
         } 
     }
-}
-
-pub fn manage_x_tugs (
-    mut commands: Commands,
-    y_tugs: Query<Entity, (With<Selected>, With<x_tug_flag>)>,
-    lastmouse_interactions: Query<&LastMouseInteraction>,
-    q_windows: Query<&Window, With<PrimaryWindow>>,
-    buttons: Res<Input<MouseButton>>,
-    time: Res<Time>,
-    transform_querry: Query<&Transform>,
-    parent_querry: Query<&Parent>,  
-) {
-
-    for e in y_tugs.iter() {
-
-        if let Some(mouse_pos) = q_windows.single().cursor_position() {
-            let mouse_inteaction = LastMouseInteraction {
-                mouse_pos: mouse_pos,
-                time_of_interaction: time.delta_seconds_f64()
-            };
-            let mut last_mouse_interaction = LastMouseInteraction::default();
-            if let Ok(mouse_check) = lastmouse_interactions.get(e) {
-                last_mouse_interaction = *mouse_check
-            } 
-            let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
-    
-        if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
-            //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
-            if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
-                let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
-    
-                //println!("inserting transform for x tug at time{:#?}", time.delta());
-                commands.entity(root_ancestor).insert(
-                Transform::from_xyz(
-                    widget_root_transform.translation.x + -mouse_delta.x / 20.0,
-                    widget_root_transform.translation.y , //* 2.0;
-                    widget_root_transform.translation.z,
-                )
-    
-                );
-            }
-        }
-    
-        // register this mouse interaction as the last one thats happened.
-        commands.entity(e).insert(mouse_inteaction);
-        } 
-    }
-    
-}
-
-pub fn manage_z_tugs (
-    mut commands: Commands,
-    y_tugs: Query<Entity, (With<Selected>, With<z_tug_flag>)>,
-    lastmouse_interactions: Query<&LastMouseInteraction>,
-    q_windows: Query<&Window, With<PrimaryWindow>>,
-    buttons: Res<Input<MouseButton>>,
-    time: Res<Time>,
-    transform_querry: Query<&Transform>,
-    parent_querry: Query<&Parent>,  
-) {
-
-    for e in y_tugs.iter() {
-
-        if let Some(mouse_pos) = q_windows.single().cursor_position() {
-            let mouse_inteaction = LastMouseInteraction {
-                mouse_pos: mouse_pos,
-                time_of_interaction: time.delta_seconds_f64()
-            };
-            let mut last_mouse_interaction = LastMouseInteraction::default();
-            if let Ok(mouse_check) = lastmouse_interactions.get(e) {
-                last_mouse_interaction = *mouse_check
-            } 
-            let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
-    
-        if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
-            //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
-            if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
-                let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
-    
-                commands.entity(root_ancestor).insert(
-                Transform::from_xyz(
-                    widget_root_transform.translation.x,
-                    widget_root_transform.translation.y , //* 2.0;
-                    widget_root_transform.translation.z + -mouse_delta.y / 20.0,
-                )
-    
-                );
-            }
-        }
-    
-        // register this mouse interaction as the last one thats happened.
-        commands.entity(e).insert(mouse_inteaction);
-        } 
-    }
-    
 }
 
 pub fn manage_y_rings(
