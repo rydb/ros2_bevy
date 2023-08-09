@@ -221,9 +221,10 @@ pub fn manage_y_tugs(
     buttons: Res<Input<MouseButton>>,
     time: Res<Time>,
     transform_querry: Query<&Transform>,
-    parent_querry: Query<&Parent>,
+    parent_querry: Query<&Parent>,  
 
 ) {
+
 
     for e in y_tugs.iter() {
 
@@ -237,31 +238,28 @@ pub fn manage_y_tugs(
                 last_mouse_interaction = *mouse_check
             } 
             let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
-
-        println!("entity is {:#?}", e);
-
+    
         if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
             //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
             if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
                 let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
-
-
-                commands.entity(root_ancestor)
-                .insert(
-            Transform::from_xyz(
+    
+                //println!("inserting transform for x tug at time{:#?}", time.delta());
+                commands.entity(root_ancestor).insert(
+                Transform::from_xyz(
                     widget_root_transform.translation.x,
-                    widget_root_transform.translation.y + mouse_delta.y / 20.0, //* 2.0;
+                    widget_root_transform.translation.y  + mouse_delta.y / 20.0, //* 2.0;
                     widget_root_transform.translation.z,
-                    )
-
+                )
+    
                 );
             }
         }
-
+    
         // register this mouse interaction as the last one thats happened.
-        //commands.entity(e).insert(mouse_inteaction);
+        commands.entity(e).insert(mouse_inteaction);
         } 
-    }     
+    }
 }
 
 pub fn manage_x_tugs (
@@ -293,6 +291,7 @@ pub fn manage_x_tugs (
             if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
                 let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
     
+                //println!("inserting transform for x tug at time{:#?}", time.delta());
                 commands.entity(root_ancestor).insert(
                 Transform::from_xyz(
                     widget_root_transform.translation.x + -mouse_delta.x / 20.0,

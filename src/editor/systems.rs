@@ -24,6 +24,7 @@ pub fn update_raycast_with_cursor(
     for mut pick_source in &mut query.iter_mut() {
         // Grab the most recent cursor event if it exists:
         if let Some(cursor_latest) = cursor.iter().last() {
+            //println!("rays bieng spawned are {:#?}", )
             pick_source.cast_method =
                 bevy_mod_raycast::RaycastMethod::Screenspace(cursor_latest.position);
         }
