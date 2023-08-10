@@ -3,8 +3,11 @@ mod timers;
 mod mesh;
 mod editor;
 mod urdf;
+mod serialization;
 
-use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
+use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput, tasks::IoTaskPool};
+use std::{fs::File, io::Write};
+
 use bevy_rapier3d::prelude::{RigidBody, GravityScale, ImpulseJoint};
 use body::robot::{FeatureTestPlugin, RobotTestPlugin};
 use bevy_flycam::prelude::*;
@@ -13,7 +16,6 @@ use bevy_mod_raycast::{
     RaycastSource, RaycastSystem,
 };
 use editor::plugins::EditorPlugin;
-use bevy_rapier3d::rapier::dynamics::JointAxis;
 //use crate::body::cube::components::*;
 
 fn main() {
@@ -28,56 +30,48 @@ fn main() {
 
             )
         )
-        .add_systems(Update, drive_wheels)
+        .add_systems(Update, serialize_world)
         .run();
 }
 
-//drive wheels forward
-fn drive_wheels(
-    commands: Commands,
-    mut wheel_query: Query<(Entity, &mut ImpulseJoint)>,
+const NEW_SCENE_FILE_PATH: &str = "scenes/load_scene_example-new.scn.ron";
+
+/// marks component as a valid candidate for serialization. The serialization system will take entities marked with this, and attempt to serialize them into
+/// a save file.
+#[derive(Component)]
+pub struct Serializable {
+
+}
+
+// take a world, serialize it to assets/scenes as a .ron file. 
+pub fn serialize_world(
+    world: &World,
     keys: Res<Input<KeyCode>>,
 
+
 ) {
-        // translation to be added after collecting all pressed key translation additions
-    // some of these are definatly wrong and will need tweaking...
+    if keys.just_pressed(KeyCode::AltRight) {
+        println!("serializing world");
+        let scene = DynamicScene::from_world(&world);
 
-    // if reset rotation key is pressed, this should reset rotation to zero when set to true.
-    let mut reset_rotation = false;
+        let type_registry = world.resource::<AppTypeRegistry>();
+        
+        let serialized_scene = scene.serialize_ron(type_registry);
 
-    // if this is enabled, model will be deselected during seelction checks for models.
-    let mut deselect = false;
-    //vertical/horizontal rotations    
-    let speed_multiplier = 10.0;
-    
-    let mut drive_velocity = 0.0;
+        println!("serialized scene result is {:#?}", serialized_scene);
 
-    // if keys.pressed(KeyCode::Space) {
-    //     direction_to_drive.translation += Vec3::new(0.0, 0.1, 0.0) * speed_multiplier
-    // }
-    // if keys.pressed(KeyCode::ShiftLeft) {
-    //     direction_to_drive.translation += Vec3::new(0.0, -0.1, 0.0) * speed_multiplier
-    // }
-    // if keys.pressed(KeyCode::Left) {
-    //     direction_to_drive.translation += Vec3::new(0.1, 0.0, 0.0) * speed_multiplier
-    // }
-    // if keys.pressed(KeyCode::Right) {
-    //     direction_to_drive.translation += Vec3::new(-0.1, 0.0, 0.0) * speed_multiplier
-    // }
-    if keys.pressed(KeyCode::Up) {
-        drive_velocity += -1.0 * speed_multiplier;
-        println!("driving twoards {:#?}", drive_velocity);
-
-    }
-    if keys.pressed(KeyCode::Down) {
-        drive_velocity += 1.0 * speed_multiplier;
-        println!("driving twoards {:#?}", drive_velocity);
-
+        // #[cfg(not(target_arch = "wasm32"))]
+        // IoTaskPool::get()
+        //     .spawn(async move {
+        //         // Write the scene RON data to file
+        //         File::create(format!("assets/{NEW_SCENE_FILE_PATH}"))
+        //             .and_then(|mut file| file.write(serialized_scene.as_bytes()))
+        //             .expect("Error while writing scene to file");
+        //     })
+        //     .detach();
     }
 
-    for (e, mut joint) in wheel_query.iter_mut() {
-        // commands.entity(e)
-        // .insert()
-        joint.data.set_motor_velocity(JointAxis::AngX, drive_velocity, speed_multiplier);
-    }
+    //let type_registry = world.resource::<AppTypeRegistry>().clone();
+    // scene_world.insert_resource(type_registry);
+
 }

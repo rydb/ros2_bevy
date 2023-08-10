@@ -31,15 +31,6 @@ pub fn update_raycast_with_cursor(
     }
 }
 
-// move models that are selected when hovering over the model
-//pub fn move_selected_model()
-
-/// weather component is selected to be movable by build tool
-// #[derive(Component, Reflect, TypeUuid)]
-// #[uuid = "52ad446b-c48e-42a1-884f-7a0e0b74081e"]
-
-// pub struct SelectedForEdit;
-
 /// editor for selected rigid bodies
 pub fn rigid_body_editor(
     mut commands: Commands,
@@ -129,15 +120,12 @@ pub fn rigid_body_editor(
     }
 }
 
-/// find things that have been selected, and draw a gizmo over them to represent that
+/// take things that have been selected, and draw a gizmo over them to represent that
 pub fn visualize_selected_things(
     mut gizmos: Gizmos,
     selected_things_querry: Query<(&GlobalTransform, &Handle<Mesh>), With<Selected>>,
     meshes: Res<Assets<Mesh>>,
 ) {
-    // for (e, mesh_handle) in mesh_querry.iter() {
-
-    // }
     // padding to make wireframe not hug meshes too tightly
     let wireframe_padding = 0.01;
     for (trans, mesh_handle) in selected_things_querry.iter() {
@@ -145,6 +133,7 @@ pub fn visualize_selected_things(
             //println!("got mesh from mesh handle");
             // get bounding box for cuboid wirefram ebased on mesh "aabb"
             if let Some(aabb) = mesh.compute_aabb() {
+                println!("mesh aabb: {:#?}", aabb);
                 gizmos.cuboid(
                     Transform::from_translation(trans.translation()).with_scale(Vec3::new(
                         (aabb.half_extents.x * 2.0) + wireframe_padding,
@@ -157,13 +146,7 @@ pub fn visualize_selected_things(
             } else {
                 println!("unable to compute mesh aabb")
             }
-            //println!("unable to get mesh from mesh handle")
         }
-
-            //     println!("found mesh handle for: {:#?} {:#?} ", e, mesh)
-
-        // }
-
     }
 
 }

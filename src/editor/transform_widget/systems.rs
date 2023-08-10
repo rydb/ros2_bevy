@@ -13,12 +13,7 @@ use crate::body::robot::components::Selectable;
 use bevy_window::PrimaryWindow;
 use bevy::input::mouse::MouseMotion;
 /// marker that states: WHICH transform widget entity has its transform based on. 
-#[derive(Component)]
-pub struct TransformWidgetMarker {
-    transform_widget_entity: Entity,
-    /// entity to be modified by transform widget
-    entity_to_transform: Entity, 
-}
+
 
 
 // despawn transform widgets around things that have been de selected
@@ -76,7 +71,7 @@ pub fn widget_spawn_for_selected (
                 },
                 MakeSelectableBundle::default(),
                 Widget,
-                tug::new(0.0,1.0,0.0),
+                Tug::new(0.0,1.0,0.0),
             )
         ).id();
         let y_tug_negative = commands.spawn(
@@ -89,7 +84,7 @@ pub fn widget_spawn_for_selected (
                 },
                 MakeSelectableBundle::default(),
                 Widget,
-                tug::new(0.0,1.0,0.0),
+                Tug::new(0.0,1.0,0.0),
             )
         ).id();
         let x_tug = commands.spawn(
@@ -102,7 +97,7 @@ pub fn widget_spawn_for_selected (
                 },
                 MakeSelectableBundle::default(),
                 Widget,
-                tug::new(1.0,0.0,0.0),
+                Tug::new(1.0,0.0,0.0),
             )
         ).id();
         let x_tug_negative = commands.spawn(
@@ -115,7 +110,7 @@ pub fn widget_spawn_for_selected (
             },
             MakeSelectableBundle::default(),
             Widget,
-            tug::new(1.0,0.0,0.0),
+            Tug::new(1.0,0.0,0.0),
         )
         ).id();
         let z_tug = commands.spawn(
@@ -128,7 +123,7 @@ pub fn widget_spawn_for_selected (
             },
             MakeSelectableBundle::default(),
             Widget,
-            tug::new(0.0,0.0,1.0),
+            Tug::new(0.0,0.0,1.0),
         )
         ).id();
         let z_tug_negative = commands.spawn(
@@ -141,7 +136,7 @@ pub fn widget_spawn_for_selected (
             },
             MakeSelectableBundle::default(),
             Widget,
-            tug::new(0.0,0.0,1.0),
+            Tug::new(0.0,0.0,1.0),
         )
         ).id();
         // discs
@@ -158,7 +153,7 @@ pub fn widget_spawn_for_selected (
             MakeSelectableBundle::default(),
             Widget,
             //y_ring_flag,
-            ring::new(0.0, 1.0, 0.0),
+            Ring::new(0.0, 1.0, 0.0),
         )
         ).id();
         // top ring
@@ -173,14 +168,18 @@ pub fn widget_spawn_for_selected (
             MakeSelectableBundle::default(),
             Widget,
             //z_ring_flag,
-            ring::new(0.0, 0.0, 1.0),
+            Ring::new(0.0, 0.0, 1.0),
         )
         ).id();
 
 
-        let transform_widget = commands.spawn_empty()
+        let transform_widget = commands.spawn(
+            (
+                SpatialBundle::from_transform(Transform::from_translation(trans.translation)),
+                TransformWidget {bound_entity: e}
+            )
+        )
         // set widget root transform to equal model the widget is spawning around
-        .insert(SpatialBundle::from_transform(Transform::from_translation(trans.translation)))
         .add_child(y_tug)
         .add_child(y_tug_negative)
         .add_child(x_tug)
@@ -211,16 +210,18 @@ pub fn widget_spawn_for_selected (
 // 
 pub fn manage_tugs(
     mut commands: Commands,
-    selected_tugs: Query<(Entity, &tug), (With<Selected>, With<tug>)>,
+    selected_tugs: Query<(Entity, &Tug), With<Selected>>,
     lastmouse_interactions: Query<&LastMouseInteraction>,
     q_windows: Query<&Window, With<PrimaryWindow>>,
     buttons: Res<Input<MouseButton>>,
     time: Res<Time>,
     transform_querry: Query<&Transform>,
     parent_querry: Query<&Parent>,  
+    transform_widget_querry: Query<&TransformWidget>
+
 
 ) {
-    /// how much pull of tugs should be reduced
+    // how much pull of tugs should be reduced
     let tug_sensitivity_divisor = 20.0;
 
     for (e, tug) in selected_tugs.iter() {
@@ -239,17 +240,23 @@ pub fn manage_tugs(
         if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
             //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
             if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
-                let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
-    
-                //println!("inserting transform for x tug at time{:#?}", time.delta());
-                commands.entity(root_ancestor).insert(
-                Transform::from_xyz(
-                    widget_root_transform.translation.x + (tug.pull.x * (-mouse_delta.x / tug_sensitivity_divisor)),
-                    widget_root_transform.translation.y + (tug.pull.y * (mouse_delta.y / tug_sensitivity_divisor)), //* 2.0;
-                    widget_root_transform.translation.z + (tug.pull.z * (-mouse_delta.y / tug_sensitivity_divisor))
-                )
-    
-                );
+                if let Ok(mut transform_widget_flag) = transform_widget_querry.get(root_ancestor) {
+                    if let Ok(bound_model_transform) = transform_querry.get(transform_widget_flag.bound_entity) {
+                        let widget_root_transform = *bound_model_transform;
+            
+                        //println!("inserting transform for x tug at time{:#?}", time.delta());
+                        commands.entity(transform_widget_flag.bound_entity).insert(
+                            Transform::from_xyz(
+                                widget_root_transform.translation.x + (tug.pull.x * (-mouse_delta.x / tug_sensitivity_divisor)),
+                                widget_root_transform.translation.y + (tug.pull.y * (mouse_delta.y / tug_sensitivity_divisor)), //* 2.0;
+                                widget_root_transform.translation.z + (tug.pull.z * (-mouse_delta.y / tug_sensitivity_divisor))
+                            )
+                
+                            );
+                        
+                    }
+                }
+
             }
         }
     
@@ -262,13 +269,14 @@ pub fn manage_tugs(
 /// Correlate movements of selected rings into rotations into rotation of bound object. 
 pub fn manage_rings(
     mut commands: Commands,
-    rings: Query<(Entity, &ring), With<Selected>>,
+    rings: Query<(Entity, &Ring), With<Selected>>,
     lastmouse_interactions: Query<&LastMouseInteraction>,
     q_windows: Query<&Window, With<PrimaryWindow>>,
     buttons: Res<Input<MouseButton>>,
     time: Res<Time>,
     transform_querry: Query<&Transform>,
     parent_querry: Query<&Parent>,
+    transform_widget_querry: Query<&TransformWidget>
 
 ) {
     // how sensitive rings are to mouse drags for rotation
@@ -292,16 +300,23 @@ pub fn manage_rings(
                 let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
 
                 // take transform of widget, and rotate root widget based on that.
-                let mut new_transform = *widget_root_transform;
-                //new_transform.rotate_y(-mouse_delta.x * 0.02); 
-                
-                // give mouse delta with z, for dot product purpose
-                let mouse_delta_with_z = Vec3::new(mouse_delta.x, mouse_delta.y, mouse_delta.y);
-                // how do we make ring axis rotations add up and stil be commutive???
-                println!("rotating ring");
-                new_transform.rotate_axis(ring.axis, (ring.axis.dot(mouse_delta_with_z)) / ring_sensitivity_divisor);
-                commands.entity(root_ancestor).insert(new_transform);
-                //println!("new transform is {:#?}", new_transform)
+                if let Ok(mut transform_widget_flag) = transform_widget_querry.get(root_ancestor) {
+                    if let Ok(bound_model_transform) = transform_querry.get(transform_widget_flag.bound_entity) {
+                        
+                        let mut new_transform = *bound_model_transform;
+                        new_transform.rotate_y(-mouse_delta.x * 0.02); 
+                        
+                        let mouse_delta_with_z = Vec3::new(mouse_delta.x, mouse_delta.y, mouse_delta.y);
+                        // how do we make ring axis rotations add up and stil be commutive???
+    
+                        println!("rotating cube based on ring rotation");
+                        new_transform.rotate_axis(ring.axis, (ring.axis.dot(mouse_delta_with_z)) / ring_sensitivity_divisor);
+                        commands.entity(transform_widget_flag.bound_entity).insert(new_transform);
+                        //println!("new transform is {:#?}", new_transform)
+                    }
+
+                }
+
             }
         }
 
@@ -313,28 +328,17 @@ pub fn manage_rings(
 
 // read which transform widgets have been interacted with, execute the behavour of the selected widgets parts.
 pub fn transform_widget_behaviour (
-    // raycast_sources: Query<&RaycastSource<SelectedForWidget>>,
-    // buttons: Res<Input<MouseButton>>,
-    // mut materials: ResMut<Assets<StandardMaterial>>,
-    // valid_meshes: Query<(&Transform, &Handle<StandardMaterial>)>,
-    // selected_meshes: Query<&SelectedForEdit>,
     mut commands: Commands,
-    models_with_widget: Query<(Entity, &GlobalTransform, &TransformWidgetMarker)>,
+    transform_widget_query: Query<(Entity, &TransformWidget)>,
     transform_querry: Query<(&Transform)>,
 
 ){
-    for (e,trans, widget_marker) in models_with_widget.iter() {
-    
-        // set widget translation to equal model translation
-        //commands.entity(widget_marker.transform_widget_entity).insert(Transform::from_translation(trans.translation()));
-        // set model transform to equal gizmo transform
-        if let Ok (transform_widget_transform) = transform_querry.get(widget_marker.transform_widget_entity){
-            //println!("setting {:#?} to match global transform for widget at {:#?}", e, transform_widget_transform.translation);
-            commands.entity(e).insert(*transform_widget_transform);
-        }else {
-            //println!("failed to get global transform of transform widget because ???");
+    for (e, transform_widget_flag) in transform_widget_query.iter() {
+        if let Ok(bound_model_transform) = transform_querry.get(transform_widget_flag.bound_entity) {
+            // take transform, and remove unwanted behaviour from widget, and then make it mirror bound entity. 
+            let mut sanitized_transform = *bound_model_transform;
+            sanitized_transform.rotation = Quat::IDENTITY;
+            commands.entity(e).insert(sanitized_transform);
         }
-
-    
     }
 }

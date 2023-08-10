@@ -4,15 +4,7 @@ use bevy::reflect::TypeUuid;
 use bevy::prelude::*;
 
 #[derive(Component)]
-pub struct Widget ;
-
-// impl Default for Widget {
-//     fn default() -> Self {
-//         Self {
-//             ..default()
-//         }
-//     }
-// }
+pub struct Widget;
 
 /// A component which stores the last mouse interaction that happened to an entity. Something that wants mouse functionality should use/over-write this.
 #[derive(Component, Clone, Copy, Reflect)]
@@ -30,21 +22,6 @@ impl Default for LastMouseInteraction {
             mouse_pos: Vec2::default(),
             time_of_interaction: 0.0,
             //hold_duration: None,
-        }
-    }
-}
-
-/// Marks the original spawn parent of this entity. If the parent the entity is attached to changes, things relying on this will probably break too...
-#[derive(Component)]
-pub struct SpawnParent {
-    /// whcih entity is the child of.
-    pub parent: Entity
-}
-
-impl SpawnParent {
-    pub fn new(parent_entity: Entity) -> Self {
-        Self {
-            parent: parent_entity
         }
     }
 }
