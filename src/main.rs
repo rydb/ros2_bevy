@@ -6,6 +6,7 @@ mod urdf;
 mod serialization;
 
 use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput, tasks::IoTaskPool};
+use serialization::components::Serializable;
 use std::{fs::File, io::Write};
 
 use bevy_rapier3d::prelude::{RigidBody, GravityScale, ImpulseJoint};
@@ -36,23 +37,25 @@ fn main() {
 
 const NEW_SCENE_FILE_PATH: &str = "scenes/load_scene_example-new.scn.ron";
 
-/// marks component as a valid candidate for serialization. The serialization system will take entities marked with this, and attempt to serialize them into
-/// a save file.
-#[derive(Component)]
-pub struct Serializable {
 
-}
+
 
 // take a world, serialize it to assets/scenes as a .ron file. 
 pub fn serialize_world(
     world: &World,
     keys: Res<Input<KeyCode>>,
-
+    serializable_query: Query<(Entity), With<Serializable>>
 
 ) {
     if keys.just_pressed(KeyCode::AltRight) {
         println!("serializing world");
-        let scene = DynamicScene::from_world(&world);
+        let mut scene_world = World::new();
+        let scene = DynamicScene::from_world(&scene_world);
+
+        for e in serializable_query.iter() {
+
+        }
+
 
         let type_registry = world.resource::<AppTypeRegistry>();
         
