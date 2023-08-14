@@ -6,6 +6,8 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use bevy::reflect::TypeUuid;
 
+use crate::serialization::components::{ModelFlag, Geometry};
+
 
 /// denotes that component can be selected by selecting raycasts.
 /// weather component is selected to be movable by build tool
@@ -45,7 +47,7 @@ impl Default for MakeSelectableBundle {
 #[derive(Bundle)]
 pub struct ModelBundle {
     /// root model of robot. Stuff like wheels should probably attach to this. 
-    model : PbrBundle, 
+    model : ModelFlag, 
     /// rigid body type. Not setting this to `Dynamic`(I.E: a moving body) will probably cause errors.
     rigid_body: RigidBody, 
     /// Collider geometry. initialize this with Default() of ConvexDecomposition
@@ -72,7 +74,7 @@ pub struct ModelBundle {
 impl Default for ModelBundle {
     fn default() -> Self{
         Self {
-            model: PbrBundle::default(),
+            model: ModelFlag::default(),
             rigid_body: RigidBody::Dynamic,
             async_collider: AsyncCollider(ComputedColliderShape::ConvexDecomposition
                 (
@@ -99,16 +101,16 @@ impl Default for ModelBundle {
 impl ModelBundle {
     
     pub fn new(
-        mesh_handle: Handle<Mesh>,
+        geometry: Geometry,
         model_position: Transform,
-        material_handle: Handle<StandardMaterial>,
+        material: StandardMaterial,
         // model_collision_groups: Option<CollisionGroups>,
         // model_solver_groups: Option<SolverGroups>,
     ) -> Self {
         return Self {
-            model: PbrBundle {
-                mesh: mesh_handle,
-                material: material_handle,
+            model: ModelFlag {
+                geometry: geometry,
+                material: material,
                 transform: model_position,
                 ..default()
 

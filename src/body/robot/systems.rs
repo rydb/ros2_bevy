@@ -21,9 +21,9 @@ pub fn spawn_cube(
 ) {
     commands.spawn(
         ModelBundle::new(
-            meshes.add(Mesh::from(shape::Cube {size: 1.0})),
+            shape::Cube {size: 1.0}.into(),
             Transform::from_xyz(0.0, 10.0, 20.0),
-            materials.add(Color::PINK.into())
+            Color::PINK.into()
         )   
     );
 

@@ -17,6 +17,7 @@ use bevy_mod_raycast::{
 };
 use editor::plugins::EditorPlugin;
 //use crate::body::cube::components::*;
+use crate::serialization::plugins::SerializationPlugin;
 
 fn main() {
     App::new()
@@ -26,6 +27,7 @@ fn main() {
                 FeatureTestPlugin, // plugin which contains(mostly) everything program needs to run.
                 NoCameraPlayerPlugin, // <-- Camera
                 EditorPlugin,
+                SerializationPlugin,
                 
 
             )
