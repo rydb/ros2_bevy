@@ -6,8 +6,6 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use bevy::reflect::TypeUuid;
 
-use crate::serialization::components::Serializable;
-
 
 /// denotes that component can be selected by selecting raycasts.
 /// weather component is selected to be movable by build tool
@@ -68,8 +66,7 @@ pub struct ModelBundle {
     solver_groups: SolverGroups,
     /// add bundle for making this model selectable
     selectable_bundle: MakeSelectableBundle,
-    /// flags the entity this bundle is attached to as serializable
-    serializeable_flag: Serializable,
+
 }
 
 impl Default for ModelBundle {
@@ -95,7 +92,6 @@ impl Default for ModelBundle {
             collision_groups: Default::default(),
             solver_groups: Default::default(),
             selectable_bundle: MakeSelectableBundle::default(),
-            serializeable_flag: Serializable,
         }
     }
 }

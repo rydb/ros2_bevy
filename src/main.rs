@@ -6,7 +6,6 @@ mod urdf;
 mod serialization;
 
 use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput, tasks::IoTaskPool};
-use serialization::components::Serializable;
 use std::{fs::File, io::Write};
 
 use bevy_rapier3d::prelude::{RigidBody, GravityScale, ImpulseJoint};
@@ -31,50 +30,10 @@ fn main() {
 
             )
         )
-        .add_systems(Update, serialize_world)
+        //.add_systems(Update, serialize_world)
         .run();
 }
 
 const NEW_SCENE_FILE_PATH: &str = "scenes/load_scene_example-new.scn.ron";
 
 
-
-
-// take a world, serialize it to assets/scenes as a .ron file. 
-pub fn serialize_world(
-    world: &World,
-    keys: Res<Input<KeyCode>>,
-    serializable_query: Query<(Entity), With<Serializable>>
-
-) {
-    if keys.just_pressed(KeyCode::AltRight) {
-        println!("serializing world");
-        let mut scene_world = World::new();
-        let scene = DynamicScene::from_world(&scene_world);
-
-        for e in serializable_query.iter() {
-
-        }
-
-
-        let type_registry = world.resource::<AppTypeRegistry>();
-        
-        let serialized_scene = scene.serialize_ron(type_registry);
-
-        println!("serialized scene result is {:#?}", serialized_scene);
-
-        // #[cfg(not(target_arch = "wasm32"))]
-        // IoTaskPool::get()
-        //     .spawn(async move {
-        //         // Write the scene RON data to file
-        //         File::create(format!("assets/{NEW_SCENE_FILE_PATH}"))
-        //             .and_then(|mut file| file.write(serialized_scene.as_bytes()))
-        //             .expect("Error while writing scene to file");
-        //     })
-        //     .detach();
-    }
-
-    //let type_registry = world.resource::<AppTypeRegistry>().clone();
-    // scene_world.insert_resource(type_registry);
-
-}
