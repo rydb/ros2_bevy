@@ -9,7 +9,7 @@ use moonshine_save::{
     save::*,
 };
     use bevy::prelude::*;
-
+use super::systems::*;
 use super::components::*;
 /// marks component as a valid candidate for serialization. 
 // #[derive(Component)]
@@ -30,6 +30,7 @@ impl Plugin for SerializationPlugin {
         .register_type::<ModelFlag>()
         .register_type::<Geometry>()
         .register_type::<MeshPrimitive>()
+        .add_systems(Update, spawn_models)
         //.add_systems(Update, save_into_file(SAVE_PATH).run_if(check_for_save_keypress))
         //.add_systems(Update, load_from_file(SAVE_PATH).run_if(check_for_load_keypress))
         //.add_systems(Update, spawn_unspawned_models)

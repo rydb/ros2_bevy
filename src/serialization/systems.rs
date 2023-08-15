@@ -4,16 +4,22 @@ use super::components::ModelFlag;
 // take unspawned models, and spawn them from flags. 
 pub fn spawn_models(
     unspawned_models_query: Query<(Entity, &ModelFlag), Without<Handle<Mesh>>>,
-    commands: Commands, 
+    mut commands: Commands, 
     mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     for (e, model) in unspawned_models_query.iter() {
-        let model_mesh_handle = meshes.add(model.geometry.clone().into());
-        // commands.spawn(
-        //     PbrBundle {
-        //         mesh
-        //     }
-        // )
+        let mesh_handle = meshes.add(model.geometry.clone().into());
+        let material_handle = materials.add(model.material.clone());
+        let trans = Transform::from(model.transform);
+        commands.entity(e).insert(
+            PbrBundle {
+                mesh: mesh_handle,
+                material: material_handle,
+                transform: trans,
+                ..default()
+            }
+        );
     }
 }
 

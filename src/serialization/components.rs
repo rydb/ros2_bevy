@@ -63,8 +63,27 @@ impl From<Cube> for Geometry {
 impl Into<Mesh> for Geometry {
     fn into(self) -> Mesh {
         match self {
-            Primitive => return shape::Cube{size: 0.1}.into(),
-            Mesh => return shape::Cube{size: 0.1}.into(),
+            Self::Primitive(variant)  => variant.into(),
+            Mesh => return shape::Cube{size: 1.0}.into(),
+        }
+    }
+}
+
+impl Into<Mesh> for MeshPrimitive {
+    fn into(self) -> Mesh {
+        match self {
+            Self::Box { size } => 
+                shape::Box{
+                    min_x: -size[0] * 0.5,
+                    max_x: size[0] * 0.5,
+                    min_y: -size[1] * 0.5,
+                    max_y: size[1] * 0.5,
+                    min_z: -size[2] * 0.5,
+                    max_z: size[2] * 0.5,
+                }.into(),
+            Self::Cylinder { radius, length } => shape::Cylinder{radius: radius, height: length, ..default()}.into(),
+            Self::Capsule { radius, length } => shape::Capsule{radius: radius, depth: length, ..default()}.into(),
+            Self::Sphere { radius } => shape::Capsule{radius: radius, depth: 0.0, ..default()}.into()
         }
     }
 }
