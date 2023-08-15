@@ -1,15 +1,27 @@
 use bevy::prelude::*;
 
-use super::components::ModelFlag;
-// take unspawned models, and spawn them from flags. 
+use super::components::Geometry;
+
+
+use super::components::*;
+
+
+// take model with 
+//pub fn spawn_multipart_model()
+
+// collect entities with `ModelFlag` that don't have meshes, and spawn their meshes.  
 pub fn spawn_models(
     unspawned_models_query: Query<(Entity, &ModelFlag), Without<Handle<Mesh>>>,
     mut commands: Commands, 
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    assset_server: Res<AssetServer>,
 ) {
     for (e, model) in unspawned_models_query.iter() {
-        let mesh_handle = meshes.add(model.geometry.clone().into());
+        let mesh_handle = match model.geometry.clone() {
+            Geometry::Primitive(variant) => meshes.add(variant.into()), 
+            Geometry::Mesh { filename, .. } => assset_server.load(filename)
+        };
         let material_handle = materials.add(model.material.clone());
         let trans = Transform::from(model.transform);
         commands.entity(e).insert(

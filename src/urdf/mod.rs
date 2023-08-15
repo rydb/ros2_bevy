@@ -5,5 +5,5 @@ pub mod urdf_to_bevy;
 pub mod model_properties;
 //pub mod recall;
 pub mod asset_source;
-//pub mod urdf_spawner;
+pub mod urdf_spawner;
 //pub mod asset_source;

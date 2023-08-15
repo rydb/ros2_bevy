@@ -1,5 +1,8 @@
 use bevy::prelude::*;
 use bevy::render::mesh::shape::*;
+use bevy::reflect::TypeUuid;
+use urdf_rs::Robot;
+
 /// component which flags entity as a model for spawning purposes. !!!TREAT THIS AS READ ONLY!!!
 #[derive(Component, Reflect, Clone)]
 //#[reflect(from_reflect = false)]
@@ -60,14 +63,14 @@ impl From<Cube> for Geometry {
     }
 }
 
-impl Into<Mesh> for Geometry {
-    fn into(self) -> Mesh {
-        match self {
-            Self::Primitive(variant)  => variant.into(),
-            Mesh => return shape::Cube{size: 1.0}.into(),
-        }
-    }
-}
+// impl Into<Mesh> for Geometry {
+//     fn into(self) -> Mesh {
+//         match self {
+//             Self::Primitive(variant)  => variant.into(),
+//             Mesh => return shape::Cube{size: 1.0}.into(),
+//         }
+//     }
+// }
 
 impl Into<Mesh> for MeshPrimitive {
     fn into(self) -> Mesh {

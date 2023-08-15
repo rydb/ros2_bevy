@@ -17,7 +17,6 @@ use urdf_rs::JointType;
 use bevy_rapier3d::prelude::*;
 
 
-
 // /// Find all robots without transforms, and construct a robot based on their urdf.
 pub fn spawn_unspawned_robots(
     mut commands: Commands,
@@ -84,11 +83,12 @@ pub fn spawn_unspawned_robots(
                             let x = *visual_link.origin.xyz.get(0).unwrap() as f32;
                             let y = *visual_link.origin.xyz.get(1).unwrap() as f32;
                             let z = *visual_link.origin.xyz.get(2).unwrap() as f32;
-                            let model = ModelBundle::new(
-                                model_mesh_handle,
-                                Transform::from_xyz(x, y, z),
-                                materials.add(Color::PINK.into())
-                            );
+                            let model = PbrBundle { 
+                                mesh: model_mesh_handle,
+                                transform: Transform::from_xyz(x, y, z),
+                                material: materials.add(Color::PINK.into()),
+                                ..default()
+                            };
                             let model_entity = commands.spawn(model)
                             //make model not collide with it self for debuggign joints
                             .insert(CollisionGroups::new(Group::GROUP_1, Group::GROUP_10))

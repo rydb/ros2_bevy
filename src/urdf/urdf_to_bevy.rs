@@ -261,7 +261,7 @@ impl BevyModel {
 }
 
 
-#[derive(Component, Clone, Debug, Deref, DerefMut, TypePath, TypeUuid)]
+#[derive(Component, Clone, Debug, Deref, DerefMut, TypeUuid, TypePath)]
 #[uuid = "fe707f9e-c6f3-11ed-afa1-0242ac120002"]
 pub struct UrdfRoot(pub Robot);
 

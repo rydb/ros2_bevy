@@ -9,7 +9,7 @@ pub mod custom_asset_loader_test;
 //use crate::mesh::example::*;
 use crate::body::robot::systems::*;
 use crate::urdf::urdf_loader::*;
-//use crate::urdf::urdf_spawner::*;
+use crate::urdf::urdf_spawner::*;
 use crate::urdf::urdf_to_bevy::*;
 
 use crate::timers::resources::*;
@@ -60,13 +60,12 @@ impl Plugin for AssetLoadersPlugin {
         .add_asset_loader(UrdfLoader) // Enables loading urdfs via `UrdfRoot` Supports .xml (TODO) Add .urdf support?
         .init_resource::<SpawnableRobots>()
         .add_asset::<UrdfRoot>()
-        //.add_system(stage_robots_to_initialize)
         .add_loading_state(
             LoadingState::new(AssetLoaderStates::AssetLoading).continue_to_state(AssetLoaderStates::Next)
         )
         .add_collection_to_loading_state::<_, SpawnableRobots>(AssetLoaderStates::AssetLoading)
         .add_systems(OnEnter(AssetLoaderStates::Next), stage_robots_to_spawn_from_urdf)
-        //.add_systems(Update, spawn_unspawned_robots)
+        .add_systems(Update, spawn_unspawned_robots)
         
         // Timers
         ;
