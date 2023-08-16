@@ -4,12 +4,12 @@ use bevy::prelude::*;
 use super::urdf_to_bevy::UrdfRoot;
 use super::urdf_loader::BevyRobot;
 //use std::prelude::*;
-
+use crate::serialization::components::ModelFlag;
 use std::collections::{HashMap, HashSet};
 
 use bevy_rapier3d::na::geometry::Rotation as RapierRotation;
 
-use crate::body::robot::components::{ModelBundle, Wheel};
+use crate::body::robot::components::{Wheel};
 
 use crate::Mesh;
 use urdf_rs::Geometry::{Box, Cylinder, Capsule, Sphere, Mesh as UrdfMesh};
@@ -41,32 +41,15 @@ pub fn spawn_unspawned_robots(
                 commands.entity(e).insert((
                         SpatialBundle::default(),
                 )
-                    ).insert(                        GlobalTransform::from_xyz(0.0, 10.0,0.0));
+                    ).insert(GlobalTransform::from_xyz(0.0, 10.0,0.0));
                     for link in &urdf.links {                        // for each part, spawn a sub part to be linked to the main robot later.
                         //println!("spawning link: {:#?}", link);
                         for visual_link in &link.visual {
                             //println!("spawning visual link, {:#?}", visual_link);
-                            let model_mesh_handle = match &visual_link.geometry {
-                                Box { size } => meshes.add(Mesh::from(shape::Box {
-                                    min_x: -size[0] as f32, max_x: size[0] as f32,
-                                    min_y: -size[1] as f32, max_y: size[1] as f32,
-                                    min_z: -size[2]as f32, max_z: size[2] as f32,
-                                })),
-                                Cylinder { radius, length} => meshes.add(Mesh::from(shape::Cylinder{
-                                    radius: *radius as f32,
-                                    height: *length as f32,
-                                    ..default()
-                                })),
-                                Capsule { radius, length } => meshes.add(Mesh::from(shape::Capsule {
-                                    radius: *radius as f32,
-                                    depth: *length as f32, // this is probably not right... leaving this to not throw an error in case it is...
-                                    ..default()
-                                })),
-                                Sphere { radius} => meshes.add(Mesh::from(shape::Capsule {
-                                    radius: *radius as f32,
-                                    depth: 0.0, // a capsule is a sphere if there is no mid section, and the icosphere doesnt work for Mesh::from....
-                                    ..default()
-                                })),
+                            let x = *visual_link.origin.xyz.get(0).unwrap() as f32;
+                            let y = *visual_link.origin.xyz.get(1).unwrap() as f32;
+                            let z = *visual_link.origin.xyz.get(2).unwrap() as f32;
+                            let model = match &visual_link.geometry {
                                 UrdfMesh { filename, .. } => {
                                     // set filename to asset source, then set it back to string so path can be trimmed just for the filename + extension.
                                     // let asset_source= AssetSource::from(filename);
@@ -75,19 +58,19 @@ pub fn spawn_unspawned_robots(
                                     let model_file = *split_paths.last().unwrap();
                                     println!("loaded urdf model from: {:#?}", unspawned_bot.models_dir_path.clone() + model_file);
 
-                                    asset_server.load(unspawned_bot.models_dir_path.clone() + model_file)
+                                    let model_file_path = unspawned_bot.models_dir_path.clone() + model_file;
+                                    //asset_server.load(unspawned_bot.models_dir_path.clone() + model_file)
+                                    ModelFlag { 
+                                        geometry: (&*model_file_path).into(),
+                                        transform: Transform::from_xyz(x, y, z),
+                                        material: Color::PINK.into(),
+                                    }
                                 },
-                                //todo!("need to test this with model")//mesh_server.add(asset_server.load())
-                    
-                            };
-                            let x = *visual_link.origin.xyz.get(0).unwrap() as f32;
-                            let y = *visual_link.origin.xyz.get(1).unwrap() as f32;
-                            let z = *visual_link.origin.xyz.get(2).unwrap() as f32;
-                            let model = PbrBundle { 
-                                mesh: model_mesh_handle,
-                                transform: Transform::from_xyz(x, y, z),
-                                material: materials.add(Color::PINK.into()),
-                                ..default()
+                                _ => ModelFlag {
+                                    geometry: (&visual_link.geometry).into(),
+                                    transform: Transform::from_xyz(x, y, z),
+                                    material: Color::PINK.into(),
+                                },                    
                             };
                             let model_entity = commands.spawn(model)
                             //make model not collide with it self for debuggign joints

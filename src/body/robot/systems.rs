@@ -5,12 +5,14 @@ use bevy_rapier3d::rapier::dynamics::JointAxis;
 
 
 use crate::body::robot::components::*;
+use crate::serialization::components::ModelFlag;
 
 // used to donote spawned model is a "part". Used to check
 // for any models that the part is "bound" to.
 #[derive(Component)]
 pub struct Part;
 
+/// spawns a cube.
 pub fn spawn_cube(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -20,11 +22,11 @@ pub fn spawn_cube(
     //model_query: Query<Entity, With<BevyRobot>>,
 ) {
     commands.spawn(
-        ModelBundle::new(
-            shape::Cube {size: 1.0}.into(),
-            Transform::from_xyz(0.0, 10.0, 20.0),
-            Color::PINK.into()
-        )   
+        ModelFlag {
+            geometry: shape::Cube {size: 1.0}.into(),
+            transform: Transform::from_xyz(0.0, 10.0, 20.0),
+            material: Color::PINK.into()
+        }   
     );
 
 }

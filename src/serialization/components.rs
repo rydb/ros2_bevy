@@ -11,6 +11,7 @@ pub struct ModelFlag {
     pub geometry: Geometry,
     pub material: StandardMaterial,
     pub transform: Transform, 
+
 }
 
 impl Default for ModelFlag {
@@ -31,7 +32,7 @@ pub enum Geometry{
     Primitive(MeshPrimitive),
     Mesh {
         filename: String,
-        scale: Vec3,
+        scale: Option<Vec3>,
     },
 }
 
@@ -41,7 +42,7 @@ impl Default for Geometry {
     fn default() -> Self {
         Self::Mesh {
             filename: "fallback.gltf".to_string(),
-            scale: Vec3::new(0.0,0.0,0.0),
+            scale: None,
         }        
     }
 }
@@ -90,3 +91,63 @@ impl Into<Mesh> for MeshPrimitive {
         }
     }
 }
+
+/// flags that entity uses a urdf for model loading. The model load system should pick this model up 
+// #[derive(Component, Reflect, Clone)]
+// #[reflect(Component)]
+// pub struct ModelFlagUrdf {
+//     pub urdf_name: String
+// }
+// impl Default for ModelFlagUrdf {
+//     fn default() -> Self {
+//         Self {
+//             urdf_name: "fallback.xml".to_string(),
+            
+//         }
+//     }
+// }
+
+impl From<&urdf_rs::Geometry> for Geometry {
+    fn from(geom: &urdf_rs::Geometry) -> Self {
+        match geom {
+            urdf_rs::Geometry::Box { size } => Geometry::Primitive(MeshPrimitive::Box {
+                size: (**size).map(|f| f as f32),
+            }),
+            urdf_rs::Geometry::Cylinder { radius, length } => {
+                Geometry::Primitive(MeshPrimitive::Cylinder {
+                    radius: *radius as f32,
+                    length: *length as f32,
+                })
+            }
+            urdf_rs::Geometry::Capsule { radius, length } => {
+                Geometry::Primitive(MeshPrimitive::Capsule {
+                    radius: *radius as f32,
+                    length: *length as f32,
+                })
+            }
+            urdf_rs::Geometry::Sphere { radius } => Geometry::Primitive(MeshPrimitive::Sphere {
+                radius: *radius as f32,
+            }),
+            urdf_rs::Geometry::Mesh { filename, scale } => {
+                //println!("filename for mesh is {:#?}", filename);
+                let scale = scale
+                    .clone()
+                    .and_then(|s| Some(Vec3::from_array(s.map(|v| v as f32))));
+                Geometry::Mesh {
+                    filename: filename.clone(),
+                    scale,
+                }
+            }
+        }
+    }
+}
+
+impl From<&str> for Geometry {
+    fn from(value: &str) -> Self {
+        Self::Mesh {
+            filename: value.to_string(),
+            scale: None,
+        }
+    }
+}
+

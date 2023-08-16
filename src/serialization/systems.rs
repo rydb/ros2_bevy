@@ -1,4 +1,7 @@
 use bevy::prelude::*;
+use moonshine_save::save::Save;
+
+use crate::body::robot::components::{PhysicsBundle, MakeSelectableBundle};
 
 use super::components::Geometry;
 
@@ -20,20 +23,52 @@ pub fn spawn_models(
     for (e, model) in unspawned_models_query.iter() {
         let mesh_handle = match model.geometry.clone() {
             Geometry::Primitive(variant) => meshes.add(variant.into()), 
-            Geometry::Mesh { filename, .. } => assset_server.load(filename)
+            Geometry::Mesh { filename, .. } => {
+                println!("attempting to load mesh: {:#?}", filename);
+                assset_server.load(filename)}
         };
         let material_handle = materials.add(model.material.clone());
         let trans = Transform::from(model.transform);
+        // add all components a deserialized model needs to be useful. 
         commands.entity(e).insert(
+            (
             PbrBundle {
                 mesh: mesh_handle,
                 material: material_handle,
                 transform: trans,
                 ..default()
-            }
-        );
+            }, // add mesh
+            PhysicsBundle::default(),// adds physics
+            MakeSelectableBundle::default(), // makes model selectable 
+            //Save, // makes model savable
+        )
+        )
+        ;
+
     }
 }
+
+pub fn check_for_save_keypress(
+    keys: Res<Input<KeyCode>>,
+) -> bool{
+    if keys.just_pressed(KeyCode::AltRight) {
+        return true
+    } else {
+        return false
+    }
+}
+
+pub fn check_for_load_keypress(
+    keys: Res<Input<KeyCode>>,
+) -> bool{
+    if keys.just_pressed(KeyCode::AltLeft) {
+        return true
+    } else {
+        return false
+    }
+}
+
+//pub fn save_models()
 
 // fn main() {
 //     App::new()

@@ -1,4 +1,5 @@
 use bevy_mod_raycast::RaycastMesh;
+use moonshine_save::save::Save;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::convert::From;
@@ -41,13 +42,9 @@ impl Default for MakeSelectableBundle {
     }
 }
 
-/// Bundle that contains everything a model to simulate interacting with physics.
-///
-///  Use ```new()``` to initialize this more easily.
+/// collection of all things required for something to have "physics"
 #[derive(Bundle)]
-pub struct ModelBundle {
-    /// root model of robot. Stuff like wheels should probably attach to this. 
-    model : ModelFlag, 
+pub struct PhysicsBundle {
     /// rigid body type. Not setting this to `Dynamic`(I.E: a moving body) will probably cause errors.
     rigid_body: RigidBody, 
     /// Collider geometry. initialize this with Default() of ConvexDecomposition
@@ -66,15 +63,11 @@ pub struct ModelBundle {
     collision_groups: CollisionGroups,
     /// "A solver_groups for filtering what pair of colliders should have their contact forces computed. This filtering happens at the end of the narrow-phase, before the constraints solver"
     solver_groups: SolverGroups,
-    /// add bundle for making this model selectable
-    selectable_bundle: MakeSelectableBundle,
-
 }
 
-impl Default for ModelBundle {
+impl Default for PhysicsBundle {
     fn default() -> Self{
         Self {
-            model: ModelFlag::default(),
             rigid_body: RigidBody::Dynamic,
             async_collider: AsyncCollider(ComputedColliderShape::ConvexDecomposition
                 (
@@ -93,34 +86,57 @@ impl Default for ModelBundle {
             },
             collision_groups: Default::default(),
             solver_groups: Default::default(),
-            selectable_bundle: MakeSelectableBundle::default(),
         }
     }
 }
+/// Bundle that contains everything a model to simulate interacting with physics.
+///
+///  Use ```new()``` to initialize this more easily.
+// #[derive(Bundle)]
+// pub struct ModelBundle {
+//     /// root model of robot. Stuff like wheels should probably attach to this. 
+//     model : ModelFlag, 
+//     //physics: PhysicsBundle,
+//     // add bundle for making this model selectable
+//     //selectable_bundle: MakeSelectableBundle,
+//     // marks model as serializable by 
+//     // save: Save,
 
-impl ModelBundle {
+// }
+
+// impl Default for ModelBundle {
+//     fn default() -> Self{
+//         Self {
+//             model: ModelFlag::default(),
+//             //physics: PhysicsBundle::default(),
+//             //selectable_bundle: MakeSelectableBundle::default(),
+//         }
+//     }
+// }
+
+// impl ModelBundle {
     
-    pub fn new(
-        geometry: Geometry,
-        model_position: Transform,
-        material: StandardMaterial,
-        // model_collision_groups: Option<CollisionGroups>,
-        // model_solver_groups: Option<SolverGroups>,
-    ) -> Self {
-        return Self {
-            model: ModelFlag {
-                geometry: geometry,
-                material: material,
-                transform: model_position,
-                ..default()
+//     pub fn new(
+//         geometry: Geometry,
+//         model_position: Transform,
+//         material: StandardMaterial,
+//         // model_collision_groups: Option<CollisionGroups>,
+//         // model_solver_groups: Option<SolverGroups>,
+//     ) -> Self {
+//         return Self {
+//             model: ModelFlag {
+//                 geometry: geometry,
+//                 material: material,
+//                 transform: model_position,
+//                 ..default()
 
-            },
-            // collision_groups: model_collision_groups.unwrap_or_default(),
-            // solver_groups: model_solver_groups.unwrap_or_default(),
-            ..default()
-        }
-    }
-}
+//             },
+//             // collision_groups: model_collision_groups.unwrap_or_default(),
+//             // solver_groups: model_solver_groups.unwrap_or_default(),
+//             ..default()
+//         }
+//     }
+// }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Component))]
