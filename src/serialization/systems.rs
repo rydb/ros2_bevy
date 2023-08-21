@@ -1,13 +1,15 @@
 use bevy::prelude::*;
+use moonshine_save::prelude::Unload;
 use moonshine_save::save::Save;
 
-use crate::body::robot::components::{PhysicsBundle, MakeSelectableBundle};
-
+use crate::{body::robot::components::{PhysicsBundle, MakeSelectableBundle}, urdf::urdf_to_bevy::UrdfRoot};
+use bevy::ecs::query::ReadOnlyWorldQuery;
 use super::components::Geometry;
+use crate::body::robot::components::Selected;
 
-
+use moonshine_save::save::*;
 use super::components::*;
-
+use std::path::PathBuf;
 
 // take model with 
 //pub fn spawn_multipart_model()
@@ -37,13 +39,16 @@ pub fn spawn_models(
                 material: material_handle,
                 transform: trans,
                 ..default()
-            }, // add mesh
+            }, // add meshd
             PhysicsBundle::default(),// adds physics
             MakeSelectableBundle::default(), // makes model selectable 
-            //Save, // makes model savable
+            Unload, // marks entity to unload on deserialize
         )
         )
+        // remove model flag 
+        //.remove::<ModelFlag>()
         ;
+        
 
     }
 }
@@ -66,6 +71,33 @@ pub fn check_for_load_keypress(
     } else {
         return false
     }
+}
+
+
+pub fn save_into_file(path: impl Into<PathBuf>) -> SavePipeline {
+    save::<With<SerializeType>>
+        .pipe(into_file(path.into()))
+        .pipe(finish)
+        .in_set(SaveSet::Save)
+}
+
+pub fn save<Filter: ReadOnlyWorldQuery>(
+    world: &World,
+    serializable_querry: Query<Entity, Filter>,
+    //serializable_querry: Query<(Entity, &)>,
+    //robot_model_querry: Query<Entity, With<UrdfRoot>>,
+    //mut commands: Commands,
+) -> Saved {
+    let mut builder = DynamicSceneBuilder::from_world(world);
+    // block all types, and then add types that should be serialized here
+    builder.deny_all();
+    builder.allow::<Transform>();
+    builder.allow::<SerializeType>();
+    builder.allow::<ModelFlag>();
+
+    builder.extract_entities(serializable_querry.iter());
+    let scene = builder.build();
+    Saved { scene }
 }
 
 //pub fn save_models()

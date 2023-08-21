@@ -7,7 +7,7 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use bevy::reflect::TypeUuid;
 
-use crate::serialization::components::{ModelFlag, Geometry};
+use crate::serialization::components::{ModelFlag, Geometry, SerializeType};
 
 
 /// denotes that component can be selected by selecting raycasts.
@@ -41,6 +41,50 @@ impl Default for MakeSelectableBundle {
         }
     }
 }
+
+/// bundle for all things a singular model would need. More complex models will their own bundles
+// #[derive(Bundle, Default)]
+// pub struct ModelBundle {
+//     pub pbr_bundle: PbrBundle,
+//     pub physics: PhysicsBundle,
+//     pub selection_enabler: MakeSelectableBundle,
+//     pub serializer_type: SerializeType,
+// }
+
+// impl ModelBundle {
+    
+//     pub fn new(
+//         mesh_handle: Handle<Mesh>,
+//         material_handle: Handle<StandardMaterial>,
+//         transform: Transform,
+//         category: SerializeType,
+
+//         // model_collision_groups: Option<CollisionGroups>,
+//         // model_solver_groups: Option<SolverGroups>,
+//     ) -> Self {
+//         return Self {
+//             pbr_bundle: PbrBundle {
+//                 mesh: mesh_handle,
+//                 material: material_handle,
+//                 transform: transform,
+//                 ..default()
+//             },
+//             physics: PhysicsBundle::default(),
+//             selection_enabler: MakeSelectableBundle::default(),
+//             serializer_type: category,
+//             // model: ModelFlag {
+//             //     geometry: geometry,
+//             //     material: material,
+//             //     transform: model_position,
+//             //     ..default()
+
+//             // },
+//             // collision_groups: model_collision_groups.unwrap_or_default(),
+//             // solver_groups: model_solver_groups.unwrap_or_default(),
+//             ..default()
+//         }
+//     }
+// }
 
 /// collection of all things required for something to have "physics"
 #[derive(Bundle)]

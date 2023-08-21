@@ -16,6 +16,8 @@ use bevy::{
 
 //use crate::body::robot::components::ModelBundle;
 
+use crate::body::robot;
+
 use super::urdf_to_bevy::UrdfRoot;
 
 use thiserror::Error;
@@ -75,6 +77,7 @@ pub struct SpawnableRobots {
 #[uuid = "6f49513d-eec8-4d23-ab5c-812fbcafe738"]
 pub struct BevyRobot {
     pub urdf_file: Handle<UrdfRoot>,
+    pub urdf_path: String,
     /// urdf path starting from the assets/, folder. E.G:, if urdf is in robots/ project, this should start
     /// from robots/
     //pub urdf_path: String,
@@ -84,37 +87,6 @@ pub struct BevyRobot {
 
 impl BevyRobot {
 
-    // pub fn new(asset_server: Res<AssetServer>, urdf_path_through_assets: String) -> Self{
-        
-    //     // folder for this should be organized as so:
-    //     // root folder / source_folder(e.g: /src) / package_folder / urdf_folder / urdf.xml
-    //     // let folders: Vec<&str> =  urdf_path_through_assets.split("/").collect();
-    //     // return Self {
-    //     //     urdf_file: asset_server.load(urdf_path_through_assets),
-    //     //     urdf_path: urdf_path_through_assets,
-    //     //     models_folder: 
-
-    //     // }
-    // }
-
-    // infer mesh folder from urdf path.
-    // mesh folder should be in the `/models` for local/package model locations. 
-    // pub fn mesh_dir_from_urdf(self) {
-        
-    // }
-    // create a strong mesh handle based on the source of a mesh.
-    // pub fn fetch_mesh_from_source(self, asset_server: Res<AssetServer>, mut mesh_server: Res<Assets<Mesh>> , mesh_source: AssetSource) -> Handle<Mesh>{
-    //     match mesh_source {
-    //         AssetSource::Package(filename) => 
-    //          {
-    //             let loaded_mesh: Handle<Mesh> = asset_server.load(
-    //                 self.root_folder + &self.source_folder + &self.package_folder + &filename
-    //             );
-    //             return loaded_mesh;
-    //         }, 
-    //         _ => panic!("fetching mesh from, {:#?}, isn't implemented. Add an implementation to remove this error", mesh_source),
-    //     }
-    // }
 }
 
 
@@ -129,10 +101,12 @@ pub fn stage_robots_to_spawn_from_urdf(
     mut commands: Commands,) {    
     // add urdfs you want to be loaded here
     let robot_pkg_path = "example_bot/src/model_pkg/";
+    let urdf_path = robot_pkg_path.to_owned() + "urdf/diff_bot.xml";
     let diff_bot = BevyRobot {
         urdf_file: 
-            asset_server.load(robot_pkg_path.to_owned() + "urdf/diff_bot.xml"),
-        models_dir_path: robot_pkg_path.to_owned() + "models/"
+            asset_server.load(urdf_path.clone()),
+        models_dir_path: robot_pkg_path.to_owned() + "models/",
+        urdf_path: urdf_path
     };
     commands.spawn(diff_bot);
 }

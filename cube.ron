@@ -1,4 +1,91 @@
 (
   resources: {},
-  entities: {},
+  entities: {
+    2: (
+      components: {
+        "ros2_bevy::serialization::components::ModelFlag": (
+          geometry: Primitive(Box(
+            size: (1.0, 1.0, 1.0),
+          )),
+          material: (
+            base_color: Rgba(
+              red: 1.0,
+              green: 0.08,
+              blue: 0.58,
+              alpha: 1.0,
+            ),
+            base_color_texture: None,
+            emissive: Rgba(
+              red: 0.0,
+              green: 0.0,
+              blue: 0.0,
+              alpha: 1.0,
+            ),
+            emissive_texture: None,
+            perceptual_roughness: 0.5,
+            metallic: 0.0,
+            metallic_roughness_texture: None,
+            reflectance: 0.5,
+            normal_map_texture: None,
+            flip_normal_map_y: false,
+            occlusion_texture: None,
+            double_sided: false,
+            unlit: false,
+            fog_enabled: true,
+            alpha_mode: Opaque,
+            depth_bias: 0.0,
+            depth_map: None,
+            parallax_depth_scale: 0.1,
+            parallax_mapping_method: Occlusion,
+            max_parallax_layer_count: 16.0,
+          ),
+          transform: (
+            translation: (
+              x: 0.0,
+              y: 10.0,
+              z: 20.0,
+            ),
+            rotation: (0.0, 0.0, 0.0, 1.0),
+            scale: (
+              x: 1.0,
+              y: 1.0,
+              z: 1.0,
+            ),
+          ),
+        ),
+        "ros2_bevy::serialization::components::SerializeType": SingleModel,
+        "bevy_transform::components::transform::Transform": (
+          translation: (
+            x: -0.0043729786,
+            y: -4.4003444,
+            z: 19.997541,
+          ),
+          rotation: (-0.0000115963785, -0.0028259913, 0.00075778435, 0.9999957),
+          scale: (
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+          ),
+        ),
+      },
+    ),
+    4: (
+      components: {
+        "ros2_bevy::serialization::components::SerializeType": Urdf("example_bot/src/model_pkg/urdf/diff_bot.xml"),
+        "bevy_transform::components::transform::Transform": (
+          translation: (
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+          ),
+          rotation: (0.0, 0.0, 0.0, 1.0),
+          scale: (
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+          ),
+        ),
+      },
+    ),
+  },
 )

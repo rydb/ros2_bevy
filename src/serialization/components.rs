@@ -1,7 +1,25 @@
+use std::default;
+
 use bevy::prelude::*;
 use bevy::render::mesh::shape::*;
 use bevy::reflect::TypeUuid;
 use urdf_rs::Robot;
+
+use crate::urdf::urdf_to_bevy::UrdfRoot;
+
+
+/// Component which save/load systems pick up on to tell them "what" a thing is for serialization purposes. 
+/// 
+/// if serialize enum  is set to [`Skip`], then that particular entity is skipped. during the save/load process
+/// ['Skip'] is generally applied to entities apart of nested structures
+#[derive(Component, Default, Reflect, Clone)]
+#[reflect(Component)]
+pub enum SerializeType {
+    #[default]
+    Skip,
+    SingleModel,
+    Urdf(String),
+}
 
 /// component which flags entity as a model for spawning purposes. !!!TREAT THIS AS READ ONLY!!!
 #[derive(Component, Reflect, Clone)]

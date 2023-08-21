@@ -2,10 +2,10 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use crate::timers::resources::DespawnTimer;
 use bevy_rapier3d::rapier::dynamics::JointAxis;
-
+use moonshine_save::prelude::*;
 
 use crate::body::robot::components::*;
-use crate::serialization::components::ModelFlag;
+use crate::serialization::components::{ModelFlag, SerializeType};
 
 // used to donote spawned model is a "part". Used to check
 // for any models that the part is "bound" to.
@@ -21,14 +21,35 @@ pub fn spawn_cube(
 
     //model_query: Query<Entity, With<BevyRobot>>,
 ) {
+    // commands.spawn(ModelBundle::new(
+    //     meshes.add(shape::Cube {size: 1.0}.into()),
+    //     materials.add(Color::PINK.into()),
+    //     Transform::from_xyz(0.0, 10.0, 20.0),
+    //     SerializeType::SingleModel,
+    // ));
     commands.spawn(
+        (
         ModelFlag {
             geometry: shape::Cube {size: 1.0}.into(),
             transform: Transform::from_xyz(0.0, 10.0, 20.0),
             material: Color::PINK.into()
-        }   
+        },
+        SerializeType::SingleModel,   
+    )
     );
+    // );
+    // commands.spawn(
+    //     ModelBundle {
+    //         pbr_bundle: PbrBundle {
+    //             mesh: meshes.add(shape::Cube {size: 1.0}.into()),
+    //             material: materials.add(Color::PINK.into()),
+    //             transform: Transform::from_xyz(0.0, 10.0, 20.0),
+    //             ..default()
+    //         },
+    //         ..Default::default()
+    //     }
 
+    // );
 }
 
 /// checks for collisions, and briefly spawns cubes to showcase 

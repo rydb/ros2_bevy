@@ -5,8 +5,8 @@ use std::{
     path::{Path, PathBuf},
 };
 use moonshine_save::{
-    prelude::*,
-    save::*,
+    prelude::{SavePlugin, LoadPlugin, load_from_file},
+    //save::*,
 };
     use bevy::prelude::*;
 use super::systems::*;
@@ -30,6 +30,7 @@ impl Plugin for SerializationPlugin {
         .register_type::<ModelFlag>()
         .register_type::<Geometry>()
         .register_type::<MeshPrimitive>()
+        .register_type::<SerializeType>()
         .register_type::<Option<Entity>>()
         .add_systems(Update, spawn_models)
         .add_systems(Update, save_into_file(SAVE_PATH).run_if(check_for_save_keypress))
