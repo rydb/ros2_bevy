@@ -11,10 +11,22 @@ use moonshine_save::save::*;
 use super::components::*;
 use std::path::PathBuf;
 
-// take model with 
-//pub fn spawn_multipart_model()
 
-// collect entities with `ModelFlag` that don't have meshes, and spawn their meshes.  
+/// collect entities with seriazer flags for multi part models, and add their non serializable
+/// equivilent component so that their spawning systems can spawn them.
+// pub fn spawn_multipart_models(
+//     commands: Commands,
+//     multipart_model_query: Query<(Entity, &SerializeType)>,
+// ) {
+//     for (e, serialize_type) in multipart_model_query.iter() {
+//         match *serialize_type {
+//             SerializeType::Skip => println!("found model marked to skip serializing, skipping"),
+//             SerializeType::SingleModel
+//         }
+//     }
+// }
+
+/// collect entities with `ModelFlag` that don't have meshes, and spawn their meshes.  
 pub fn spawn_models(
     unspawned_models_query: Query<(Entity, &ModelFlag), Without<Handle<Mesh>>>,
     mut commands: Commands, 
