@@ -48,9 +48,7 @@ pub fn spawn_unspawned_robots(
                         //println!("spawning link: {:#?}", link);
                         for visual_link in &link.visual {
                             //println!("spawning visual link, {:#?}", visual_link);
-                            let x = *visual_link.origin.xyz.get(0).unwrap() as f32;
-                            let y = *visual_link.origin.xyz.get(1).unwrap() as f32;
-                            let z = *visual_link.origin.xyz.get(2).unwrap() as f32;
+
                             let model = match &visual_link.geometry {
                                 UrdfMesh { filename, .. } => {
                                     // set filename to asset source, then set it back to string so path can be trimmed just for the filename + extension.
@@ -64,17 +62,25 @@ pub fn spawn_unspawned_robots(
                                     //asset_server.load(unspawned_bot.models_dir_path.clone() + model_file)
                                     ModelFlag { 
                                         geometry: (&*model_file_path).into(),
-                                        transform: Transform::from_xyz(x, y, z),
+                                        //transform: Transform::from_xyz(x, y, z),
                                         material: Color::PINK.into(),
                                     }
                                 },
                                 _ => ModelFlag {
                                     geometry: (&visual_link.geometry).into(),
-                                    transform: Transform::from_xyz(x, y, z),
+                                    //transform: Transform::from_xyz(x, y, z),
                                     material: Color::PINK.into(),
                                 },                    
                             };
-                            let model_entity = commands.spawn(model)
+                            let x = *visual_link.origin.xyz.get(0).unwrap() as f32;
+                            let y = *visual_link.origin.xyz.get(1).unwrap() as f32;
+                            let z = *visual_link.origin.xyz.get(2).unwrap() as f32;
+                            let model_entity = commands.spawn(
+                            (
+                                model, 
+                                Transform::from_xyz(x, y, z),
+                            )
+                            )
                             //make model not collide with it self for debuggign joints
                             .insert(CollisionGroups::new(Group::GROUP_1, Group::GROUP_10))
                             .insert(Damping{linear_damping: 0.0, angular_damping: 100.0})

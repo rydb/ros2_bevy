@@ -26,13 +26,14 @@ pub enum SerializeType {
 }
 
 /// component which flags entity as a model for spawning purposes. !!!TREAT THIS AS READ ONLY!!!
+/// (TODO) reimplement this to 
 #[derive(Component, Reflect, Clone)]
 //#[reflect(from_reflect = false)]
 #[reflect(Component)]
 pub struct ModelFlag {
     pub geometry: Geometry,
     pub material: StandardMaterial,
-    pub transform: Transform, 
+    //pub transform: Transform, 
 
 }
 
@@ -41,7 +42,7 @@ impl Default for ModelFlag {
         Self {
             geometry: Default::default(),
             material: Default::default(),
-            transform: Default::default()
+            //transform: Default::default()
         }
     }
 }

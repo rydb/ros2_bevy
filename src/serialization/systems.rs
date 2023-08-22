@@ -36,13 +36,14 @@ use std::path::PathBuf;
 
 /// collect entities with `ModelFlag` that don't have meshes, and spawn their meshes.  
 pub fn spawn_models(
-    unspawned_models_query: Query<(Entity, &ModelFlag), Without<Handle<Mesh>>>,
+    unspawned_models_query: Query<(Entity, &ModelFlag, &Transform), Without<Handle<Mesh>>>,
     mut commands: Commands, 
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     assset_server: Res<AssetServer>,
+    transform_query: Query<&Transform>,
 ) {
-    for (e, model) in unspawned_models_query.iter() {
+    for (e, model, trans) in unspawned_models_query.iter() {
 
         let mesh_check: Option<Mesh> = match model.geometry.clone() {
             Geometry::Primitive(variant) => Some(variant.into()), 
@@ -54,14 +55,17 @@ pub fn spawn_models(
             let mesh_handle = meshes.add(mesh);
 
             let material_handle = materials.add(model.material.clone());
-            let trans = Transform::from(model.transform);
+            
+            if let Ok(trans) = transform_query.get(e) {
+
+            }
             // add all components a deserialized model needs to be useful. 
             commands.entity(e).insert(
                 (
                 PbrBundle {
                     mesh: mesh_handle,
                     material: material_handle,
-                    transform: trans,
+                    transform: *trans,
                     ..default()
                 }, // add meshd
                 PhysicsBundle::default(),// adds physics
@@ -101,8 +105,8 @@ pub fn check_for_load_keypress(
     }
 }
 
-
 pub fn save_into_file(path: impl Into<PathBuf>) -> SavePipeline {
+    
     save::<With<Serializable>>
         .pipe(into_file(path.into()))
         .pipe(finish)

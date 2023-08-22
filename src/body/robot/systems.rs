@@ -31,10 +31,11 @@ pub fn spawn_cube(
         (
         ModelFlag {
             geometry: shape::Cube {size: 1.0}.into(),
-            transform: Transform::from_xyz(0.0, 10.0, 20.0),
+            //transform: Transform::from_xyz(0.0, 10.0, 20.0),
             material: Color::PINK.into()
         },
         Serializable,
+        Transform::from_xyz(0.0, 10.0, 20.0),
         //SerializeType::SingleModel,   
     )
     );
