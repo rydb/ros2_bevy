@@ -73,7 +73,8 @@ pub struct SpawnableRobots {
     pub list: Vec<BevyRobot>,
 }
 
-#[derive(Component, TypeUuid)]
+#[derive(Component, TypeUuid, Default, Reflect)]
+#[reflect(Component)]
 #[uuid = "6f49513d-eec8-4d23-ab5c-812fbcafe738"]
 pub struct BevyRobot {
     pub urdf_file: Handle<UrdfRoot>,

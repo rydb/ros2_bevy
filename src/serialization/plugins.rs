@@ -5,10 +5,12 @@ use std::{
     path::{Path, PathBuf},
 };
 use moonshine_save::{
-    prelude::{SavePlugin, LoadPlugin, load_from_file},
+    prelude::{SavePlugin, LoadPlugin, load_from_file, Save},
     //save::*,
 };
     use bevy::prelude::*;
+use crate::urdf::urdf_loader::BevyRobot;
+
 use super::systems::*;
 use super::components::*;
 /// marks component as a valid candidate for serialization. 
@@ -36,6 +38,8 @@ impl Plugin for SerializationPlugin {
         .register_type::<Option<Handle<Image>>>()
         .register_type::<AlphaMode>()
         .register_type::<ParallaxMappingMethod>()
+        .register_type::<BevyRobot>()
+        .register_type::<Serializable>()
         .add_systems(Update, spawn_models)
         .add_systems(Update, save_into_file(SAVE_PATH).run_if(check_for_save_keypress))
         .add_systems(Update, load_from_file(SAVE_PATH).run_if(check_for_load_keypress))

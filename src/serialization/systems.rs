@@ -6,6 +6,7 @@ use crate::{body::robot::components::{PhysicsBundle, MakeSelectableBundle}, urdf
 use bevy::ecs::query::ReadOnlyWorldQuery;
 use super::components::Geometry;
 use crate::body::robot::components::Selected;
+use crate::urdf::urdf_loader::BevyRobot;
 
 use moonshine_save::save::*;
 use super::components::*;
@@ -19,9 +20,16 @@ use std::path::PathBuf;
 //     multipart_model_query: Query<(Entity, &SerializeType)>,
 // ) {
 //     for (e, serialize_type) in multipart_model_query.iter() {
-//         match *serialize_type {
-//             SerializeType::Skip => println!("found model marked to skip serializing, skipping"),
-//             SerializeType::SingleModel
+//         match serialize_type {
+//             SerializeType::Skip => {
+
+//             },
+//             SerializeType::SingleModel => {
+
+//             },
+//             SerializeType::Urdf(dir) => {
+                
+//             }
 //         }
 //     }
 // }
@@ -35,31 +43,39 @@ pub fn spawn_models(
     assset_server: Res<AssetServer>,
 ) {
     for (e, model) in unspawned_models_query.iter() {
-        let mesh_handle = match model.geometry.clone() {
-            Geometry::Primitive(variant) => meshes.add(variant.into()), 
+
+        let mesh_check: Option<Mesh> = match model.geometry.clone() {
+            Geometry::Primitive(variant) => Some(variant.into()), 
             Geometry::Mesh { filename, .. } => {
                 println!("attempting to load mesh: {:#?}", filename);
-                assset_server.load(filename)}
-        };
-        let material_handle = materials.add(model.material.clone());
-        let trans = Transform::from(model.transform);
-        // add all components a deserialized model needs to be useful. 
-        commands.entity(e).insert(
-            (
-            PbrBundle {
-                mesh: mesh_handle,
-                material: material_handle,
-                transform: trans,
-                ..default()
-            }, // add meshd
-            PhysicsBundle::default(),// adds physics
-            MakeSelectableBundle::default(), // makes model selectable 
-            Unload, // marks entity to unload on deserialize
-        )
-        )
-        // remove model flag 
-        //.remove::<ModelFlag>()
-        ;
+                meshes.get(&assset_server.load(filename))}.cloned()
+        }; 
+        if let Some(mesh) = mesh_check {
+            let mesh_handle = meshes.add(mesh);
+
+            let material_handle = materials.add(model.material.clone());
+            let trans = Transform::from(model.transform);
+            // add all components a deserialized model needs to be useful. 
+            commands.entity(e).insert(
+                (
+                PbrBundle {
+                    mesh: mesh_handle,
+                    material: material_handle,
+                    transform: trans,
+                    ..default()
+                }, // add meshd
+                PhysicsBundle::default(),// adds physics
+                MakeSelectableBundle::default(), // makes model selectable 
+                Unload, // marks entity to unload on deserialize
+            )
+            )
+            // remove model flag 
+            //.remove::<ModelFlag>()
+            ;
+        } else {
+            println!("load attempt failed for this mesh, re-attempting next system call");
+        }
+
         
 
     }
@@ -87,7 +103,7 @@ pub fn check_for_load_keypress(
 
 
 pub fn save_into_file(path: impl Into<PathBuf>) -> SavePipeline {
-    save::<With<SerializeType>>
+    save::<With<Serializable>>
         .pipe(into_file(path.into()))
         .pipe(finish)
         .in_set(SaveSet::Save)
@@ -104,8 +120,10 @@ pub fn save<Filter: ReadOnlyWorldQuery>(
     // block all types, and then add types that should be serialized here
     builder.deny_all();
     builder.allow::<Transform>();
-    builder.allow::<SerializeType>();
+    //builder.allow::<SerializeType>();
     builder.allow::<ModelFlag>();
+    builder.allow::<BevyRobot>();
+    builder.allow::<Serializable>();
 
     builder.extract_entities(serializable_querry.iter());
     let scene = builder.build();

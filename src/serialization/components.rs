@@ -8,6 +8,10 @@ use urdf_rs::Robot;
 use crate::urdf::urdf_to_bevy::UrdfRoot;
 
 
+/// Component which marks entity as target for serialization/deserialization
+#[derive(Component, Default, Reflect, Clone)]
+#[reflect(Component)]
+pub struct Serializable;
 /// Component which save/load systems pick up on to tell them "what" a thing is for serialization purposes. 
 /// 
 /// if serialize enum  is set to [`Skip`], then that particular entity is skipped. during the save/load process
@@ -88,6 +92,12 @@ impl From<Cube> for Geometry {
 //             Self::Primitive(variant)  => variant.into(),
 //             Mesh => return shape::Cube{size: 1.0}.into(),
 //         }
+//     }
+// }
+
+// impl Into<Option<Mesh>> for MeshPrimitive {
+//     fn into(self) -> Option<Mesh> {
+//         return Option
 //     }
 // }
 

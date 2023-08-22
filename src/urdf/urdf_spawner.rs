@@ -4,9 +4,9 @@ use bevy::prelude::*;
 use super::urdf_to_bevy::UrdfRoot;
 use super::urdf_loader::BevyRobot;
 //use std::prelude::*;
-use crate::serialization::components::{ModelFlag, SerializeType};
+use crate::serialization::components::{ModelFlag, SerializeType, Serializable};
 use std::collections::{HashMap, HashSet};
-
+use moonshine_save::save::Save;
 use bevy_rapier3d::na::geometry::Rotation as RapierRotation;
 
 use crate::body::robot::components::{Wheel};
@@ -40,7 +40,8 @@ pub fn spawn_unspawned_robots(
                 let mut root_links: HashSet<Entity> = HashSet::new();
                 commands.entity(e).insert((
                         SpatialBundle::default(),
-                        SerializeType::Urdf(unspawned_bot.urdf_path.clone()),
+                        Serializable,
+                        //SerializeType::Urdf(unspawned_bot.urdf_path.clone()),
                 )
                     ).insert(GlobalTransform::from_xyz(0.0, 10.0,0.0));
                     for link in &urdf.links {                        // for each part, spawn a sub part to be linked to the main robot later.
