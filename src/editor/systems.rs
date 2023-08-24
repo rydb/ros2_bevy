@@ -1,10 +1,13 @@
 
 use std::f32::consts::PI;
 use crate::RaycastSource;
+
 use crate::RaycastMethod;
-use crate::DefaultPluginState;
+use crate::DefaultRaycastingPlugin;
 use crate::body::robot::components::Selectable;
+use bevy_window::PrimaryWindow;
 use crate::body::robot::components::Selected;
+use bevy_mod_raycast::RaycastPluginState;
 use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
 use bevy_rapier3d::prelude::{RigidBody, GravityScale};
 //use body::robot::{FeatureTestPlugin, RobotTestPlugin};
@@ -16,17 +19,15 @@ use super::components::*;
 
 // Update our `RaycastSource` with the current cursor position every frame.
 pub fn update_raycast_with_cursor(
-    mut cursor: EventReader<CursorMoved>,
     mut query: Query<&mut RaycastSource<Selectable>>,
+    q_windows: Query<&Window, With<PrimaryWindow>>
 
 ) {
     // Grab the most recent cursor event if it exists:
     for mut pick_source in &mut query.iter_mut() {
-        // Grab the most recent cursor event if it exists:
-        if let Some(cursor_latest) = cursor.iter().last() {
-            //println!("rays bieng spawned are {:#?}", )
+        if let Some(cursor_pos) = q_windows.single().cursor_position() {
             pick_source.cast_method =
-                bevy_mod_raycast::RaycastMethod::Screenspace(cursor_latest.position);
+                bevy_mod_raycast::RaycastMethod::Screenspace(cursor_pos);
         }
     }
 }
@@ -168,6 +169,7 @@ pub fn manage_selection_behaviour(
     // for raycast_y_pos in raycast_sources.iter() {
     //     println!("raycast_pos is {:#?}", raycast_y_pos.ray.unwrap())
     // }
+    println!("number of raycast sources is {:#?}", raycast_sources.iter().len());
     if buttons.just_pressed(MouseButton::Left) {
         // pick nearest rigid body that camera with selector ray picks.
         for (e, intersection) in raycast_sources.iter().flat_map(|m| m.get_nearest_intersection()) {
@@ -226,7 +228,7 @@ pub fn manage_selection_behaviour(
 
 ///spawns camera for debug
 pub fn spawn_debug_cam(mut commands:Commands) {
-    commands.insert_resource(DefaultPluginState::<Selectable>::default().with_debug_cursor());
+    commands.insert_resource(RaycastPluginState::<Selectable>::default().with_debug_cursor());
     commands.spawn(
 Camera3dBundle {
             transform: Transform::from_xyz(0.0, 4.0, 20.0).with_rotation(Quat::from_rotation_z(PI / 2.0)),

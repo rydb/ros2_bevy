@@ -12,7 +12,7 @@ use bevy_rapier3d::prelude::{RigidBody, GravityScale, ImpulseJoint};
 use body::robot::{FeatureTestPlugin, RobotTestPlugin};
 use bevy_flycam::prelude::*;
 use bevy_mod_raycast::{
-    print_intersections, DefaultPluginState, DefaultRaycastingPlugin, RaycastMesh, RaycastMethod,
+    print_intersections, DefaultRaycastingPlugin, RaycastMesh, RaycastMethod,
     RaycastSource, RaycastSystem,
 };
 use editor::plugins::EditorPlugin;
