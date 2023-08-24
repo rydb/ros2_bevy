@@ -5,6 +5,7 @@ use crate::RaycastSource;
 use crate::RaycastMethod;
 use crate::DefaultRaycastingPlugin;
 use crate::body::robot::components::Selectable;
+use bevy::pbr::wireframe::Wireframe;
 use bevy_window::PrimaryWindow;
 use crate::body::robot::components::Selected;
 use bevy_mod_raycast::RaycastPluginState;
@@ -122,35 +123,35 @@ pub fn rigid_body_editor(
 }
 
 /// take things that have been selected, and draw a gizmo over them to represent that
-pub fn visualize_selected_things(
-    mut gizmos: Gizmos,
-    selected_things_querry: Query<(&GlobalTransform, &Handle<Mesh>), With<Selected>>,
-    meshes: Res<Assets<Mesh>>,
-) {
-    // padding to make wireframe not hug meshes too tightly
-    let wireframe_padding = 0.01;
-    for (trans, mesh_handle) in selected_things_querry.iter() {
-        if let Some(mesh) = meshes.get(mesh_handle) {
-            //println!("got mesh from mesh handle");
-            // get bounding box for cuboid wirefram ebased on mesh "aabb"
-            if let Some(aabb) = mesh.compute_aabb() {
-                println!("mesh aabb: {:#?}", aabb);
-                gizmos.cuboid(
-                    Transform::from_translation(trans.translation()).with_scale(Vec3::new(
-                        (aabb.half_extents.x * 2.0) + wireframe_padding,
-                        (aabb.half_extents.y * 2.0) + wireframe_padding,
-                        (aabb.half_extents.y * 2.0) + wireframe_padding,
-                    )
-                    ),
-                    Color::GREEN,
-                );
-            } else {
-                println!("unable to compute mesh aabb")
-            }
-        }
-    }
+// pub fn visualize_selected_things(
+//     mut gizmos: Gizmos,
+//     selected_things_querry: Query<(&GlobalTransform, &Handle<Mesh>), With<Selected>>,
+//     meshes: Res<Assets<Mesh>>,
+// ) {
+//     // padding to make wireframe not hug meshes too tightly
+//     let wireframe_padding = 0.01;
+//     for (trans, mesh_handle) in selected_things_querry.iter() {
+//         if let Some(mesh) = meshes.get(mesh_handle) {
+//             //println!("got mesh from mesh handle");
+//             // get bounding box for cuboid wirefram ebased on mesh "aabb"
+//             if let Some(aabb) = mesh.compute_aabb() {
+//                 println!("mesh aabb: {:#?}", aabb);
+//                 gizmos.cuboid(
+//                     Transform::from_translation(trans.translation()).with_scale(Vec3::new(
+//                         (aabb.half_extents.x * 2.0) + wireframe_padding,
+//                         (aabb.half_extents.y * 2.0) + wireframe_padding,
+//                         (aabb.half_extents.y * 2.0) + wireframe_padding,
+//                     )
+//                     ),
+//                     Color::GREEN,
+//                 );
+//             } else {
+//                 println!("unable to compute mesh aabb")
+//             }
+//         }
+//     }
 
-}
+// }
 
 /// checks for selectable things, and then selects/deselects them on various criteria
 pub fn manage_selection_behaviour(    
@@ -160,16 +161,10 @@ pub fn manage_selection_behaviour(
     valid_meshes: Query<(&Transform, &Handle<StandardMaterial>)>,
     selected_meshes: Query<&Selected>,
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    rigidbody_querry: Query<&RigidBody>,
     widget_querry: Query<(Entity), With<Widget>>,
 
 ) {
-
-    // for raycast_y_pos in raycast_sources.iter() {
-    //     println!("raycast_pos is {:#?}", raycast_y_pos.ray.unwrap())
-    // }
-    println!("number of raycast sources is {:#?}", raycast_sources.iter().len());
+    //println!("number of raycast sources is {:#?}", raycast_sources.iter().len());
     if buttons.just_pressed(MouseButton::Left) {
         // pick nearest rigid body that camera with selector ray picks.
         for (e, intersection) in raycast_sources.iter().flat_map(|m| m.get_nearest_intersection()) {
@@ -183,8 +178,9 @@ pub fn manage_selection_behaviour(
                         //material_properties.unlit = false;
                         
                         println!("turning off build mode");
-                        commands.entity(e).remove::<Selected>()
-                        
+                        commands.entity(e)
+                        .remove::<Selected>()
+                        .remove::<Wireframe>()
                         // if let Ok(rigidbody) = rigidbody_querry.get(e){
 
                         // }
@@ -198,13 +194,19 @@ pub fn manage_selection_behaviour(
                         // check if selected thing is a widget, if it is, deselect all other widgets.
                         if let Ok(_) = widget_querry.get(e) {
                             for widget in widget_querry.iter() {
-                                commands.entity(widget).remove::<Selected>();
+                                commands.entity(widget)
+                                .remove::<Selected>()
+                                .remove::<Wireframe>();
+                                
                             }
                         }
                         //material_properties.unlit = true;
 
-                        commands.entity(e).insert(Selected)
+                        commands.entity(e)
+                        .insert(Selected)
+                        .insert(Wireframe)
                         .insert(RigidBody::Fixed)
+
                         // spawn collisionless sphere thing that conveys build direction?
                         ;
 

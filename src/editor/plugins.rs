@@ -4,6 +4,7 @@ use bevy_mod_raycast::RaycastSystem;
 use crate::DefaultRaycastingPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_egui::EguiPlugin;
+use bevy::pbr::wireframe::WireframePlugin;
 use crate::body::robot::components::Selectable;
 
 use super::systems::*;
@@ -20,6 +21,7 @@ impl Plugin for SelecterPlugin {
             DefaultRaycastingPlugin::<Selectable>::default(),
             EguiPlugin,
             TransformWidgetPlugin,
+            WireframePlugin,
             )
         )
         .add_systems(
@@ -43,7 +45,7 @@ impl Plugin for EditorPlugin {
         )
         //.add_systems(RaycastSystem::BuildRays::<RigidBody>, update_raycast_with_cursor)
         .add_systems(Startup, (spawn_debug_cam))
-        .add_systems(Update, (manage_selection_behaviour, visualize_selected_things/*rigid_body_editor*/))
+        .add_systems(Update, (manage_selection_behaviour))
         ;
     }
 }

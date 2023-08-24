@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use super::systems::*;
+use super::{systems::*, gizmo_material::GizmoMaterial};
 use crate::{DefaultRaycastingPlugin, editor::components::LastMouseInteraction};
 use bevy_mod_raycast::RaycastSystem;
 //use crate::editor::systems::SelectedForEdit;
@@ -13,7 +13,7 @@ impl Plugin for TransformWidgetPlugin {
     fn build(&self, app: &mut App) {
         app
         .register_type::<LastMouseInteraction>()
-        
+        .add_plugins(MaterialPlugin::<GizmoMaterial>::default())
         .add_systems(Update, widget_despawn_for_deselected)
         .add_systems(Update, (manage_tugs, manage_rings, widget_spawn_for_selected, transform_widget_behaviour)
             .before(widget_despawn_for_deselected)) 
