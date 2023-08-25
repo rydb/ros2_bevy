@@ -1,4 +1,5 @@
 
+use std::default;
 use std::f32::consts::PI;
 use crate::RaycastSource;
 
@@ -7,6 +8,7 @@ use crate::DefaultRaycastingPlugin;
 use crate::body::robot::components::Selectable;
 use bevy::pbr::wireframe::Wireframe;
 use bevy_window::PrimaryWindow;
+use rapier3d::crossbeam::channel::Select;
 use crate::body::robot::components::Selected;
 use bevy_mod_raycast::RaycastPluginState;
 use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
@@ -153,13 +155,14 @@ pub fn rigid_body_editor(
 
 // }
 
+
+
 /// checks for selectable things, and then selects/deselects them on various criteria
 pub fn manage_selection_behaviour(    
-    raycast_sources: Query<&RaycastSource<Selectable>>,
+    raycast_sources: Query<(&RaycastSource<Selectable>, &SelectionMode)>,
     buttons: Res<Input<MouseButton>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    valid_meshes: Query<(&Transform, &Handle<StandardMaterial>)>,
     selected_meshes: Query<&Selected>,
+    selectable_meshes: Query<&Selectable>,
     mut commands: Commands,
     widget_querry: Query<(Entity), With<Widget>>,
 
@@ -167,60 +170,48 @@ pub fn manage_selection_behaviour(
     //println!("number of raycast sources is {:#?}", raycast_sources.iter().len());
     if buttons.just_pressed(MouseButton::Left) {
         // pick nearest rigid body that camera with selector ray picks.
-        for (e, intersection) in raycast_sources.iter().flat_map(|m| m.get_nearest_intersection()) {
-            //println!("clicked on {:#?}, at {:#?}", e, intersection.position());
-            
-            if let Ok((trans, material)) = valid_meshes.get(e) {
-                // attempt to fetch color from model
-                if let Some(material_properties) = materials.get_mut(material) {
-                    // use model ligting on and off as stand in for being selected.
-                    if let Ok(..) = selected_meshes.get(e){
-                        //material_properties.unlit = false;
-                        
-                        println!("turning off build mode");
-                        commands.entity(e)
-                        .remove::<Selected>()
-                        .remove::<Wireframe>()
-                        // if let Ok(rigidbody) = rigidbody_querry.get(e){
-
-                        // }
-
-                        .insert(RigidBody::Dynamic)                        ;
-
-
-                        
-
-                    } else {
-                        // check if selected thing is a widget, if it is, deselect all other widgets.
-                        if let Ok(_) = widget_querry.get(e) {
-                            for widget in widget_querry.iter() {
-                                commands.entity(widget)
+        for (raycast_source, selector_mode) in raycast_sources.iter() {/*raycast_sources.iter().flat_map(|m| m.get_nearest_intersection()) {*/
+            if let Some((e, ..)) = raycast_source.get_nearest_intersection() {
+                match *selector_mode {
+                    SelectionMode::Selecting => {
+                        // don't select unselectable meshes
+                        if let Ok(..) = selectable_meshes.get(e) {
+                            if let Ok(..) = selected_meshes.get(e){
+                                commands.entity(e)
                                 .remove::<Selected>()
-                                .remove::<Wireframe>();
-                                
+                                .remove::<Wireframe>()
+                                .insert(RigidBody::Dynamic)                        ;
+                            } else {
+                                // check if selected thing is a widget, if it is, deselect all other widgets.
+                                if let Ok(_) = widget_querry.get(e) {
+                                    for widget in widget_querry.iter() {
+                                        commands.entity(widget)
+                                        .remove::<Selected>()
+                                        .remove::<Wireframe>();
+                                        
+                                    }
+                                }
+                                commands.entity(e)
+                                .insert(Selected)
+                                .insert(Wireframe)
+                                .insert(RigidBody::Fixed)
+                                ;
+                
+                
                             }
                         }
-                        //material_properties.unlit = true;
-
-                        commands.entity(e)
-                        .insert(Selected)
-                        .insert(Wireframe)
-                        .insert(RigidBody::Fixed)
-
-                        // spawn collisionless sphere thing that conveys build direction?
-                        ;
-
-
+                    }
+                    SelectionMode::Clicking => {
+                        println!("executing function...")
                     }
                 }
-                else {
-                    println!("failed to fetch standard material from handle, not selecting mesh for stability sake.")
-                }
+
             }
-            else {
-                println!("failed to fetch handle to standard material for model");
-                //println!("model components are {:#?}", commands.entity(*e).log_components())
-            }
+        
+        //println!("clicked on {:#?}, at {:#?}", e, intersection.position());
+                    // attempt to fetch color from model
+            // use model ligting on and off as stand in for being selected.
+            
         }
     }
 }
@@ -228,18 +219,32 @@ pub fn manage_selection_behaviour(
 
 // }
 
+
+/// defines the selection mode for raycasting source: E.G: selecting would mean the camera is selecting meshes, 
+/// clicking would fire a function when clicking, etc...
+#[derive(Component, Clone, Copy, Reflect, Default)]
+#[reflect(Component)]
+pub enum SelectionMode {
+    #[default]
+    Selecting,
+    Clicking,
+}
+
 ///spawns camera for debug
 pub fn spawn_debug_cam(mut commands:Commands) {
     commands.insert_resource(RaycastPluginState::<Selectable>::default().with_debug_cursor());
     commands.spawn(
+        (
 Camera3dBundle {
             transform: Transform::from_xyz(0.0, 4.0, 20.0).with_rotation(Quat::from_rotation_z(PI / 2.0)),
             ..default()
-        }
-        
+        },
+        FlyCam,
+        RaycastSource::<Selectable>::new(),
+        SelectionMode::default(),
+
     )
-    .insert(FlyCam)
-    .insert(RaycastSource::<Selectable>::new())
+    )
     ;
 }
 

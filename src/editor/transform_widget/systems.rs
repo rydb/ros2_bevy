@@ -8,6 +8,8 @@ use crate::body::robot::components::Selected;
 use crate::body::robot::components::MakeSelectableBundle;
 use crate::editor::components::*;
 use super::components::*;
+use super::gizmo_material;
+use super::gizmo_material::GizmoMaterial;
 use crate::body::robot::components::Selectable;
 
 use bevy_window::PrimaryWindow;
@@ -35,7 +37,7 @@ pub fn widget_spawn_for_selected (
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-
+    mut gizmo_material: ResMut<Assets<GizmoMaterial>>,
 
 ) {
     //println!("transform widget existence called");
@@ -61,11 +63,12 @@ pub fn widget_spawn_for_selected (
         // spawn edit widget, x = red, y = green, z = blue
         
         // some these are probably wrong and will need tweaking...
+        let (s, l) = (0.8, 0.6);
         let y_tug = commands.spawn(
         (
-                PbrBundle {
+                MaterialMeshBundle {
                     mesh: cube_mesh.clone(),
-                    material: materials.add(Color::GREEN.into()),
+                    material: gizmo_material.add(GizmoMaterial::from(Color::hsl(120.0, s, l))),
                     transform: Transform::from_translation(Vec3::new(0.0,dist,0.0)),
                     ..default()
                 },
@@ -76,9 +79,9 @@ pub fn widget_spawn_for_selected (
         ).id();
         let y_tug_negative = commands.spawn(
             (
-                PbrBundle {
+                MaterialMeshBundle {
                     mesh: cube_mesh.clone(),
-                    material: materials.add(Color::GREEN.into()),
+                    material: gizmo_material.add(GizmoMaterial::from(Color::hsl(120.0, s, l))),
                     transform: Transform::from_translation(Vec3::new(0.0,-dist,0.0)),
                     ..default()
                 },

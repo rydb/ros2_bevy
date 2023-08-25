@@ -5,17 +5,26 @@ use bevy_egui::EguiContext;
 use egui::{Align, Align2, Pos2, Widget, Button};
 
 use crate::body::robot::components::Selected;
+use crate::RaycastSource;
+use crate::body::robot::components::Selectable;
+use crate::editor::systems::SelectionMode;
 
 
 /// ui for build menu
 pub fn build_menu(
-    world: &mut World,
+    //world: &mut World,
     mut disabled: Local<bool>,
+    mut commands: Commands,
+    raycast_sources: Query<(Entity), With<RaycastSource<Selectable>>>,
+    egui_context_query: Query<&mut EguiContext, With<PrimaryWindow>>,
 ){
-    let mut egui_context = world
-        .query_filtered::<&mut EguiContext, With<PrimaryWindow>>()
-        .single(world)
-        .clone();
+    // let mut egui_context = world
+    //     .query_filtered::<&mut EguiContext, With<PrimaryWindow>>()
+    //     .single(world)
+    //     .clone();
+    // if the ability to have multiple people work on a project at once is added, this will need to be refactored....
+    let mut egui_context = egui_context_query.single().clone();
+    let raycast_camera = raycast_sources.single();
     let menu_name = "Build Menu";
     egui::Window::new(menu_name)
     // positioning
@@ -26,10 +35,17 @@ pub fn build_menu(
     .show(egui_context.get_mut(), |ui| {
         egui::ScrollArea::vertical().show(ui, |ui| {
             //ui.heading(menu_name);
-            ui.add(egui::Button::new("builder ray"));
+            ui.add(egui::Button::new("Cube"));
+            if ui.button("Right Triangle Prism").clicked() {
+                println!("click spot where to spawn prism");
+                //*selector_mode = SelectionMode::Clicking;
+                commands.entity(raycast_camera).insert(SelectionMode::Clicking);
+            };
+            //ui.add(egui::Button::new("builder ray"));
             //ui.add()
             ui.separator();
-        });
+        })
+        ;
     });
 }
 

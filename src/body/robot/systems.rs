@@ -73,21 +73,6 @@ pub fn display_contacts(
                 let local_contact_point = contact_point.local_p2();
                 let collision_point = collider1_transform.transform_point(local_contact_point);
                 let cube_size = 0.1 as f32;
-
-                //println!("collider global transform is: {:#?}", collider1_transform);
-                //println!("contact point is {:#?}", local_contact_point);
-                //println!("collision happened at: {:#?}", collision_point);
-                // commands.spawn(
-                //     (
-                //         PbrBundle {
-                //             mesh: meshes.add(shape::Cube{size: cube_size}.into()),
-                //             material: materials.add(Color::RED.into()),
-                //             transform: Transform::from_translation(collider1_transform.translation()),
-                //             ..default()
-                //         },
-                //         DespawnTimer::new(0.3 as f32),
-                //     )
-                // ); 
                 commands.spawn(
                     (
                         PbrBundle {
@@ -98,18 +83,7 @@ pub fn display_contacts(
                         },
                         DespawnTimer::new(0.3 as f32),
                     )
-                );   
-                // commands.spawn(
-                //     (
-                //         PbrBundle {
-                //             mesh: meshes.add(shape::Cube{size: cube_size}.into()),
-                //             material: materials.add(Color::GREEN.into()),
-                //             transform: Transform::from_translation(local_contact_point),
-                //             ..default()
-                //         },
-                //         DespawnTimer::new(0.3 as f32),
-                //     )
-                // );        
+                );    
             }
         }
 

@@ -6,6 +6,8 @@ pub mod components;
 mod systems;
 pub mod custom_asset_loader_test;
 
+use crate::body::robot::components::MakeSelectableBundle;
+use crate::body::robot::components::Selectable;
 //use crate::mesh::example::*;
 use crate::body::robot::systems::*;
 use crate::urdf::urdf_loader::*;
@@ -138,5 +140,7 @@ fn setup_physics(
         })
         .insert(Collider::cuboid(base_plate_size, 0.1, base_plate_size))
         .insert(Friction {coefficient: 1000.0, combine_rule: CoefficientCombineRule::Average})
+        .insert(MakeSelectableBundle::default())
+        .remove::<Selectable>() // we want the base-plate to be able to recieve selection events, but modifyable by widgets(yet)
         ;
 }
