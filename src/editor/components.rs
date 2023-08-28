@@ -6,6 +6,11 @@ use bevy::prelude::*;
 #[derive(Component)]
 pub struct Widget;
 
+
+/// marks entity as "held", meaning its position should following mouse + raycast source point.
+#[derive(Component)]
+pub struct Held;
+
 /// A component which stores the last mouse interaction that happened to an entity. Something that wants mouse functionality should use/over-write this.
 #[derive(Component, Clone, Copy, Reflect)]
 #[reflect(Component)]

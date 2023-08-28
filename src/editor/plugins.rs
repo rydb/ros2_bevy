@@ -27,7 +27,7 @@ impl Plugin for SelecterPlugin {
         .add_systems(
             First,update_raycast_with_cursor.before(RaycastSystem::BuildRays::<Selectable>)
         )
-        .add_systems(Update, (inspector_ui, build_menu))
+        .add_systems(Update, (inspector_ui, build_menu, hover_mesh_at_mouse))
         ;
     }
 }

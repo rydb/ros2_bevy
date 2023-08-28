@@ -1,4 +1,4 @@
-use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
+use bevy::{prelude::*};
 //use body::robot::{FeatureTestPlugin, RobotTestPlugin};
 use bevy_window::PrimaryWindow;
 use bevy_egui::EguiContext;
@@ -7,6 +7,7 @@ use egui::{Align, Align2, Pos2, Widget, Button};
 use crate::body::robot::components::Selected;
 use crate::RaycastSource;
 use crate::body::robot::components::Selectable;
+use crate::editor::components::Held;
 use crate::editor::systems::SelectionMode;
 
 
@@ -16,6 +17,8 @@ pub fn build_menu(
     mut disabled: Local<bool>,
     mut commands: Commands,
     raycast_sources: Query<(Entity), With<RaycastSource<Selectable>>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
     egui_context_query: Query<&mut EguiContext, With<PrimaryWindow>>,
 ){
     // let mut egui_context = world
@@ -40,6 +43,20 @@ pub fn build_menu(
                 println!("click spot where to spawn prism");
                 //*selector_mode = SelectionMode::Clicking;
                 commands.entity(raycast_camera).insert(SelectionMode::Clicking);
+                commands.spawn(
+                    (
+                    PbrBundle {
+                        mesh: meshes.add(
+                            shape::RegularPolygon{radius: 10.0, sides: 3}.into()
+                        ),
+                        material: materials.add(Color::WHITE.into()),
+                        transform: Transform::from_xyz(0.0, 0.0, 0.0),
+                        ..Default::default()
+                    },
+                    Held,
+                )
+                )
+                ;
             };
             //ui.add(egui::Button::new("builder ray"));
             //ui.add()

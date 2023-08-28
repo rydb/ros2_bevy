@@ -11,6 +11,7 @@ pub struct TransformWidgetPlugin;
 //(todo) make a `Compose`, set which includes all composed systems, and have a `delete` set of systems, run only after compose
 impl Plugin for TransformWidgetPlugin {
     fn build(&self, app: &mut App) {
+//
 
         let mut shaders = app.world.get_resource_mut::<Assets<Shader>>().unwrap();
         shaders.set_untracked(
@@ -22,8 +23,8 @@ impl Plugin for TransformWidgetPlugin {
         );
         app
 
-        
         .add_plugins(MaterialPlugin::<GizmoMaterial>::default())
+
 
         .register_type::<LastMouseInteraction>()
 

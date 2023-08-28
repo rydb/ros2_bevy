@@ -18,7 +18,6 @@ use bevy_mod_raycast::{
 use editor::plugins::EditorPlugin;
 //use crate::body::cube::components::*;
 use crate::serialization::plugins::SerializationPlugin;
-
 fn main() {
     App::new()
         .add_plugins(

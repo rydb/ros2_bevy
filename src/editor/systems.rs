@@ -155,7 +155,29 @@ pub fn rigid_body_editor(
 
 // }
 
+/// take models flagged with "held", and have their position follow mouse + raycast point
+pub fn hover_mesh_at_mouse(
+    raycast_sources: Query<(&RaycastSource<Selectable>, &SelectionMode)>,
+    held_entities: Query<(Entity, &Transform, &Held)>,
+    mut commands: Commands,
+) {
+    for (e, trans, ..) in held_entities.iter() {
+        let (selecter_camera, selection_mode) = raycast_sources.single();
 
+        match *selection_mode {
+            SelectionMode::Clicking => {
+                if let Some((collided_entity, intersection))  = selecter_camera.get_nearest_intersection()
+                {
+                    commands.entity(e).insert(
+                        Transform::from_translation(intersection.position())
+                    );
+
+                } 
+            },
+            _ => {}
+        }
+    } 
+}
 
 /// checks for selectable things, and then selects/deselects them on various criteria
 pub fn manage_selection_behaviour(    
