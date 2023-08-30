@@ -12,13 +12,13 @@ pub struct TransformWidgetPlugin;
 impl Plugin for TransformWidgetPlugin {
     fn build(&self, app: &mut App) {
 //
-
+        //let shader_path = "../../../assets/gizmo_material.wgsl";
         let mut shaders = app.world.get_resource_mut::<Assets<Shader>>().unwrap();
         shaders.set_untracked(
             gizmo_material::GIZMO_SHADER_HANDLE,
             Shader::from_wgsl(
                 include_str!("../../../assets/gizmo_material.wgsl"),
-                "../../../assets/gizmo_material.wgsl",
+                " ",//"../../../assets/gizmo_material.wgsl",
             ),
         );
         app
