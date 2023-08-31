@@ -47,7 +47,7 @@ pub fn build_menu(
                     (
                     PbrBundle {
                         mesh: meshes.add(
-                            shape::RegularPolygon{radius: 10.0, sides: 3}.into()
+                            shape::Box{radius: 10.0, sides: 3}.into()
                         ),
                         material: materials.add(Color::WHITE.into()),
                         transform: Transform::from_xyz(0.0, 0.0, 0.0),
