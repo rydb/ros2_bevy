@@ -2,8 +2,8 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use crate::editor::components::MakeSelectableBundle;
 use crate::editor::components::Selectable;
-use crate::serialization::components::ModelFlag;
-use crate::serialization::components::Serializable;
+use crate::serialization::components::*;
+//use crate::serialization::components::Serializable;
 /// spawns a cube.
 pub fn spawn_cube(
     mut commands: Commands,
@@ -24,7 +24,8 @@ pub fn spawn_cube(
         ModelFlag {
             geometry: shape::Cube {size: 1.0}.into(),
             //transform: Transform::from_xyz(0.0, 10.0, 20.0),
-            material: Color::PINK.into()
+            material: Color::PINK.into(),
+            ..default()
         },
         Serializable,
         Transform::from_xyz(0.0, 10.0, 20.0),
@@ -46,7 +47,8 @@ pub fn spawn_cube(
     // );
 }
 
-pub fn setup_physics(
+/// spawns a baseplate
+pub fn spawn_base_plate(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -55,8 +57,22 @@ pub fn setup_physics(
     println!("spawning ground");
     let base_plate_size = 100.0;
     /* Create the ground. */
-    commands
-        .spawn(
+    // commands.spawn(
+    //     (
+    //     ModelFlag {
+    //         geometry: shape::Plane {
+    //             size: base_plate_size * 2.0,
+    //             subdivisions: 0,
+    //         }.into(),
+    //         material: Color::WHITE.into(),
+    //         physics: Physics::Fixed,
+
+    //     },
+    //     Transform::from_xyz(0.0, -5.0, 0.0)
+    // )
+    // );
+
+    commands.spawn(
             PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Plane{
                 size: base_plate_size * 2.0,

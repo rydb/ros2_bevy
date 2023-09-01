@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use moonshine_save::prelude::Unload;
 use moonshine_save::save::Save;
 
+use bevy_rapier3d::prelude::RigidBody;
 use crate::{body::robot::components::{PhysicsBundle}, urdf::urdf_to_bevy::UrdfRoot};
 use bevy::ecs::query::ReadOnlyWorldQuery;
 use super::components::Geometry;
@@ -60,22 +61,37 @@ pub fn spawn_models(
 
             }
             // add all components a deserialized model needs to be useful. 
-            commands.entity(e).insert(
+            
+            
+            commands.entity(e)
+            .insert(
                 (
                 PbrBundle {
                     mesh: mesh_handle,
                     material: material_handle,
                     transform: *trans,
                     ..default()
-                }, // add meshd
-                PhysicsBundle::default(),// adds physics
+                }, // add mesh
                 MakeSelectableBundle::default(), // makes model selectable 
                 Unload, // marks entity to unload on deserialize
             )
             )
-            // remove model flag 
-            //.remove::<ModelFlag>()
+
+       
             ;
+            match model.physics {
+                Physics::Dynamic => {
+                    commands.entity(e).insert(PhysicsBundle::default());
+                },
+                Physics::Fixed => {
+                    commands.entity(e).insert(
+                        PhysicsBundle {
+                        rigid_body: RigidBody::Fixed,
+                        ..default() 
+                    }
+                    );
+                }
+            }
         } else {
             println!("load attempt failed for this mesh, re-attempting next system call");
         }

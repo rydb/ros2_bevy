@@ -1,11 +1,5 @@
-use std::default;
-
 use bevy::prelude::*;
 use bevy::render::mesh::shape::*;
-use bevy::reflect::TypeUuid;
-use urdf_rs::Robot;
-
-use crate::urdf::urdf_to_bevy::UrdfRoot;
 
 
 /// Component which marks entity as target for serialization/deserialization
@@ -16,15 +10,25 @@ pub struct Serializable;
 /// 
 /// if serialize enum  is set to [`Skip`], then that particular entity is skipped. during the save/load process
 /// ['Skip'] is generally applied to entities apart of nested structures
-#[derive(Component, Default, Reflect, Clone)]
-#[reflect(Component)]
-pub enum SerializeType {
-    #[default]
-    Skip,
-    SingleModel,
-    Urdf(String),
-}
+// #[derive(Component, Default, Reflect, Clone)]
+// #[reflect(Component)]
+// pub enum SerializeType {
+//     #[default]
+//     Skip,
+//     SingleModel,
+//     Urdf(String),
+// }
 
+
+
+
+/// The type of physics an entity should be serialized with, this is set to dynamic by default
+#[derive(Component, Reflect, Clone, Default)]
+pub enum Physics {
+    #[default]
+    Dynamic,
+    Fixed,
+}
 /// component which flags entity as a model for spawning purposes. !!!TREAT THIS AS READ ONLY!!!
 /// (TODO) reimplement this to 
 #[derive(Component, Reflect, Clone)]
@@ -33,7 +37,8 @@ pub enum SerializeType {
 pub struct ModelFlag {
     pub geometry: Geometry,
     pub material: StandardMaterial,
-    //pub transform: Transform, 
+    pub physics: Physics
+    //pub thing_type: Transform, 
 
 }
 
@@ -42,6 +47,7 @@ impl Default for ModelFlag {
         Self {
             geometry: Default::default(),
             material: Default::default(),
+            physics: Default::default(),
             //transform: Default::default()
         }
     }
@@ -87,6 +93,14 @@ impl From<Cube> for Geometry {
     }
 }
 
+impl From<Plane> for Geometry {
+    fn from(value: Plane) -> Self {
+        return Geometry::Primitive(
+            MeshPrimitive::Box { size: [value.size, 1.0, value.size]} 
+        )
+    }
+}
+
 // impl Into<Mesh> for Geometry {
 //     fn into(self) -> Mesh {
 //         match self {
@@ -116,7 +130,7 @@ impl Into<Mesh> for MeshPrimitive {
                 }.into(),
             Self::Cylinder { radius, length } => shape::Cylinder{radius: radius, height: length, ..default()}.into(),
             Self::Capsule { radius, length } => shape::Capsule{radius: radius, depth: length, ..default()}.into(),
-            Self::Sphere { radius } => shape::Capsule{radius: radius, depth: 0.0, ..default()}.into()
+            Self::Sphere { radius } => shape::Capsule{radius: radius, depth: 0.0, ..default()}.into(),
         }
     }
 }

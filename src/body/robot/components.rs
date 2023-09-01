@@ -1,13 +1,9 @@
-use bevy_mod_raycast::RaycastMesh;
-use moonshine_save::save::Save;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::convert::From;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
-use bevy::reflect::TypeUuid;
-use crate::editor::components::*;
-use crate::serialization::components::{ModelFlag, Geometry, SerializeType};
+
 
 
 
@@ -63,23 +59,23 @@ use crate::serialization::components::{ModelFlag, Geometry, SerializeType};
 #[derive(Bundle)]
 pub struct PhysicsBundle {
     /// rigid body type. Not setting this to `Dynamic`(I.E: a moving body) will probably cause errors.
-    rigid_body: RigidBody, 
+    pub rigid_body: RigidBody, 
     /// Collider geometry. initialize this with Default() of ConvexDecomposition
-    async_collider: AsyncCollider, 
+    pub async_collider: AsyncCollider, 
     /// Mass of the robot(not sure what the mass is measured in?)
-    mass: AdditionalMassProperties, 
+    pub mass: AdditionalMassProperties, 
     /// friction rules for object. No clue how this works, and this should probably be abstracted away from the user's eyes through a "Material" component/resource?
-    friction: Friction,
+    pub friction: Friction,
     /// external forces being applied on a robot. These are not implied(except gravity?), and must be manually set on robot initialization.
     //external_forces: ExternalForce, 
     /// velocity of object. A model does not need this object to have a velocity, but `in order to read/write to the object's velocity, you need to have this object`
-    velocity: Velocity,
+    pub velocity: Velocity,
     /// sets weather continous or discrete collision is the collision detection for this model. Continous = more accurate/more slow, discrete = faster/more innacurate
-    continous_collision_setting: Ccd, 
+    pub continous_collision_setting: Ccd, 
     /// "for filtering what pair of colliders should have their contacts (or intersection test if at least one of the colliders is a sensor) computed by the narrow-phase. This filtering happens right after the broad-phase, at the beginning of the narrow phase."
-    collision_groups: CollisionGroups,
+    pub collision_groups: CollisionGroups,
     /// "A solver_groups for filtering what pair of colliders should have their contact forces computed. This filtering happens at the end of the narrow-phase, before the constraints solver"
-    solver_groups: SolverGroups,
+    pub solver_groups: SolverGroups,
 }
 
 impl Default for PhysicsBundle {

@@ -5,7 +5,7 @@ use bevy_rapier3d::rapier::dynamics::JointAxis;
 use moonshine_save::prelude::*;
 
 use crate::body::robot::components::*;
-use crate::serialization::components::{ModelFlag, SerializeType, Serializable};
+//use crate::serialization::components::{ModelFlag, SerializeType, Serializable};
 
 // used to donote spawned model is a "part". Used to check
 // for any models that the part is "bound" to.

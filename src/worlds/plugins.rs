@@ -3,36 +3,45 @@ use bevy::prelude::*;
 use crate::body::robot::plugins::RobotDebugPlugin;
 use crate::body::robot::plugins::RobotSpawnerPlugin;
 use crate::timers::plugins::TimerManagerPlugin;
-//use crate::body::robot::TimerManagerPlugin;
-//use crate::mesh::example::*;
 
 use super::systems::*;
-
-//use bevy_flycam::PlayerPlugin; // bevy 0.10
 use bevy_rapier3d::prelude::*;
-// plugin which contains all relevant custom asset loaders + initializes/adds all relevant
-// resources required to load them.
 
-/// plugin for managing timers and ticking them in general. If there is a timer that needs to be managed, add its relevant system here
+/// world for testing misc things
+pub struct TestingWorld;
 
+impl Plugin for TestingWorld {
+    fn build(&self, app: &mut App) {
+        app
+        .add_plugins(
+            (
+            RapierPhysicsPlugin::<NoUserData>::default(),
+            RapierDebugRenderPlugin::default(),
+            )
+        )
+        .add_systems( Startup,(spawn_base_plate, spawn_cube))
+        ;
+    }
+}
 
-pub struct BasePlateWorld;
+/// Spawns a base plate + adds everyhting needed to test robot
+pub struct RobotTestingWorld;
 
-impl Plugin for BasePlateWorld {
+impl Plugin for RobotTestingWorld {
     fn build(&self, app: &mut App) {
         app
         .add_plugins(
             (
             TimerManagerPlugin,
             RobotSpawnerPlugin, // asset loaders
-            RobotDebugPlugin,
+            //RobotDebugPlugin,
             //physics stuff -V
             RapierPhysicsPlugin::<NoUserData>::default(),
             RapierDebugRenderPlugin::default()
             )
         )
         
-        .add_systems(Startup, (setup_physics, spawn_cube ))
+        .add_systems(Startup, (spawn_base_plate, spawn_cube ))
         //.add_systems(Update, display_contacts)
         ;
     }

@@ -11,7 +11,7 @@ use std::{fs::File, io::Write};
 
 use bevy_rapier3d::prelude::{RigidBody, GravityScale, ImpulseJoint};
 //use body::robot::{FeatureTestPlugin, RobotTestPlugin};
-use worlds::plugins::BasePlateWorld;
+use worlds::plugins::*;
 use bevy_flycam::prelude::*;
 use bevy_mod_raycast::{
     print_intersections, DefaultRaycastingPlugin, RaycastMesh, RaycastMethod,
@@ -25,7 +25,7 @@ fn main() {
         .add_plugins(
             (
                 DefaultPlugins,//< --- bevy needs these in order to run
-                BasePlateWorld, // plugin which contains(mostly) everything program needs to run.
+                RobotTestingWorld, // <-- World
                 NoCameraPlayerPlugin, // <-- Camera
                 EditorPlugin,
                 SerializationPlugin,

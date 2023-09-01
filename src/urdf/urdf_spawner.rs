@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use super::urdf_to_bevy::UrdfRoot;
 use super::urdf_loader::BevyRobot;
 //use std::prelude::*;
-use crate::serialization::components::{ModelFlag, SerializeType, Serializable};
+use crate::serialization::components::{ModelFlag, Serializable};
 use std::collections::{HashMap, HashSet};
 use moonshine_save::save::Save;
 use bevy_rapier3d::na::geometry::Rotation as RapierRotation;
@@ -65,12 +65,14 @@ pub fn spawn_unspawned_robots(
                                         geometry: (&*model_file_path).into(),
                                         //transform: Transform::from_xyz(x, y, z),
                                         material: Color::PINK.into(),
+                                        ..default()
                                     }
                                 },
                                 _ => ModelFlag {
                                     geometry: (&visual_link.geometry).into(),
                                     //transform: Transform::from_xyz(x, y, z),
                                     material: Color::PINK.into(),
+                                    ..default()
                                 },                    
                             };
                             let x = *visual_link.origin.xyz.get(0).unwrap() as f32;

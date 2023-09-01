@@ -32,7 +32,7 @@ impl Plugin for SerializationPlugin {
         .register_type::<ModelFlag>()
         .register_type::<Geometry>()
         .register_type::<MeshPrimitive>()
-        .register_type::<SerializeType>()
+        //.register_type::<SerializeType>()
         .register_type::<Option<Entity>>()
         .register_type::<[f32; 3]>()
         .register_type::<Option<Handle<Image>>>()
