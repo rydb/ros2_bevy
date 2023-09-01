@@ -9,7 +9,8 @@ use std::collections::{HashMap, HashSet};
 use moonshine_save::save::Save;
 use bevy_rapier3d::na::geometry::Rotation as RapierRotation;
 
-use crate::body::robot::components::{Wheel};
+//use crate::body::robot::components::{Wheel};
+use super::components::*;
 
 use crate::Mesh;
 use urdf_rs::Geometry::{Box, Cylinder, Capsule, Sphere, Mesh as UrdfMesh};

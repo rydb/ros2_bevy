@@ -6,41 +6,14 @@ use std::convert::From;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 use bevy::reflect::TypeUuid;
-
+use crate::editor::components::*;
 use crate::serialization::components::{ModelFlag, Geometry, SerializeType};
 
 
-/// denotes that component can be selected by selecting raycasts.
-/// weather component is selected to be movable by build tool
-#[derive(Component, Reflect, TypeUuid)]
-#[uuid = "52ad446b-c48e-42a1-884f-7a0e0b74081e"]
-pub struct Selectable;
-
-/// denotes thing has been selected.
-#[derive(Component, Reflect, TypeUuid)]
-#[uuid = "9e31f3e9-34e2-4e47-b113-606a4b91af58"]
-pub struct Selected;
-
-// denotes entity is "wheel", for sending drive instructions.
-#[derive(Component)]
-pub struct Wheel {}
 
 
-/// bundle that contains everything(!!!EXCEPT MESH!!!) that something needs to be selectable
-#[derive(Bundle)]
-pub struct MakeSelectableBundle {
-    raycast_reciever_mesh: RaycastMesh<Selectable>,
-    selectable: Selectable,
-}
 
-impl Default for MakeSelectableBundle {
-    fn default() -> Self{
-        Self {
-            raycast_reciever_mesh: RaycastMesh::<Selectable>::default(),
-            selectable: Selectable {}
-        }
-    }
-}
+
 
 /// bundle for all things a singular model would need. More complex models will their own bundles
 // #[derive(Bundle, Default)]

@@ -5,11 +5,11 @@ use crate::RaycastSource;
 
 use crate::RaycastMethod;
 use crate::DefaultRaycastingPlugin;
-use crate::body::robot::components::Selectable;
+use crate::editor::components::Selectable;
 use bevy::pbr::wireframe::Wireframe;
 use bevy_window::PrimaryWindow;
 use rapier3d::crossbeam::channel::Select;
-use crate::body::robot::components::Selected;
+use crate::editor::components::Selected;
 use bevy_mod_raycast::RaycastPluginState;
 use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
 use bevy_rapier3d::prelude::{RigidBody, GravityScale};

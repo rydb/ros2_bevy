@@ -4,13 +4,13 @@ use bevy::transform;
 use std::f32::consts::PI;
 use bevy::reflect::TypeUuid;
 use crate::RaycastSource;
-use crate::body::robot::components::Selected;
-use crate::body::robot::components::MakeSelectableBundle;
+use crate::editor::components::Selected;
+use crate::editor::components::MakeSelectableBundle;
 use crate::editor::components::*;
 use super::components::*;
 use super::gizmo_material;
 use super::gizmo_material::GizmoMaterial;
-use crate::body::robot::components::Selectable;
+use crate::editor::components::Selectable;
 
 use bevy_window::PrimaryWindow;
 use bevy::input::mouse::MouseMotion;

@@ -2,7 +2,6 @@
 use bevy::prelude::{Mesh};
 use bevy::render::mesh::*;
 use glam::*;
-use itertools::Itertools;
 use bevy::render::mesh::Indices;
 
 /// quad that corresponds to a face, and other convienience methods. This is converted to triangles for bevy mesh initialization. 

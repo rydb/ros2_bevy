@@ -5,7 +5,7 @@ use crate::DefaultRaycastingPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_egui::EguiPlugin;
 use bevy::pbr::wireframe::WireframePlugin;
-use crate::body::robot::components::Selectable;
+use crate::editor::components::Selectable;
 
 use super::systems::*;
 use super::ui::*;

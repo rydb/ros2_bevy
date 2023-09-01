@@ -4,12 +4,12 @@ use bevy_window::PrimaryWindow;
 use bevy_egui::EguiContext;
 use egui::{Align, Align2, Pos2, Widget, Button};
 
-use crate::body::robot::components::Selected;
+use crate::editor::components::Selected;
 use crate::RaycastSource;
-use crate::body::robot::components::Selectable;
+use crate::editor::components::Selectable;
 use crate::editor::components::Held;
 use crate::editor::systems::SelectionMode;
-
+use crate::editor::ramp::*;
 
 /// ui for build menu
 pub fn build_menu(
@@ -30,11 +30,7 @@ pub fn build_menu(
     let raycast_camera = raycast_sources.single();
     let menu_name = "Build Menu";
     egui::Window::new(menu_name)
-    // positioning
-    //.fixed_pos(Pos2::new(50.0, 200.0)) works...
     .anchor(Align2::LEFT_BOTTOM, (0.0, -100.0))
-    //.pivot(Align2::LEFT_BOTTOM)
-    // gui construction
     .show(egui_context.get_mut(), |ui| {
         egui::ScrollArea::vertical().show(ui, |ui| {
             //ui.heading(menu_name);
@@ -47,9 +43,10 @@ pub fn build_menu(
                     (
                     PbrBundle {
                         mesh: meshes.add(
-                            shape::Box{radius: 10.0, sides: 3}.into()
+                            //Ramp{radius: 10.0, sides: 3}.into()
+                            Ramp{angle_of_incline: 45.0, height: 1.0, width: 1.0}.into()
                         ),
-                        material: materials.add(Color::WHITE.into()),
+                        material: materials.add(Color::PINK.into()),
                         transform: Transform::from_xyz(0.0, 0.0, 0.0),
                         ..Default::default()
                     },

@@ -2,10 +2,10 @@ use bevy::prelude::*;
 use moonshine_save::prelude::Unload;
 use moonshine_save::save::Save;
 
-use crate::{body::robot::components::{PhysicsBundle, MakeSelectableBundle}, urdf::urdf_to_bevy::UrdfRoot};
+use crate::{body::robot::components::{PhysicsBundle}, urdf::urdf_to_bevy::UrdfRoot};
 use bevy::ecs::query::ReadOnlyWorldQuery;
 use super::components::Geometry;
-use crate::body::robot::components::Selected;
+use crate::editor::components::*;
 use crate::urdf::urdf_loader::BevyRobot;
 
 use moonshine_save::save::*;

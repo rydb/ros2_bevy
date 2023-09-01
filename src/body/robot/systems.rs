@@ -12,47 +12,7 @@ use crate::serialization::components::{ModelFlag, SerializeType, Serializable};
 #[derive(Component)]
 pub struct Part;
 
-/// spawns a cube.
-pub fn spawn_cube(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    //assset_server: Res<AssetServer>,
 
-    //model_query: Query<Entity, With<BevyRobot>>,
-) {
-    // commands.spawn(ModelBundle::new(
-    //     meshes.add(shape::Cube {size: 1.0}.into()),
-    //     materials.add(Color::PINK.into()),
-    //     Transform::from_xyz(0.0, 10.0, 20.0),
-    //     SerializeType::SingleModel,
-    // ));
-    commands.spawn(
-        (
-        ModelFlag {
-            geometry: shape::Cube {size: 1.0}.into(),
-            //transform: Transform::from_xyz(0.0, 10.0, 20.0),
-            material: Color::PINK.into()
-        },
-        Serializable,
-        Transform::from_xyz(0.0, 10.0, 20.0),
-        //SerializeType::SingleModel,   
-    )
-    );
-    // );
-    // commands.spawn(
-    //     ModelBundle {
-    //         pbr_bundle: PbrBundle {
-    //             mesh: meshes.add(shape::Cube {size: 1.0}.into()),
-    //             material: materials.add(Color::PINK.into()),
-    //             transform: Transform::from_xyz(0.0, 10.0, 20.0),
-    //             ..default()
-    //         },
-    //         ..Default::default()
-    //     }
-
-    // );
-}
 
 /// checks for collisions, and briefly spawns cubes to showcase 
 #[allow(dead_code)]
