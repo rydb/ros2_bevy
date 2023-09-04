@@ -1,14 +1,10 @@
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
-use std::{
-    io,
-    path::{Path, PathBuf},
-};
+
 use moonshine_save::{
-    prelude::{SavePlugin, LoadPlugin, load_from_file, Save},
+    prelude::{SavePlugin, LoadPlugin, load_from_file},
     //save::*,
 };
-    use bevy::prelude::*;
+use bevy::prelude::*;
 use crate::urdf::urdf_loader::BevyRobot;
 
 use super::systems::*;

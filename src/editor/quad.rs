@@ -1,5 +1,5 @@
 //use super::{Indices, Mesh};
-use bevy::prelude::{Mesh};
+use bevy::prelude::Mesh;
 use bevy::render::mesh::*;
 use glam::*;
 use bevy::render::mesh::Indices;
@@ -31,7 +31,7 @@ pub fn quads_to_uvs(quads: &Vec<Quad>) -> Vec<[f32; 2]> {
     
     let mut uvs_list = Vec::new();
     
-    for quad in quads {
+    for _quad in quads {
         // uvs based on Box `Front` UVs, this is going to need a proper algorithm 
         // at some point....
         uvs_list.push([0., 0.]);

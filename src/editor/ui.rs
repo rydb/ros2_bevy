@@ -1,8 +1,7 @@
-use bevy::{prelude::*};
-//use body::robot::{FeatureTestPlugin, RobotTestPlugin};
+use bevy::prelude::*;
 use bevy_window::PrimaryWindow;
 use bevy_egui::EguiContext;
-use egui::{Align, Align2, Pos2, Widget, Button};
+use egui::Align2;
 
 use crate::editor::components::Selected;
 use crate::RaycastSource;
@@ -14,9 +13,9 @@ use crate::editor::ramp::*;
 /// ui for build menu
 pub fn build_menu(
     //world: &mut World,
-    mut disabled: Local<bool>,
+    //mut disabled: Local<bool>,
     mut commands: Commands,
-    raycast_sources: Query<(Entity), With<RaycastSource<Selectable>>>,
+    raycast_sources: Query<Entity, With<RaycastSource<Selectable>>>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     egui_context_query: Query<&mut EguiContext, With<PrimaryWindow>>,
@@ -26,6 +25,8 @@ pub fn build_menu(
     //     .single(world)
     //     .clone();
     // if the ability to have multiple people work on a project at once is added, this will need to be refactored....
+
+    //println!("build menu test");
     let mut egui_context = egui_context_query.single().clone();
     let raycast_camera = raycast_sources.single();
     let menu_name = "Build Menu";
@@ -69,7 +70,7 @@ pub fn build_menu(
 
 pub fn inspector_ui(
     world: &mut World,
-    mut disabled: Local<bool>,
+    //mut disabled: Local<bool>,
 ) {
     // let space_pressed = world
     //     .resource::<Input<KeyCode>>()
@@ -80,7 +81,7 @@ pub fn inspector_ui(
     // if *disabled {
     //     return;
     // }
-
+    //println!("inspector ui test");
 
     // }
     let mut egui_context = world

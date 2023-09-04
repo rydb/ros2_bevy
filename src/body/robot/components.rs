@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+//use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::convert::From;
 use bevy::prelude::*;
@@ -151,7 +151,7 @@ impl Default for PhysicsBundle {
 //     }
 // }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "bevy", derive(Component))]
 pub enum AssetSource {
     Local(String),

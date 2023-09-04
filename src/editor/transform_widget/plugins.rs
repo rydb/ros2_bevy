@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 
 use super::{systems::*, gizmo_material::{GizmoMaterial, self}};
-use crate::{DefaultRaycastingPlugin, editor::components::LastMouseInteraction};
-use bevy_mod_raycast::RaycastSystem;
+use crate::{editor::components::LastMouseInteraction};
 //use crate::editor::systems::SelectedForEdit;
 //use gizmo_material::GizmoMaterial;
 /// plugin for managing transform widgets. Use this to spawn transform widgets to manipulate clicked models.

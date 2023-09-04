@@ -1,28 +1,12 @@
 use super::systems::*;
-use super::components::*;
-use super::custom_asset_loader_test;
-// use bevy::prelude::*;
-// use crate::urdf::urdf_loader::SpawnableRobots;
-// use crate::urdf::urdf_loader::UrdfLoader;
-// use crate::urdf::urdf_to_bevy::UrdfRoot;
-//pub mod timers;
-
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::LoadingState;
 use bevy_asset_loader::prelude::LoadingStateAppExt;
 
-use crate::editor::components::MakeSelectableBundle;
-use crate::editor::components::Selectable;
 //use crate::mesh::example::*;
-use crate::body::robot::systems::*;
 use crate::urdf::urdf_loader::*;
 use crate::urdf::urdf_spawner::*;
 use crate::urdf::urdf_to_bevy::*;
-
-use crate::timers::resources::*;
-
-//use bevy_flycam::PlayerPlugin; // bevy 0.10
-use bevy_rapier3d::prelude::*;
 use bevy_obj::*;
 
 

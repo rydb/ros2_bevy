@@ -1,19 +1,12 @@
-use bevy::ecs::query::QueryParIter;
 use bevy::prelude::*;
-use bevy::transform;
 use std::f32::consts::PI;
-use bevy::reflect::TypeUuid;
-use crate::RaycastSource;
 use crate::editor::components::Selected;
 use crate::editor::components::MakeSelectableBundle;
 use crate::editor::components::*;
 use super::components::*;
-use super::gizmo_material;
 use super::gizmo_material::GizmoMaterial;
-use crate::editor::components::Selectable;
 
 use bevy_window::PrimaryWindow;
-use bevy::input::mouse::MouseMotion;
 /// marker that states: WHICH transform widget entity has its transform based on. 
 
 
@@ -33,7 +26,7 @@ pub fn widget_despawn_for_deselected(
 /// spawn widgets around things that have been selected
 pub fn widget_spawn_for_selected (
     models_without_widget: Query<(Entity, &Transform, &Selected), (Without<Widget>, Without<TransformWidgetMarker>)>,
-    widgets_to_despawn: Query<(Entity, &TransformWidgetMarker), Without<Selected>>,
+    //widgets_to_despawn: Query<(Entity, &TransformWidgetMarker), Without<Selected>>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -243,7 +236,7 @@ pub fn manage_tugs(
         if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
             //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
             if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
-                if let Ok(mut transform_widget_flag) = transform_widget_querry.get(root_ancestor) {
+                if let Ok(transform_widget_flag) = transform_widget_querry.get(root_ancestor) {
                     if let Ok(bound_model_transform) = transform_querry.get(transform_widget_flag.bound_entity) {
                         let widget_root_transform = *bound_model_transform;
             
@@ -300,10 +293,10 @@ pub fn manage_rings(
         if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
             //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
             if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
-                let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
+                //let widget_root_transform = transform_querry.get(root_ancestor).unwrap();
 
                 // take transform of widget, and rotate root widget based on that.
-                if let Ok(mut transform_widget_flag) = transform_widget_querry.get(root_ancestor) {
+                if let Ok(transform_widget_flag) = transform_widget_querry.get(root_ancestor) {
                     if let Ok(bound_model_transform) = transform_querry.get(transform_widget_flag.bound_entity) {
                         
                         let mut new_transform = *bound_model_transform;
@@ -333,7 +326,7 @@ pub fn manage_rings(
 pub fn transform_widget_behaviour (
     mut commands: Commands,
     transform_widget_query: Query<(Entity, &TransformWidget)>,
-    transform_querry: Query<(&Transform)>,
+    transform_querry: Query<&Transform>,
 
 ){
     for (e, transform_widget_flag) in transform_widget_query.iter() {

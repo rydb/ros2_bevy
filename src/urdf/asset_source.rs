@@ -1,9 +1,9 @@
 use bevy::prelude::Component;
-use serde::{Deserialize, Serialize};
+//use serde::{Deserialize, Serialize};
 use std::path::Path;
 
 
-#[derive(Component, Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Component, Debug, Clone, PartialEq)]
 pub enum AssetSource {
     Local(String),
     Remote(String),

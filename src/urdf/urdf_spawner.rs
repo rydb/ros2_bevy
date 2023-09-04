@@ -6,14 +6,12 @@ use super::urdf_loader::BevyRobot;
 //use std::prelude::*;
 use crate::serialization::components::{ModelFlag, Serializable};
 use std::collections::{HashMap, HashSet};
-use moonshine_save::save::Save;
-use bevy_rapier3d::na::geometry::Rotation as RapierRotation;
+//use bevy_rapier3d::na::geometry::Rotation as RapierRotation;
 
 //use crate::body::robot::components::{Wheel};
 use super::components::*;
 
-use crate::Mesh;
-use urdf_rs::Geometry::{Box, Cylinder, Capsule, Sphere, Mesh as UrdfMesh};
+use urdf_rs::Geometry::Mesh as UrdfMesh;
 use urdf_rs::JointType;
 use bevy_rapier3d::prelude::*;
 
@@ -21,11 +19,8 @@ use bevy_rapier3d::prelude::*;
 // /// Find all robots without transforms, and construct a robot based on their urdf.
 pub fn spawn_unspawned_robots(
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
 
     urdf_server: Res<Assets<UrdfRoot>>,
-    asset_server: Res<AssetServer>,
     new_urdfs: Query<(Entity, &BevyRobot), Without<GlobalTransform>> 
 ) {
 
@@ -122,8 +117,8 @@ pub fn spawn_unspawned_robots(
                                 let trans = Vec3::new(x * blender_obj_overscale_correction, z * blender_obj_overscale_correction, y* blender_obj_overscale_correction);
                                 //let trans = Vec3::new((x.abs()/ x) *0.75, 0.50, 0.40);
                                 //println!("{:#?}",trans);
-                                let rot = Vec3::from_array(joint.origin.rpy.map(|t| t as f32));
-                                let rot = RapierRotation::from_euler_angles(rot[0], rot[1], rot[2]);
+                                //let rot = Vec3::from_array(joint.origin.rpy.map(|t| t as f32));
+                                //let rot = RapierRotation::from_euler_angles(rot[0], rot[1], rot[2]);
                                 let joint_data = match joint.joint_type {
                                     JointType::Revolute => {
                                         let axis = Vec3::from_array(joint.axis.xyz.map(|t| t as f32));

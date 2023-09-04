@@ -8,7 +8,7 @@ use bevy::prelude::*;
 use bevy::reflect::TypeUuid;
 
 use glam::Vec3;
-use serde::{Deserialize, Serialize};
+//use serde::{Deserialize, Serialize};
 use urdf_rs::Robot;
 use super::model_properties::*;
 //use super::recall::*;
@@ -21,80 +21,80 @@ impl RefTrait for u32 {}
 impl RefTrait for Entity {}
 
 /// Helper structure to serialize / deserialize entities with parents
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct Parented<P: RefTrait, T> {
     pub parent: P,
-    #[serde(flatten)]
+    //#[serde(flatten)]
     pub bundle: T,
 }
 
-#[derive(Component, Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Component, Debug, Clone, PartialEq)]
 pub struct MeshConstraint<T: RefTrait> {
     pub entity: T,
     pub element: MeshElement,
     pub relative_pose: Pose,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum MeshElement {
-    Vertex(u32),
+    //Vertex(u32),
     // TODO(luca) edge and vertices
 }
 
 /// Attached to Model entities to keep track of constraints attached to them,
 /// for change detection and hierarchy propagation
-#[derive(Component, Deref, DerefMut, Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
+#[derive(Component, Deref, DerefMut, Debug, Default, Clone, PartialEq)]
 pub struct ConstraintDependents(pub HashSet<Entity>);
 
-#[derive(Component, Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Component, Debug, Default, Clone)]
 pub struct WorkcellProperties {
     pub name: String,
 }
 
-#[derive(Component, Deref, DerefMut , Serialize, Deserialize, Debug, Default, Clone, PartialEq)]
+#[derive(Component, Deref, DerefMut, Debug, Default, Clone, PartialEq)]
 pub struct NameInWorkcell(pub String);
 
-#[derive(Component, Deref, DerefMut, Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Component, Deref, DerefMut, Debug, Default, Clone)]
 pub struct Mass(f32);
 
-#[derive(Component, Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Component, Debug, Default, Clone)]
 pub struct Inertia {}
 
-#[derive(Bundle, Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Bundle, Debug, Default, Clone)]
 pub struct Inertial {
     pub origin: Pose,
     pub mass: Mass,
     pub inertia: Inertia,
 }
 
-#[derive(Bundle, Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Bundle, Debug, Default, Clone)]
 pub struct Link {
     pub name: NameInWorkcell,
     pub inertial: Inertial,
-    #[serde(skip)]
+    //#[serde(skip)]
     pub marker: LinkMarker,
 }
 
 #[derive(Component, Debug, Default, Clone)]
 pub struct LinkMarker;
 
-#[derive(Bundle, Serialize, Deserialize, Debug, Default, Clone)]
+#[derive(Bundle, Debug, Default, Clone)]
 pub struct Joint {
     pub name: NameInWorkcell,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Debug, Clone)]
 pub enum Geometry {
     //#[serde(flatten)]
     Primitive(MeshPrimitive),
     Mesh {
         filename: String,
-        #[serde(skip)]
+        //#[serde(skip)]
         scale: Option<Vec3>,
     },
 }
 
-#[derive(Component, Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Component, Debug, Clone, PartialEq)]
 pub enum MeshPrimitive {
     Box { size: [f32; 3] },
     Cylinder { radius: f32, length: f32 },
@@ -216,7 +216,7 @@ pub struct WorkcellVisualMarker;
 #[derive(Component, Debug, Default, Clone)]
 pub struct WorkcellCollisionMarker;
 
-#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+#[derive( Debug, Default, Clone)]
 //#[reflect(Resource, Default)]
 pub struct BevyModel {
     pub name: String,

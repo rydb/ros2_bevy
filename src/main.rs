@@ -6,16 +6,13 @@ mod urdf;
 mod serialization;
 mod worlds;
 
-use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput, tasks::IoTaskPool};
-use std::{fs::File, io::Write};
+use bevy::prelude::*;
 
-use bevy_rapier3d::prelude::{RigidBody, GravityScale, ImpulseJoint};
-//use body::robot::{FeatureTestPlugin, RobotTestPlugin};
 use worlds::plugins::*;
 use bevy_flycam::prelude::*;
 use bevy_mod_raycast::{
-    print_intersections, DefaultRaycastingPlugin, RaycastMesh, RaycastMethod,
-    RaycastSource, RaycastSystem,
+    DefaultRaycastingPlugin,
+    RaycastSource,
 };
 use editor::plugins::EditorPlugin;
 //use crate::body::cube::components::*;
@@ -28,7 +25,7 @@ fn main() {
                 RobotTestingWorld, // <-- World
                 NoCameraPlayerPlugin, // <-- Camera
                 EditorPlugin,
-                SerializationPlugin,
+                SerializationPlugin, // <-- serialization
                 
 
             )
@@ -37,6 +34,6 @@ fn main() {
         .run();
 }
 
-const NEW_SCENE_FILE_PATH: &str = "scenes/load_scene_example-new.scn.ron";
+//const NEW_SCENE_FILE_PATH: &str = "scenes/load_scene_example-new.scn.ron";
 
 

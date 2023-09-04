@@ -1,9 +1,8 @@
 use bevy::prelude::*;
 use moonshine_save::prelude::Unload;
-use moonshine_save::save::Save;
 
 use bevy_rapier3d::prelude::RigidBody;
-use crate::{body::robot::components::{PhysicsBundle}, urdf::urdf_to_bevy::UrdfRoot};
+use crate::body::robot::components::PhysicsBundle;
 use bevy::ecs::query::ReadOnlyWorldQuery;
 use super::components::Geometry;
 use crate::editor::components::*;
@@ -42,7 +41,7 @@ pub fn spawn_models(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     assset_server: Res<AssetServer>,
-    transform_query: Query<&Transform>,
+    //transform_query: Query<&Transform>,
 ) {
     for (e, model, trans) in unspawned_models_query.iter() {
 
@@ -57,9 +56,9 @@ pub fn spawn_models(
 
             let material_handle = materials.add(model.material.clone());
             
-            if let Ok(trans) = transform_query.get(e) {
+            // if let Ok(trans) = transform_query.get(e) {
 
-            }
+            // }
             // add all components a deserialized model needs to be useful. 
             
             

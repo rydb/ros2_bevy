@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::body::robot::plugins::RobotDebugPlugin;
+//use crate::body::robot::plugins::RobotDebugPlugin;
 use crate::body::robot::plugins::RobotSpawnerPlugin;
 use crate::timers::plugins::TimerManagerPlugin;
 

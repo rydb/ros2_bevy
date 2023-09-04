@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use crate::RigidBody;
 use bevy_mod_raycast::RaycastSystem;
 use crate::DefaultRaycastingPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
@@ -44,8 +43,8 @@ impl Plugin for EditorPlugin {
             )
         )
         //.add_systems(RaycastSystem::BuildRays::<RigidBody>, update_raycast_with_cursor)
-        .add_systems(Startup, (spawn_debug_cam))
-        .add_systems(Update, (manage_selection_behaviour))
+        .add_systems(Startup, spawn_debug_cam)
+        .add_systems(Update, manage_selection_behaviour)
         ;
     }
 }

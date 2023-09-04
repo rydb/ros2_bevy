@@ -9,19 +9,12 @@ edition = "2021"
 bevy = { version = "*", features = ["dynamic_linking"]}
 rand = "0.8.5"
 bevy_mod_raycast = "0.13.1"
-# bevy_editor_pls = "0.4"
-# bevy_mod_picking = {git = "https://github.com/aevyrie/bevy_mod_picking.git", rev = "e2d1a935ebc05634fa4e06bb417a208635a74c88"}
-# bevy_flycam = "*"
 bevy_flycam = { git = "https://github.com/sburris0/bevy_flycam.git", rev = "4ed8bcebac4210f30c7d757c3fd2fba7a1d275e2"  }
 bevy-inspector-egui = "0.19.0"
 rapier3d = "0.17.2"
 bevy_rapier3d = "0.22.0"
 bevy_obj = "0.11.0"
 urdf-rs = "0.7.1"
-bevy_common_assets = {version = "0.7.0", features = ["xml"] }
-serde = { version = "1.0", features = ["derive"]}
-serde_yaml = "0.9.21"
-serde_json = "*"
 bevy_asset_loader = "0.17.0"
 thiserror = "1.0.40"
 glam = "0.24.0"
@@ -31,6 +24,84 @@ bevy_window = "0.11.0"
 egui = "0.22.0"
 moonshine-save = { git = "https://github.com/Zeenobit/moonshine_save", rev="0ad1b69f966c344159c38c1033d458bf01c3c219"}
 
+# [dependencies.bevy]
+# version = "0.11"
+# # Disable the default features if there are any that you do not want
+# default-features = false
+# features = [
+#   # These are the default features:
+#   # (re-enable whichever you like)
+
+#   # Bevy functionality:
+#   "multi-threaded",     # Run with multithreading
+#   "bevy_asset",         # Assets management
+#   "bevy_audio",         # Builtin audio
+#   "bevy_gilrs",         # Gamepad input support
+#   "bevy_scene",         # Scenes management
+#   "bevy_winit",         # Window management
+#   "bevy_render",        # Rendering framework core
+#   "bevy_core_pipeline", # Common rendering abstractions
+#   #"bevy_gizmos",        # Support drawing debug lines and shapes
+#   #"bevy_sprite",        # 2D (sprites) rendering
+#   "bevy_pbr",           # 3D (physically-based) rendering
+#   #"bevy_gltf",          # GLTF 3D assets format support
+#   "bevy_text",          # Text/font rendering
+#   #"bevy_ui",            # UI toolkit
+#   #"animation",          # Animation support
+#   "tonemapping_luts",   # Support different camera Tonemapping modes (embeds extra data)
+#   "filesystem_watcher", # Asset hot-reloading
+#   "default_font",       # Embed a minimal default font for text/UI
+
+#   # File formats:
+#   "png",    # PNG image format for simple 2D images
+#   "hdr",    # HDR images
+#   "ktx2",   # Preferred format for GPU textures
+#   "zstd",   # ZSTD compression support in KTX2 files
+#   "vorbis", # Audio: OGG Vorbis
+
+#   # Platform-specific:
+#   "x11",                   # Linux: Support X11 windowing system
+#   #"android_shared_stdcxx", # Android: use shared C++ library
+#   #"webgl2",                # Web: use WebGL2 instead of WebGPU
+
+#   # These are other features that may be of interest:
+#   # (add any of these that you need)
+
+#   # Bevy functionality:
+#   "subpixel_glyph_atlas", # Subpixel antialiasing for text/fonts
+#   #"serialize",            # Support for `serde` Serialize/Deserialize
+
+#   # File formats:
+#   #"dds",  # Alternative DirectX format for GPU textures, instead of KTX2
+#   "jpeg", # JPEG lossy format for 2D photos
+#   #"webp", # WebP image format
+#   #"bmp",  # Uncompressed BMP image format
+#   #"tga",  # Truevision Targa image format
+#   #"exr",  # OpenEXR advanced image format
+#   #"pnm",  # PNM (pam, pbm, pgm, ppm) image format
+#   #"basis-universal", # Basis Universal GPU texture compression format
+#   #"zlib", # zlib compression support in KTX2 files
+#   #"flac", # Audio: FLAC lossless format
+#   #"mp3",  # Audio: MP3 format (not recommended)
+#   #"wav",  # Audio: Uncompressed WAV
+#   #"symphonia-all", # All Audio formats supported by the Symphonia library
+#   #"shader_format_glsl", # GLSL shader support
+#   #"shader_format_spirv", # SPIR-V shader support
+
+#   # Platform-specific:
+#   "wayland",              # (Linux) Support Wayland windowing system
+#   "accesskit_unix",       # (Unix-like) AccessKit integration for UI Accessibility
+#   "bevy_dynamic_plugin",  # (Desktop) support for loading of `DynamicPlugin`s
+
+#   # Development/Debug features:
+#   "dynamic_linking", # Dynamic linking for faster compile-times
+#   #"trace",           # Enable tracing for performance measurement
+#   #"detailed_trace",  # Make traces more verbose
+#   #"trace_tracy",     # Tracing using `tracy`
+#   #"trace_tracy_memory", # + memory profiling
+#   #"trace_chrome",    # Tracing using the Chrome format
+#   #"wgpu_trace",      # WGPU/rendering tracing
+# ]
 # Enable a small amount of optimization in debug mode
 [profile.dev]
 opt-level = 1
@@ -51,7 +122,15 @@ features = [
   "ogg",
 ]
 
+
+# [target.x86_64-unknown-linux-gnu]
+# #[build]
+# linker = "clang"
+# rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold"]
+
 #stuff to fix compile speed for rust, major cause of low speed is linking, and this linker should be faster?
-[build]
-rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+# [build]
+# rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+# experimental !!!LINUX ONLY!!! faster linker
 

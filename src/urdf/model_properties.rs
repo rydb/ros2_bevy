@@ -17,7 +17,7 @@
 
 //use super::recall::{Recall};
 use bevy::prelude::*;
-use serde::{Deserialize, Serialize};
+//use serde::{Deserialize, Serialize};
 use bevy::prelude::{Deref, DerefMut};
 
 
@@ -31,8 +31,8 @@ impl Default for Scale {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, PartialOrd)]
-#[serde(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+//#[serde(rename_all = "snake_case")]
 pub enum Angle {
     Deg(f32),
     Rad(f32),
@@ -120,72 +120,72 @@ impl std::ops::SubAssign for Angle {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
-#[serde(rename_all = "snake_case")]
+#[derive(Debug, Clone, Copy, PartialEq)]
+//#[serde(rename_all = "snake_case")]
 pub enum Rotation {
     Yaw(Angle),
-    #[serde(rename = "euler_xyz")]
+    //#[serde(rename = "euler_xyz")]
     EulerExtrinsicXYZ([Angle; 3]),
-    Quat([f32; 4]),
+    //Quat([f32; 4]),
 }
 
 impl Rotation {
-    pub fn apply_yaw(&mut self, delta: Angle) {
-        match self {
-            Self::Yaw(yaw) => *yaw += delta,
-            Self::EulerExtrinsicXYZ([_, _, yaw]) => *yaw += delta,
-            Self::Quat(quat) => {
-                let q = Quat::from_array(*quat);
-                *quat = Quat::from_rotation_z(delta.radians())
-                    .mul_quat(q)
-                    .to_array();
-            }
-        }
-    }
+    // pub fn apply_yaw(&mut self, delta: Angle) {
+    //     match self {
+    //         Self::Yaw(yaw) => *yaw += delta,
+    //         Self::EulerExtrinsicXYZ([_, _, yaw]) => *yaw += delta,
+    //         Self::Quat(quat) => {
+    //             let q = Quat::from_array(*quat);
+    //             *quat = Quat::from_rotation_z(delta.radians())
+    //                 .mul_quat(q)
+    //                 .to_array();
+    //         }
+    //     }
+    // }
 }
 
 //#[cfg(feature = "bevy")]
 impl Rotation {
-    pub fn as_yaw(&self) -> Self {
-        match self {
-            Self::Yaw(_) => self.clone(),
-            Self::EulerExtrinsicXYZ([_, _, yaw]) => Self::Yaw(*yaw),
-            Self::Quat(_) => Self::Yaw(Angle::Rad(self.as_bevy_quat().to_euler(EulerRot::ZYX).0)),
-        }
-    }
+    // pub fn as_yaw(&self) -> Self {
+    //     match self {
+    //         Self::Yaw(_) => self.clone(),
+    //         Self::EulerExtrinsicXYZ([_, _, yaw]) => Self::Yaw(*yaw),
+    //         Self::Quat(_) => Self::Yaw(Angle::Rad(self.as_bevy_quat().to_euler(EulerRot::ZYX).0)),
+    //     }
+    // }
 
-    pub fn as_euler_extrinsic_xyz(&self) -> Self {
-        match self {
-            Self::Yaw(yaw) => Self::EulerExtrinsicXYZ([Angle::Deg(0.0), Angle::Deg(0.0), *yaw]),
-            Self::EulerExtrinsicXYZ(_) => self.clone(),
-            Self::Quat(_) => {
-                let (z, y, x) = self.as_bevy_quat().to_euler(EulerRot::ZYX);
-                Self::EulerExtrinsicXYZ([Angle::Rad(x), Angle::Rad(y), Angle::Rad(z)])
-            }
-        }
-    }
+    // pub fn as_euler_extrinsic_xyz(&self) -> Self {
+    //     match self {
+    //         Self::Yaw(yaw) => Self::EulerExtrinsicXYZ([Angle::Deg(0.0), Angle::Deg(0.0), *yaw]),
+    //         Self::EulerExtrinsicXYZ(_) => self.clone(),
+    //         Self::Quat(_) => {
+    //             let (z, y, x) = self.as_bevy_quat().to_euler(EulerRot::ZYX);
+    //             Self::EulerExtrinsicXYZ([Angle::Rad(x), Angle::Rad(y), Angle::Rad(z)])
+    //         }
+    //     }
+    // }
 
-    pub fn as_quat(&self) -> Self {
-        Self::Quat(self.as_bevy_quat().to_array())
-    }
+    // pub fn as_quat(&self) -> Self {
+    //     Self::Quat(self.as_bevy_quat().to_array())
+    // }
 
-    pub fn as_bevy_quat(&self) -> Quat {
-        match self {
-            Self::Yaw(yaw) => Quat::from_rotation_z(yaw.radians()),
-            Self::EulerExtrinsicXYZ([x, y, z]) => {
-                Quat::from_euler(EulerRot::ZYX, z.radians(), y.radians(), x.radians())
-            }
-            Self::Quat(quat) => Quat::from_array(*quat),
-        }
-    }
+    // pub fn as_bevy_quat(&self) -> Quat {
+    //     match self {
+    //         Self::Yaw(yaw) => Quat::from_rotation_z(yaw.radians()),
+    //         Self::EulerExtrinsicXYZ([x, y, z]) => {
+    //             Quat::from_euler(EulerRot::ZYX, z.radians(), y.radians(), x.radians())
+    //         }
+    //         Self::Quat(quat) => Quat::from_array(*quat),
+    //     }
+    // }
 
-    pub fn label(&self) -> &str {
-        match self {
-            Self::Yaw(_) => "Yaw",
-            Self::EulerExtrinsicXYZ(_) => "Euler Extrinsic XYZ",
-            Self::Quat(_) => "Quaternion",
-        }
-    }
+    // pub fn label(&self) -> &str {
+    //     match self {
+    //         Self::Yaw(_) => "Yaw",
+    //         Self::EulerExtrinsicXYZ(_) => "Euler Extrinsic XYZ",
+    //         Self::Quat(_) => "Quaternion",
+    //     }
+    // }
 }
 
 impl Default for Rotation {
@@ -194,10 +194,10 @@ impl Default for Rotation {
     }
 }
 
-#[derive(Component, Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+#[derive(Component, Debug, Clone, Copy, PartialEq)]
 pub struct Pose {
     pub trans: [f32; 3],
-    #[serde(default)]
+    //#[serde(default)]
     pub rot: Rotation,
 }
 
@@ -212,53 +212,53 @@ impl Default for Pose {
 
 //#[cfg(feature = "bevy")]
 impl Pose {
-    pub fn transform(&self) -> Transform {
-        Transform {
-            translation: self.trans.clone().into(),
-            rotation: self.rot.as_bevy_quat(),
-            ..default()
-        }
-    }
+    // pub fn transform(&self) -> Transform {
+    //     Transform {
+    //         translation: self.trans.clone().into(),
+    //         rotation: self.rot.as_bevy_quat(),
+    //         ..default()
+    //     }
+    // }
 
-    pub fn align_with(&mut self, tf: &Transform) -> Self {
-        self.trans = tf.translation.into();
+    // pub fn align_with(&mut self, tf: &Transform) -> Self {
+    //     self.trans = tf.translation.into();
 
-        match self.rot {
-            Rotation::Yaw(angle) => {
-                let (yaw, pitch, roll) = tf.rotation.to_euler(EulerRot::ZYX);
-                if pitch != 0.0 || roll != 0.0 {
-                    // Automatically switch the representation if the pitch or
-                    // roll are no longer 0.0
-                    self.rot = Rotation::EulerExtrinsicXYZ([
-                        Angle::Rad(roll).match_variant(angle),
-                        Angle::Rad(pitch).match_variant(angle),
-                        Angle::Rad(yaw).match_variant(angle),
-                    ]);
-                } else {
-                    self.rot = Rotation::Yaw(Angle::Rad(yaw).match_variant(angle));
-                }
-            }
-            Rotation::EulerExtrinsicXYZ([o_roll, o_pitch, o_yaw]) => {
-                let (yaw, pitch, roll) = tf.rotation.to_euler(EulerRot::ZYX);
-                self.rot = Rotation::EulerExtrinsicXYZ([
-                    Angle::Rad(roll).match_variant(o_roll),
-                    Angle::Rad(pitch).match_variant(o_pitch),
-                    Angle::Rad(yaw).match_variant(o_yaw),
-                ]);
-            }
-            Rotation::Quat(_) => {
-                self.rot = Rotation::Quat(tf.rotation.to_array());
-            }
-        }
-        *self
-    }
+    //     match self.rot {
+    //         Rotation::Yaw(angle) => {
+    //             let (yaw, pitch, roll) = tf.rotation.to_euler(EulerRot::ZYX);
+    //             if pitch != 0.0 || roll != 0.0 {
+    //                 // Automatically switch the representation if the pitch or
+    //                 // roll are no longer 0.0
+    //                 self.rot = Rotation::EulerExtrinsicXYZ([
+    //                     Angle::Rad(roll).match_variant(angle),
+    //                     Angle::Rad(pitch).match_variant(angle),
+    //                     Angle::Rad(yaw).match_variant(angle),
+    //                 ]);
+    //             } else {
+    //                 self.rot = Rotation::Yaw(Angle::Rad(yaw).match_variant(angle));
+    //             }
+    //         }
+    //         Rotation::EulerExtrinsicXYZ([o_roll, o_pitch, o_yaw]) => {
+    //             let (yaw, pitch, roll) = tf.rotation.to_euler(EulerRot::ZYX);
+    //             self.rot = Rotation::EulerExtrinsicXYZ([
+    //                 Angle::Rad(roll).match_variant(o_roll),
+    //                 Angle::Rad(pitch).match_variant(o_pitch),
+    //                 Angle::Rad(yaw).match_variant(o_yaw),
+    //             ]);
+    //         }
+    //         Rotation::Quat(_) => {
+    //             self.rot = Rotation::Quat(tf.rotation.to_array());
+    //         }
+    //     }
+    //     *self
+    // }
 }
 
 /// The unique name of the site element within its site.
 /// NOTE: We call this `NameInSite` instead of just `Name` because `Name`
 /// conflicts with another `Name` defined in `bevy::prelude`.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(transparent)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+//#[serde(transparent)]
 #[cfg_attr(feature = "bevy", derive(Component, Deref, DerefMut))]
 pub struct NameInSite(pub String);
 
@@ -268,8 +268,8 @@ impl Default for NameInSite {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(transparent)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+//#[serde(transparent)]
 #[cfg_attr(feature = "bevy", derive(Component, Deref, DerefMut))]
 pub struct Label(pub Option<String>);
 
@@ -300,8 +300,8 @@ pub struct RecallLabel {
 //     }
 // }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[serde(transparent)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+//#[serde(transparent)]
 #[cfg_attr(feature = "bevy", derive(Component, Deref, DerefMut))]
 pub struct IsStatic(pub bool);
 

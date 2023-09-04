@@ -16,7 +16,7 @@ use bevy::{
 
 //use crate::body::robot::components::ModelBundle;
 
-use crate::body::robot;
+//use crate::body::robot;
 
 use super::urdf_to_bevy::UrdfRoot;
 

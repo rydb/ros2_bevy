@@ -1,22 +1,15 @@
 
-use std::default;
 use std::f32::consts::PI;
 use crate::RaycastSource;
 
-use crate::RaycastMethod;
-use crate::DefaultRaycastingPlugin;
 use crate::editor::components::Selectable;
 use bevy::pbr::wireframe::Wireframe;
 use bevy_window::PrimaryWindow;
-use rapier3d::crossbeam::channel::Select;
 use crate::editor::components::Selected;
 use bevy_mod_raycast::RaycastPluginState;
-use bevy::{prelude::*, reflect::TypePath, input::keyboard::KeyboardInput};
-use bevy_rapier3d::prelude::{RigidBody, GravityScale};
-//use body::robot::{FeatureTestPlugin, RobotTestPlugin};
+use bevy::prelude::*;
+use bevy_rapier3d::prelude::RigidBody;
 use bevy_flycam::prelude::*;
-
-use bevy::reflect::TypeUuid;
 
 use super::components::*;
 
@@ -36,10 +29,10 @@ pub fn update_raycast_with_cursor(
 }
 
 /// editor for selected rigid bodies
-pub fn rigid_body_editor(
-    mut commands: Commands,
+pub fn _rigid_body_editor(
+    //mut commands: Commands,
     mut selected_models: Query<(Entity, &RigidBody, &Selected, &mut Transform), Without<Widget>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    //mut materials: ResMut<Assets<StandardMaterial>>,
 
     keys: Res<Input<KeyCode>>,
 ) {
@@ -50,7 +43,7 @@ pub fn rigid_body_editor(
     let mut reset_rotation = false;
 
     // if this is enabled, model will be deselected during seelction checks for models.
-    let mut deselect = false;
+    let mut _deselect = false;
     //vertical/horizontal rotations
     let mut trans_to_add = Transform::from_xyz(0.0, 0.0, 0.0);
     
@@ -115,7 +108,7 @@ pub fn rigid_body_editor(
         reset_rotation = true;
     }
 
-    for (e, rigidbody, selected, mut trans) in selected_models.iter_mut() {
+    for (_e, _rigidbody, _selected, mut trans) in selected_models.iter_mut() {
         trans.translation += trans_to_add.translation;
         trans.rotate(trans_to_add.rotation);
         if reset_rotation == true {
@@ -161,12 +154,12 @@ pub fn hover_mesh_at_mouse(
     held_entities: Query<(Entity, &Transform, &Held)>,
     mut commands: Commands,
 ) {
-    for (e, trans, ..) in held_entities.iter() {
+    for (e, ../*trans*/) in held_entities.iter() {
         let (selecter_camera, selection_mode) = raycast_sources.single();
 
         match *selection_mode {
             SelectionMode::Clicking => {
-                if let Some((collided_entity, intersection))  = selecter_camera.get_nearest_intersection()
+                if let Some((_collided_entity, intersection))  = selecter_camera.get_nearest_intersection()
                 {
                     commands.entity(e).insert(
                         Transform::from_translation(intersection.position())
@@ -186,7 +179,7 @@ pub fn manage_selection_behaviour(
     selected_meshes: Query<&Selected>,
     selectable_meshes: Query<&Selectable>,
     mut commands: Commands,
-    widget_querry: Query<(Entity), With<Widget>>,
+    widget_querry: Query<Entity, With<Widget>>,
 
 ) {
     //println!("number of raycast sources is {:#?}", raycast_sources.iter().len());

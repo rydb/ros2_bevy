@@ -1,7 +1,6 @@
 use bevy::prelude::{Mesh};
 use bevy::render::mesh::*;
 use glam::*;
-use bevy::render::mesh::Indices;
 use super::quad::*;
 /// A ramp generated from height and an angle of incline from 0-89
 /// NOTE: If angle of incline is larger then 89, ramp angle will clamp to 89.
