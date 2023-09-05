@@ -1,7 +1,7 @@
 use super::systems::*;
 use bevy::prelude::*;
-use bevy_asset_loader::prelude::LoadingState;
-use bevy_asset_loader::prelude::LoadingStateAppExt;
+//use bevy_asset_loader::prelude::LoadingState;
+//use bevy_asset_loader::prelude::LoadingStateAppExt;
 
 //use crate::mesh::example::*;
 use crate::urdf::urdf_loader::*;
@@ -42,11 +42,12 @@ impl Plugin for RobotSpawnerPlugin {
         .add_asset_loader(UrdfLoader) // Enables loading urdfs via `UrdfRoot` Supports .xml (TODO) Add .urdf support?
         .init_resource::<SpawnableRobots>()
         .add_asset::<UrdfRoot>()
-        .add_loading_state(
-            LoadingState::new(UrdfLoaderState::AssetLoading).continue_to_state(UrdfLoaderState::Next)
-        )
-        .add_collection_to_loading_state::<_, SpawnableRobots>(UrdfLoaderState::AssetLoading)
-        .add_systems(OnEnter(UrdfLoaderState::Next), stage_robots_to_spawn_from_urdf)
+        // .add_loading_state(
+        //     LoadingState::new(UrdfLoaderState::AssetLoading).continue_to_state(UrdfLoaderState::Next)
+        // )
+        // .add_collection_to_loading_state::<_, SpawnableRobots>(UrdfLoaderState::AssetLoading)
+        // .add_systems(OnEnter(UrdfLoaderState::Next), stage_robots_to_spawn_from_urdf)
+        .add_systems(Startup, stage_robots_to_spawn_from_urdf)
         .add_systems(Update, spawn_unspawned_robots)
         
         ;

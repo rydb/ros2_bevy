@@ -5,6 +5,7 @@ mod editor;
 mod urdf;
 mod serialization;
 mod worlds;
+mod camera;
 
 use bevy::prelude::*;
 
@@ -22,8 +23,7 @@ fn main() {
         .add_plugins(
             (
                 DefaultPlugins,//< --- bevy needs these in order to run
-                RobotTestingWorld, // <-- World
-                NoCameraPlayerPlugin, // <-- Camera
+                TestingWorld, // <-- World
                 EditorPlugin,
                 SerializationPlugin, // <-- serialization
                 

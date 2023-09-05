@@ -3,9 +3,11 @@ use bevy::prelude::*;
 //use crate::body::robot::plugins::RobotDebugPlugin;
 use crate::body::robot::plugins::RobotSpawnerPlugin;
 use crate::timers::plugins::TimerManagerPlugin;
-
+use crate::NoCameraPlayerPlugin;
 use super::systems::*;
 use bevy_rapier3d::prelude::*;
+
+use crate::camera::plugins::DefaultCameraPlugin;
 
 /// world for testing misc things
 pub struct TestingWorld;
@@ -17,6 +19,9 @@ impl Plugin for TestingWorld {
             (
             RapierPhysicsPlugin::<NoUserData>::default(),
             RapierDebugRenderPlugin::default(),
+            DefaultCameraPlugin,
+
+            //NoCameraPlayerPlugin, // <-- Camera
             )
         )
         .add_systems( Startup,(spawn_base_plate, spawn_cube))
@@ -36,6 +41,9 @@ impl Plugin for RobotTestingWorld {
             RobotSpawnerPlugin, // asset loaders
             //RobotDebugPlugin,
             //physics stuff -V
+            DefaultCameraPlugin,
+
+            NoCameraPlayerPlugin, // <-- Camera
             RapierPhysicsPlugin::<NoUserData>::default(),
             RapierDebugRenderPlugin::default()
             )

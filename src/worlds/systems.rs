@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
+use crate::camera::components::Followed;
+use crate::camera::components::Watched;
 use crate::editor::components::MakeSelectableBundle;
 use crate::editor::components::Selectable;
 use crate::serialization::components::*;
@@ -29,6 +31,8 @@ pub fn spawn_cube(
         },
         Serializable,
         Transform::from_xyz(0.0, 10.0, 20.0),
+        Watched,
+        //Followed,
         //SerializeType::SingleModel,   
     )
     );
@@ -88,4 +92,5 @@ pub fn spawn_base_plate(
         .insert(MakeSelectableBundle::default())
         .remove::<Selectable>() // we want the base-plate to be able to recieve selection events, but modifyable by widgets(yet)
         ;
+        commands.spawn(Text {..default()});
 }

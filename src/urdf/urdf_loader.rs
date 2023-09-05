@@ -24,7 +24,7 @@ use thiserror::Error;
 
 //use std::prelude::*;
 
-use bevy_asset_loader::prelude::*;
+//use bevy_asset_loader::prelude::*;
 
 #[derive(Default)]
 pub struct UrdfLoader;
@@ -67,9 +67,8 @@ pub enum LoadState {
     
 // }
 
-#[derive(Resource, Default, AssetCollection)]
+#[derive(Resource, Default)]
 pub struct SpawnableRobots {
-    #[asset]
     pub list: Vec<BevyRobot>,
 }
 
@@ -89,8 +88,6 @@ pub struct BevyRobot {
 impl BevyRobot {
 
 }
-
-
 
 
 /// stages bevy robots to be spawned in the world by a later spawner function

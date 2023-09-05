@@ -245,21 +245,21 @@ pub enum SelectionMode {
     Clicking,
 }
 
-///spawns camera for debug
-pub fn spawn_debug_cam(mut commands:Commands) {
-    commands.insert_resource(RaycastPluginState::<Selectable>::default().with_debug_cursor());
-    commands.spawn(
-        (
-Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 4.0, 20.0).with_rotation(Quat::from_rotation_z(PI / 2.0)),
-            ..default()
-        },
-        FlyCam,
-        RaycastSource::<Selectable>::new(),
-        SelectionMode::default(),
+// ///spawns camera for debug
+// pub fn spawn_debug_cam(mut commands:Commands) {
+//     commands.insert_resource(RaycastPluginState::<Selectable>::default().with_debug_cursor());
+//     commands.spawn(
+//         (
+// Camera3dBundle {
+//             transform: Transform::from_xyz(0.0, 4.0, 20.0).with_rotation(Quat::from_rotation_z(PI / 2.0)),
+//             ..default()
+//         },
+//         FlyCam,
+//         RaycastSource::<Selectable>::new(),
+//         SelectionMode::default(),
 
-    )
-    )
-    ;
-}
+//     )
+//     )
+//     ;
+// }
 
