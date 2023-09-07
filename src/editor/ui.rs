@@ -3,11 +3,10 @@ use bevy_window::PrimaryWindow;
 use bevy_egui::EguiContext;
 use egui::Align2;
 
-use crate::editor::components::Selected;
+use crate::editor::components::*;
 use crate::RaycastSource;
 use crate::editor::components::Selectable;
 use crate::editor::components::Held;
-use crate::editor::systems::SelectionMode;
 use crate::editor::ramp::*;
 
 /// ui for build menu

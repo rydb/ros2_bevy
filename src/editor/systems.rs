@@ -187,6 +187,7 @@ pub fn manage_selection_behaviour(
         // pick nearest rigid body that camera with selector ray picks.
         for (raycast_source, selector_mode) in raycast_sources.iter() {/*raycast_sources.iter().flat_map(|m| m.get_nearest_intersection()) {*/
             if let Some((e, ..)) = raycast_source.get_nearest_intersection() {
+                println!("clicked on valid mesh!");
                 match *selector_mode {
                     SelectionMode::Selecting => {
                         // don't select unselectable meshes
@@ -235,15 +236,8 @@ pub fn manage_selection_behaviour(
 // }
 
 
-/// defines the selection mode for raycasting source: E.G: selecting would mean the camera is selecting meshes, 
-/// clicking would fire a function when clicking, etc...
-#[derive(Component, Clone, Copy, Reflect, Default)]
-#[reflect(Component)]
-pub enum SelectionMode {
-    #[default]
-    Selecting,
-    Clicking,
-}
+
+
 
 // ///spawns camera for debug
 // pub fn spawn_debug_cam(mut commands:Commands) {

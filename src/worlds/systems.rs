@@ -32,7 +32,7 @@ pub fn spawn_cube(
         Serializable,
         Transform::from_xyz(0.0, 10.0, 20.0),
         Watched,
-        //Followed,
+        Followed,
         //SerializeType::SingleModel,   
     )
     );

@@ -43,7 +43,7 @@ impl Plugin for RobotTestingWorld {
             //physics stuff -V
             DefaultCameraPlugin,
 
-            NoCameraPlayerPlugin, // <-- Camera
+            //NoCameraPlayerPlugin, // <-- Camera
             RapierPhysicsPlugin::<NoUserData>::default(),
             RapierDebugRenderPlugin::default()
             )

@@ -56,3 +56,12 @@ impl Default for LastMouseInteraction {
         }
     }
 }
+/// defines the selection mode for raycasting source: E.G: selecting would mean the camera is selecting meshes, 
+/// clicking would fire a function when clicking, etc...
+#[derive(Component, Clone, Copy, Reflect, Default)]
+#[reflect(Component)]
+pub enum SelectionMode {
+    #[default]
+    Selecting,
+    Clicking,
+}

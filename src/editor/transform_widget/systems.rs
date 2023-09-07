@@ -5,7 +5,7 @@ use crate::editor::components::MakeSelectableBundle;
 use crate::editor::components::*;
 use super::components::*;
 use super::gizmo_material::GizmoMaterial;
-
+use crate::RaycastSource;
 use bevy_window::PrimaryWindow;
 /// marker that states: WHICH transform widget entity has its transform based on. 
 
@@ -211,55 +211,75 @@ pub fn manage_tugs(
     q_windows: Query<&Window, With<PrimaryWindow>>,
     buttons: Res<Input<MouseButton>>,
     time: Res<Time>,
-    transform_querry: Query<&Transform>,
+    mut transform_querry: Query<&mut Transform, Without<SelectionMode>>,
+    transform_immutable_querry: Query<&Transform, With<SelectionMode>>,
     parent_querry: Query<&Parent>,  
-    transform_widget_querry: Query<&TransformWidget>
+    transform_widget_querry: Query<&TransformWidget>,
+    raycast_sources: Query<(Entity, &RaycastSource<Selectable>)>,
 
 
 ) {
     // how much pull of tugs should be reduced
     let tug_sensitivity_divisor = 20.0;
+    // made to crash on multiple cameras on purpose. this will need to be refactored when multiple cams exist.
+    if let Ok(selector_cam_trans) = transform_immutable_querry.get(raycast_sources.single().0) {
+        for (e, tug) in selected_tugs.iter() {
 
-    for (e, tug) in selected_tugs.iter() {
-
-        if let Some(mouse_pos) = q_windows.single().cursor_position() {
-            let mouse_inteaction = LastMouseInteraction {
-                mouse_pos: mouse_pos,
-                time_of_interaction: time.delta_seconds_f64()
-            };
-            let mut last_mouse_interaction = LastMouseInteraction::default();
-            if let Ok(mouse_check) = lastmouse_interactions.get(e) {
-                last_mouse_interaction = *mouse_check
-            } 
-            let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
-    
-        if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
-            //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
-            if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
-                if let Ok(transform_widget_flag) = transform_widget_querry.get(root_ancestor) {
-                    if let Ok(bound_model_transform) = transform_querry.get(transform_widget_flag.bound_entity) {
-                        let widget_root_transform = *bound_model_transform;
-            
-                        //println!("inserting transform for x tug at time{:#?}", time.delta());
-                        commands.entity(transform_widget_flag.bound_entity).insert(
-                            Transform::from_xyz(
-                                widget_root_transform.translation.x + (tug.pull.x * (-mouse_delta.x / tug_sensitivity_divisor)),
-                                widget_root_transform.translation.y + (tug.pull.y * (mouse_delta.y / tug_sensitivity_divisor)), //* 2.0;
-                                widget_root_transform.translation.z + (tug.pull.z * (-mouse_delta.y / tug_sensitivity_divisor))
-                            )
-                
+            if let Some(mouse_pos) = q_windows.single().cursor_position() {
+                let mouse_inteaction = LastMouseInteraction {
+                    mouse_pos: mouse_pos,
+                    time_of_interaction: time.delta_seconds_f64()
+                };
+                let mut last_mouse_interaction = LastMouseInteraction::default();
+                if let Ok(mouse_check) = lastmouse_interactions.get(e) {
+                    last_mouse_interaction = *mouse_check
+                } 
+                let mouse_delta = last_mouse_interaction.mouse_pos - mouse_inteaction.mouse_pos;
+        
+            if buttons.pressed(MouseButton::Left) && last_mouse_interaction.time_of_interaction > 0.0 {
+                //tug.translation.y += mouse_delta.y / 20.0; //* 2.0;
+                if let Some(root_ancestor) = parent_querry.iter_ancestors(e).last() {
+                    if let Ok(transform_widget_flag) = transform_widget_querry.get(root_ancestor) {
+                        if let Ok(mut widget_root_transform) = transform_querry.get_mut(transform_widget_flag.bound_entity) {
+                            //let widget_root_transform = *bound_model_transform;
+                            let (cam_x, cam_y, cam_z) = (
+                                (widget_root_transform.translation.x - selector_cam_trans.translation.x),
+                                (widget_root_transform.translation.y - selector_cam_trans.translation.y),
+                                (widget_root_transform.translation.z - selector_cam_trans.translation.z)); 
+                            // math for gizmos
+                            
+                            widget_root_transform.translation = Vec3::new(
+                                (widget_root_transform.translation.x + (tug.pull.x * (-mouse_delta.x / tug_sensitivity_divisor))),
+                                    //* (cam_x / cam_x.abs()) ,
+                                (widget_root_transform.translation.y + (tug.pull.y * (mouse_delta.y / tug_sensitivity_divisor))),
+                                    //* (cam_y / cam_y.abs()), //* 2.0;
+                                (widget_root_transform.translation.z + (tug.pull.z * (-mouse_delta.x / tug_sensitivity_divisor))),
+                                    //* (cam_z / cam_z.abs())
                             );
-                        
+                            println!("cam z is {:#?}", (cam_z / cam_z.abs()));
+                            println!("cam z is {:#?}", cam_z);
+                            //println!("inserting transform for x tug at time{:#?}", time.delta());
+                            // commands.entity(transform_widget_flag.bound_entity).insert(
+                            //     Transform::from_xyz(
+                            //         widget_root_transform.translation.x + (tug.pull.x * (-mouse_delta.x / tug_sensitivity_divisor)),
+                            //         widget_root_transform.translation.y + (tug.pull.y * (mouse_delta.y / tug_sensitivity_divisor)), //* 2.0;
+                            //         widget_root_transform.translation.z + (tug.pull.z * (-mouse_delta.y / tug_sensitivity_divisor))
+                            //     )
+                    
+                            //     );
+                            
+                        }
                     }
-                }
-
-            }
-        }
     
-        // register this mouse interaction as the last one thats happened.
-        commands.entity(e).insert(mouse_inteaction);
-        } 
+                }
+            }
+        
+            // register this mouse interaction as the last one thats happened.
+            commands.entity(e).insert(mouse_inteaction);
+            } 
+        }
     }
+
 }
 
 /// Correlate movements of selected rings into rotations into rotation of bound object. 
@@ -270,7 +290,7 @@ pub fn manage_rings(
     q_windows: Query<&Window, With<PrimaryWindow>>,
     buttons: Res<Input<MouseButton>>,
     time: Res<Time>,
-    transform_querry: Query<&Transform>,
+    mut transform_querry: Query<&mut Transform>,
     parent_querry: Query<&Parent>,
     transform_widget_querry: Query<&TransformWidget>
 
@@ -297,17 +317,17 @@ pub fn manage_rings(
 
                 // take transform of widget, and rotate root widget based on that.
                 if let Ok(transform_widget_flag) = transform_widget_querry.get(root_ancestor) {
-                    if let Ok(bound_model_transform) = transform_querry.get(transform_widget_flag.bound_entity) {
+                    if let Ok(mut ring_transform) = transform_querry.get_mut(transform_widget_flag.bound_entity) {
                         
-                        let mut new_transform = *bound_model_transform;
-                        new_transform.rotate_y(-mouse_delta.x * 0.02); 
+                        //let mut new_transform = *bound_model_transform;
+                        ring_transform.rotate_y(-mouse_delta.x * 0.02); 
                         
                         let mouse_delta_with_z = Vec3::new(mouse_delta.x, mouse_delta.y, mouse_delta.y);
                         // how do we make ring axis rotations add up and stil be commutive???
     
                         println!("rotating cube based on ring rotation");
-                        new_transform.rotate_axis(ring.axis, (ring.axis.dot(mouse_delta_with_z)) / ring_sensitivity_divisor);
-                        commands.entity(transform_widget_flag.bound_entity).insert(new_transform);
+                        ring_transform.rotate_axis(ring.axis, (ring.axis.dot(mouse_delta_with_z)) / ring_sensitivity_divisor);
+                        //commands.entity(transform_widget_flag.bound_entity).insert(new_transform);
                         //println!("new transform is {:#?}", new_transform)
                     }
 
