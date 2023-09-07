@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 
 /// flag + direction of tug, when dragged, things with tug pull their widget in this components direction.
-#[derive(Component)]
+#[derive(Component, Reflect, Default)]
+#[reflect(Component)]
 pub struct Tug {
     pub pull: Vec3,
 }

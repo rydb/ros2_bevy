@@ -6,6 +6,7 @@ use crate::{editor::components::LastMouseInteraction};
 //use gizmo_material::GizmoMaterial;
 /// plugin for managing transform widgets. Use this to spawn transform widgets to manipulate clicked models.
 pub struct TransformWidgetPlugin;
+use super::components::*;
 
 //(todo) make a `Compose`, set which includes all composed systems, and have a `delete` set of systems, run only after compose
 impl Plugin for TransformWidgetPlugin {
@@ -26,6 +27,7 @@ impl Plugin for TransformWidgetPlugin {
 
 
         .register_type::<LastMouseInteraction>()
+        .register_type::<Tug>()
 
         .add_systems(Update, widget_despawn_for_deselected)
         .add_systems(Update, (manage_tugs, manage_rings, widget_spawn_for_selected, transform_widget_behaviour)
