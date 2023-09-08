@@ -1,0 +1,11 @@
+[package]
+name = "mesh_extras"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { version = "*"}
+glam = "*"
+
+[lib]
+crate-type=["cdylib", "staticlib", "rlib"]

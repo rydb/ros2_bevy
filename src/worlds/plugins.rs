@@ -7,7 +7,7 @@ use crate::NoCameraPlayerPlugin;
 use super::systems::*;
 use bevy_rapier3d::prelude::*;
 
-use crate::camera::plugins::DefaultCameraPlugin;
+use crate::camera_extras::plugins::DefaultCameraPlugin;
 
 /// world for testing misc things
 pub struct TestingWorld;

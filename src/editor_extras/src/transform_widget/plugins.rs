@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use super::{systems::*, gizmo_material::{GizmoMaterial, self}};
-use crate::{editor::components::LastMouseInteraction};
+use crate::components::*;
 //use crate::editor::systems::SelectedForEdit;
 //use gizmo_material::GizmoMaterial;
 /// plugin for managing transform widgets. Use this to spawn transform widgets to manipulate clicked models.
@@ -17,7 +17,7 @@ impl Plugin for TransformWidgetPlugin {
         shaders.set_untracked(
             gizmo_material::GIZMO_SHADER_HANDLE,
             Shader::from_wgsl(
-                include_str!("../../../assets/gizmo_material.wgsl"),
+                include_str!("../../../../assets/gizmo_material.wgsl"),
                 " ",//"../../../assets/gizmo_material.wgsl",
             ),
         );

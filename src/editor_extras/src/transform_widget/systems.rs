@@ -1,14 +1,11 @@
 use bevy::prelude::*;
 use std::f32::consts::PI;
-use crate::editor::components::Selected;
-use crate::editor::components::MakeSelectableBundle;
-use crate::editor::components::*;
-use super::components::*;
+use crate::components::*;
 use super::gizmo_material::GizmoMaterial;
-use crate::RaycastSource;
+use bevy_mod_raycast::RaycastSource;
 use bevy_window::PrimaryWindow;
 /// marker that states: WHICH transform widget entity has its transform based on. 
-
+use crate::transform_widget::components::*;
 
 
 // despawn transform widgets around things that have been de selected
@@ -251,7 +248,11 @@ pub fn manage_tugs(
                             // math for gizmos
                             
                             widget_root_transform.translation = Vec3::new(
-                                widget_root_transform.translation.x + (tug.pull.x * (mouse_delta.x / tug_sensitivity_divisor)) * (cam_z / cam_z.abs())  
+                                widget_root_transform.translation.x + (
+                                    tug.pull.x * 
+                                    (
+                                        ((-mouse_delta.x * (1.0 - (cam_y_rot / (PI / 2.0)))) + ((-mouse_delta.y) * (-cam_y_rot / (PI / 2.0))))  / tug_sensitivity_divisor
+                                    )) * (cam_z / cam_z.abs())  
                                     //* (cam_x / cam_x.abs()) ,
                                     ,
                                 widget_root_transform.translation.y + (tug.pull.y * (mouse_delta.y / tug_sensitivity_divisor))
@@ -260,10 +261,10 @@ pub fn manage_tugs(
                                 widget_root_transform.translation.z + 
                                 (tug.pull.z * 
                                     (
-                                        ((-mouse_delta.y * (1.0 - (cam_y_rot.abs() / (PI / 2.0)))) + ((-mouse_delta.x) * (cam_y_rot.abs() / (PI / 2.0))))  / tug_sensitivity_divisor
+                                        ((-mouse_delta.y * (1.0 - (cam_y_rot / (PI / 2.0)))) + ((-mouse_delta.x) * (cam_y_rot / (PI / 2.0))))  / tug_sensitivity_divisor
                                     )
                                 )
-                                 * (cam_x / cam_x.abs())
+                                * (cam_x / cam_x.abs())/* (cam_y_rot / cam_y_rot.abs())*/
                                     
                             );
                             //println!("mouse interaction last {:#}", last_mouse_interaction.mouse_pos);
@@ -274,8 +275,10 @@ pub fn manage_tugs(
                             //println!("mouse drag is {:#?}", mouse_delta);
                             println!("camera y rot is {:#?}", cam_y_rot);
                             println!("mouse delta y multipler is {:#?}", (1.0 - (cam_y_rot.abs() / (PI / 2.0))));
-                            println!("mouse delta x multipler is {:#?}", (cam_y_rot.abs() / (PI / 2.0)))
-
+                            println!("mouse delta x multipler is {:#?}", (cam_y_rot.abs() / (PI / 2.0)));
+                            println!("x alignment multiplier is {:#?}", cam_x / cam_x.abs());
+                            println!("y alignment multiplier is {:#?}", cam_y / cam_y.abs());
+                            println!("z alignment multiplier is {:#?}", cam_z / cam_z.abs());
                             //println!("mouse drag is modified to be : {:#?}", ((-mouse_delta.y * (cam_y_rot.abs() % PI)) + ((-mouse_delta.x) * (cam_y_rot.abs() / PI)))  / tug_sensitivity_divisor);
                             //println!("camera rotation y is now {:#?}", selector_cam_trans.rotation.to_euler(EulerRot::XYZ));
                             //println!("camera and widget rotation difference is {:#?}", widget_root_transform.rotation - selector_cam_trans.rotation)

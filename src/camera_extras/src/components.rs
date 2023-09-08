@@ -12,6 +12,14 @@ pub struct Viewer {
     pub offset: Vec3,
 }
 
+impl Default for Viewer {
+    fn default() -> Self {
+        Self {
+            offset: Vec3::new(0.0 , 5.0, 0.0)
+        }
+    }
+}
+
 /// marks entity to be followed by viewers
 #[derive(Component)]
 pub struct Followed;

@@ -1,0 +1,15 @@
+[package]
+name = "camera_extras"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { version = "*"}
+glam = "*"
+bevy_flycam = { git = "https://github.com/sburris0/bevy_flycam.git", rev = "4ed8bcebac4210f30c7d757c3fd2fba7a1d275e2"  }
+bevy_mod_raycast = "0.13.1"
+editor_extras = {path = "../editor_extras"}
+
+
+[lib]
+crate-type=["cdylib", "staticlib", "rlib"]

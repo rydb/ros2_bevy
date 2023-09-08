@@ -1,14 +1,15 @@
 use bevy::prelude::*;
 use bevy_mod_raycast::RaycastSystem;
-use crate::DefaultRaycastingPlugin;
+use bevy_mod_raycast::DefaultRaycastingPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_egui::EguiPlugin;
 use bevy::pbr::wireframe::WireframePlugin;
-use crate::editor::components::Selectable;
+use crate::components::*;
+use crate::transform_widget::plugins::TransformWidgetPlugin;
 
 use super::systems::*;
-use super::ui::*;
-use crate::editor::transform_widget::plugins::*;
+use crate::ui::*;
+//use editor_extras::transform_widget::plugins::*;
 /// plugin to click on stuff. Consolidates raycasts  into single plugin.
 pub struct SelecterPlugin;
 

@@ -1,5 +1,5 @@
 use bevy::prelude::*;
-use crate::NoCameraPlayerPlugin;
+use bevy_flycam::NoCameraPlayerPlugin;
 
 use super::systems::*;
 

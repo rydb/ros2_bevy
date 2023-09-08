@@ -1,11 +1,11 @@
 mod body;
 mod timers;
-mod mesh;
-mod editor;
+use mesh_extras;
+use editor_extras;
 mod urdf;
 mod serialization;
 mod worlds;
-mod camera;
+mod camera_extras;
 
 use bevy::prelude::*;
 
@@ -15,7 +15,7 @@ use bevy_mod_raycast::{
     DefaultRaycastingPlugin,
     RaycastSource,
 };
-use editor::plugins::EditorPlugin;
+use editor_extras::plugins::EditorPlugin;
 //use crate::body::cube::components::*;
 use crate::serialization::plugins::SerializationPlugin;
 fn main() {

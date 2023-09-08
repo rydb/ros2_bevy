@@ -1,12 +1,11 @@
 use bevy::prelude::*;
 use glam::Vec3;
 use bevy_mod_raycast::RaycastPluginState;
-use crate::editor::components::Selectable;
-use crate::RaycastSource;
+use editor_extras::components::*;
+use bevy_mod_raycast::RaycastSource;
 use std::f32::consts::PI;
-use crate::editor::components::*;
 use super::components::*;
-use crate::FlyCam;
+use bevy_flycam::FlyCam;
 
 /// follow behind entities marked for following
 pub fn follow_flagged (

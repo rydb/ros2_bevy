@@ -1,15 +1,14 @@
 
 use std::f32::consts::PI;
-use crate::RaycastSource;
+use bevy_mod_raycast::RaycastSource;
 
-use crate::editor::components::Selectable;
+use crate::components::*;
 use bevy::pbr::wireframe::Wireframe;
 use bevy_window::PrimaryWindow;
-use crate::editor::components::Selected;
 use bevy_mod_raycast::RaycastPluginState;
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::RigidBody;
-use bevy_flycam::prelude::*;
+//use bevy_flycam::prelude::*;
 
 use super::components::*;
 

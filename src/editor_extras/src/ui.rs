@@ -3,12 +3,9 @@ use bevy_window::PrimaryWindow;
 use bevy_egui::EguiContext;
 use egui::Align2;
 
-use crate::editor::components::*;
-use crate::RaycastSource;
-use crate::editor::components::Selectable;
-use crate::editor::components::Held;
-use crate::editor::ramp::*;
-
+use crate::components::*;
+use bevy_mod_raycast::RaycastSource;
+//use crate::extra_meshes::ramp::*;
 /// ui for build menu
 pub fn build_menu(
     //world: &mut World,
@@ -39,21 +36,21 @@ pub fn build_menu(
                 println!("click spot where to spawn prism");
                 //*selector_mode = SelectionMode::Clicking;
                 commands.entity(raycast_camera).insert(SelectionMode::Clicking);
-                commands.spawn(
-                    (
-                    PbrBundle {
-                        mesh: meshes.add(
-                            //Ramp{radius: 10.0, sides: 3}.into()
-                            Ramp{angle_of_incline: 45.0, height: 1.0, width: 1.0}.into()
-                        ),
-                        material: materials.add(Color::PINK.into()),
-                        transform: Transform::from_xyz(0.0, 0.0, 0.0),
-                        ..Default::default()
-                    },
-                    Held,
-                )
-                )
-                ;
+                // commands.spawn(
+                //     (
+                //     PbrBundle {
+                //         mesh: meshes.add(
+                //             //Ramp{radius: 10.0, sides: 3}.into()
+                //             Ramp{angle_of_incline: 45.0, height: 1.0, width: 1.0}.into()
+                //         ),
+                //         material: materials.add(Color::PINK.into()),
+                //         transform: Transform::from_xyz(0.0, 0.0, 0.0),
+                //         ..Default::default()
+                //     },
+                //     Held,
+                // )
+                // )
+                // ;
             };
             //ui.add(egui::Button::new("builder ray"));
             //ui.add()
