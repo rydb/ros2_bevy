@@ -22,5 +22,5 @@ egui = "0.22.0"
 #moonshine-save = { git = "https://github.com/Zeenobit/moonshine_save", rev="0ad1b69f966c344159c38c1033d458bf01c3c219"}
 #extra_meshes = {path = "../mesh_extras"}
 [lib]
-crate-type=["lib"]
+crate-type=["dylib"]
 #crate-type=["staticlib", "lib"]

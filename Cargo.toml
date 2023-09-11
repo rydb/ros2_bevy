@@ -8,7 +8,7 @@ edition = "2021"
 members = ["src/mesh_extras", "src/camera_extras", "src/editor_extras", "src/component_extras"]
 
 [dependencies]
-bevy = { version = "*"}#, features = ["dynamic_linking"]}
+bevy = { version = "*", features = ["dynamic_linking"]}
 rand = "0.8.5"
 bevy_mod_raycast = "0.13.1"
 bevy-inspector-egui = "0.19.0"

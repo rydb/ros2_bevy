@@ -4,16 +4,21 @@ use bevy::prelude::*;
 use mesh_extras::ramp::*;
 use camera_extras::plugins::DefaultCameraPlugin;
 use component_extras::components::*;
-
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
+//use editor_extras::plugins::EditorPlugin;
+use mesh_extras::systems::*;
 fn main() {
     App::new()
         .add_plugins(
             (
                 DefaultPlugins,
                 DefaultCameraPlugin,
+                WorldInspectorPlugin::new(),
+                //EditorPlugin, 
             )
         )
         .add_systems(Startup, spawn_world)
+        .add_systems(Update, (visualize_verticies, visualize_verticies_ui))
         .run();
 }
 

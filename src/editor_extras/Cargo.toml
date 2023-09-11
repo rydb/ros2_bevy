@@ -24,4 +24,4 @@ egui = "0.22.0"
 component_extras = {path = "../component_extras"}
 
 [lib]
-crate-type=["lib"]
+crate-type=["dylib"]

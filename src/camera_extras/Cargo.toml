@@ -12,4 +12,4 @@ editor_extras = {path = "../editor_extras"}
 component_extras = {path = "../component_extras"}
 
 [lib]
-crate-type=["lib"]
+crate-type=["dylib"]
