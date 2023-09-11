@@ -21,6 +21,7 @@ bevy_window = "0.11.0"
 egui = "0.22.0"
 #moonshine-save = { git = "https://github.com/Zeenobit/moonshine_save", rev="0ad1b69f966c344159c38c1033d458bf01c3c219"}
 #extra_meshes = {path = "../mesh_extras"}
+component_extras = {path = "../component_extras"}
 
 [lib]
-crate-type=["cdylib", "staticlib", "rlib"]
+crate-type=["lib"]

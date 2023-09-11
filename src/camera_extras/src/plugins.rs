@@ -12,7 +12,7 @@ impl Plugin for DefaultCameraPlugin {
         app
         .add_plugins(NoCameraPlayerPlugin)
         .add_systems(Startup, spawn_debug_cam)
-        //.add_systems(Update, (/*follow_flagged,*/ watch_flagged))
+        .add_systems(Update, (follow_flagged, watch_flagged))
         ;
     }
 }

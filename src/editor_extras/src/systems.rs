@@ -2,7 +2,7 @@
 use std::f32::consts::PI;
 use bevy_mod_raycast::RaycastSource;
 
-use crate::components::*;
+use component_extras::components::*;
 use bevy::pbr::wireframe::Wireframe;
 use bevy_window::PrimaryWindow;
 use bevy_mod_raycast::RaycastPluginState;

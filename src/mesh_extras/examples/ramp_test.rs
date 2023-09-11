@@ -2,8 +2,8 @@ use bevy::prelude::*;
 
 
 use mesh_extras::ramp::*;
-//use crate::camera_extras::{components::{Followed, Viewer}, plugins::DefaultCameraPlugin};
-
+use camera_extras::plugins::DefaultCameraPlugin;
+use component_extras::components::*;
 
 fn main() {
     App::new()
@@ -31,7 +31,8 @@ pub fn spawn_world (
                 }.into()),
                 ..default()
             },
-            Followed,
+            //Followed,
+            Watched,
             
         ),
     );

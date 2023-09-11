@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use super::{systems::*, gizmo_material::{GizmoMaterial, self}};
 use crate::components::*;
+use component_extras::components::*;
 //use crate::editor::systems::SelectedForEdit;
 //use gizmo_material::GizmoMaterial;
 /// plugin for managing transform widgets. Use this to spawn transform widgets to manipulate clicked models.

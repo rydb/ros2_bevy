@@ -1,9 +1,6 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
-use crate::camera_extras::components::Followed;
-use crate::camera_extras::components::Watched;
-use crate::editor_extras::components::MakeSelectableBundle;
-use crate::editor_extras::components::Selectable;
+use component_extras::components::*;
 use crate::serialization::components::*;
 //use crate::serialization::components::Serializable;
 /// spawns a cube.

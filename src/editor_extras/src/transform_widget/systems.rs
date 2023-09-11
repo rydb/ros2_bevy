@@ -6,7 +6,7 @@ use bevy_mod_raycast::RaycastSource;
 use bevy_window::PrimaryWindow;
 /// marker that states: WHICH transform widget entity has its transform based on. 
 use crate::transform_widget::components::*;
-
+use component_extras::components::*;
 
 // despawn transform widgets around things that have been de selected
 pub fn widget_despawn_for_deselected(

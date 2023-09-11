@@ -5,7 +5,7 @@ use bevy_rapier3d::prelude::RigidBody;
 use crate::body::robot::components::PhysicsBundle;
 use bevy::ecs::query::ReadOnlyWorldQuery;
 use super::components::Geometry;
-use crate::editor_extras::components::*;
+use component_extras::components::*;
 use crate::urdf::urdf_loader::BevyRobot;
 
 use moonshine_save::save::*;

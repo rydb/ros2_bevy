@@ -6,6 +6,8 @@ edition = "2021"
 [dependencies]
 bevy = { version = "*"}
 glam = "*"
+component_extras = { path = "../component_extras" }
+camera_extras = {path = "../camera_extras"}
 
 [lib]
-crate-type=["cdylib", "staticlib", "rlib"]
+crate-type=["lib"]

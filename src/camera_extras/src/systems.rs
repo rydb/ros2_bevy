@@ -1,11 +1,11 @@
 use bevy::prelude::*;
 use glam::Vec3;
 use bevy_mod_raycast::RaycastPluginState;
-use editor_extras::components::*;
 use bevy_mod_raycast::RaycastSource;
 use std::f32::consts::PI;
 use super::components::*;
 use bevy_flycam::FlyCam;
+use component_extras::components::*;
 
 /// follow behind entities marked for following
 pub fn follow_flagged (
@@ -73,7 +73,7 @@ Camera3dBundle {
         FlyCam,
         RaycastSource::<Selectable>::new(),
         SelectionMode::default(),
-        Viewer{offset: Vec3::new(20.0, 5.0, 0.0)},
+        Viewer{offset: Vec3::new(5.0, 5.0, 5.0)},
 
     )
     )

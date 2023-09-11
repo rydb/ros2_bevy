@@ -5,10 +5,10 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [workspace]
-members = ["src/mesh_extras", "src/camera_extras", "src/editor_extras"]
+members = ["src/mesh_extras", "src/camera_extras", "src/editor_extras", "src/component_extras"]
 
 [dependencies]
-bevy = { version = "*", features = ["dynamic_linking"]}
+bevy = { version = "*"}#, features = ["dynamic_linking"]}
 rand = "0.8.5"
 bevy_mod_raycast = "0.13.1"
 bevy-inspector-egui = "0.19.0"
@@ -27,6 +27,8 @@ egui = "0.22.0"
 moonshine-save = { git = "https://github.com/Zeenobit/moonshine_save", rev="0ad1b69f966c344159c38c1033d458bf01c3c219"}
 mesh_extras = {path = "src/mesh_extras"}
 camera_extras = {path = "src/camera_extras"}
+component_extras = {path = "src/component_extras"}
+editor_extras = {path = "src/editor_extras"}
 # [dependencies.bevy]
 # version = "0.11"
 # # Disable the default features if there are any that you do not want

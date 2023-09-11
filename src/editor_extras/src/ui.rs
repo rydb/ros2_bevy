@@ -3,7 +3,7 @@ use bevy_window::PrimaryWindow;
 use bevy_egui::EguiContext;
 use egui::Align2;
 
-use crate::components::*;
+use component_extras::components::*;
 use bevy_mod_raycast::RaycastSource;
 //use crate::extra_meshes::ramp::*;
 /// ui for build menu
