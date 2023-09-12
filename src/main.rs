@@ -6,6 +6,7 @@ mod urdf;
 mod serialization;
 mod worlds;
 use camera_extras;
+use ui_extras;
 
 use bevy::prelude::*;
 

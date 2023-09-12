@@ -19,15 +19,13 @@ impl Plugin for SelecterPlugin {
         .add_plugins(
             (
             DefaultRaycastingPlugin::<Selectable>::default(),
-            EguiPlugin,
-            TransformWidgetPlugin,
             WireframePlugin,
             )
         )
         .add_systems(
             First,update_raycast_with_cursor.before(RaycastSystem::BuildRays::<Selectable>)
         )
-        .add_systems(Update, (inspector_ui, build_menu, hover_mesh_at_mouse))
+        .add_systems(Update, ( hover_mesh_at_mouse, manage_selection_behaviour))
         ;
     }
 }
@@ -39,13 +37,16 @@ impl Plugin for EditorPlugin {
         app
         .add_plugins(
             (
+            TransformWidgetPlugin,
             SelecterPlugin,
-            WorldInspectorPlugin::new(), // menu that displays active entities
+            WorldInspectorPlugin::new(),
+            //EguiPlugin,
+            // menu that displays active entities
             )
         )
         //.add_systems(RaycastSystem::BuildRays::<RigidBody>, update_raycast_with_cursor)
         //.add_systems(Startup, spawn_debug_cam)
-        .add_systems(Update, manage_selection_behaviour)
+        .add_systems(Update, (inspector_ui, build_menu))
         ;
     }
 }

@@ -1,9 +1,12 @@
-use bevy::prelude::*;
+use std::collections::HashMap;
+
+use bevy::{prelude::*};
 use bevy_window::PrimaryWindow;
 use bevy_egui::EguiContext;
-use egui::Align2;
 use bevy::render::mesh::VertexAttributeValues::*;
+use component_extras::components::*;
 use crate::components::Visualized;
+use bevy::window::*;
 
 /// ui for displaying vertex stuff in ui
 pub fn visualize_verticies (
@@ -18,14 +21,21 @@ pub fn visualize_verticies (
             for mesh_attr_type in mesh.attribute(Mesh::ATTRIBUTE_POSITION) {
                 match mesh_attr_type {
                     Float32x3(vertex_list) => {
+                        let mut spawned_vertexes = Vec::new();
                         for vertex in vertex_list {
-                            commands.spawn(PbrBundle {
-                                mesh: tug_cube_mesh.clone(),
-                                material: materials.add(Color::ORANGE.into()),
-                                transform: Transform::from_xyz(vertex[0], vertex[1], vertex[2]),
-                                ..default()
-                            })
-                            .insert(Visualized);
+                            if spawned_vertexes.contains(vertex) != true  {
+                                spawned_vertexes.push(*vertex);
+                                commands.spawn(PbrBundle {
+                                    mesh: tug_cube_mesh.clone(),
+                                    material: materials.add(Color::ORANGE.into()),
+                                    transform: Transform::from_xyz(vertex[0], vertex[1], vertex[2]),
+                                    ..default()
+                                })
+                                .insert(Visualized)
+                                .insert(MakeSelectableBundle::default())
+                                ;
+                            }
+
                         }
 
                     }
@@ -83,3 +93,25 @@ pub fn visualize_verticies_ui (
     });
 
 }
+
+// pub fn second_window_test (
+//     mut commands: Commands,
+//     selected_querry: Query<&Transform, &Selected>
+// ) {
+//     commands.spawn(
+//         (
+//             Window {
+//                 title: "example_window".to_owned(),
+//                 resolution: WindowResolution::new(800.0, 600.0),
+//                 present_mode: PresentMode::AutoVsync,
+//                 ..default()
+//             }
+//         )
+//     );
+// }
+
+// pub fn visualize_components<T> (
+//     components_to_visualize: 
+// ) {
+
+// }

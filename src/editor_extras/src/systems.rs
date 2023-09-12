@@ -184,14 +184,17 @@ pub fn manage_selection_behaviour(
     //println!("number of raycast sources is {:#?}", raycast_sources.iter().len());
     if buttons.just_pressed(MouseButton::Left) {
         // pick nearest rigid body that camera with selector ray picks.
+        //println!("checking for mesh intersection");
         for (raycast_source, selector_mode) in raycast_sources.iter() {/*raycast_sources.iter().flat_map(|m| m.get_nearest_intersection()) {*/
+            //println!("mesh intersection found");
             if let Some((e, ..)) = raycast_source.get_nearest_intersection() {
-                println!("clicked on valid mesh!");
+                //println!("clicked on valid mesh!");
                 match *selector_mode {
                     SelectionMode::Selecting => {
                         // don't select unselectable meshes
                         if let Ok(..) = selectable_meshes.get(e) {
                             if let Ok(..) = selected_meshes.get(e){
+                                println!("selected: {:#?}", e);
                                 commands.entity(e)
                                 .remove::<Selected>()
                                 .remove::<Wireframe>()

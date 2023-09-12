@@ -29,6 +29,7 @@ mesh_extras = {path = "src/mesh_extras"}
 camera_extras = {path = "src/camera_extras"}
 component_extras = {path = "src/component_extras"}
 editor_extras = {path = "src/editor_extras"}
+ui_extras = {path = "src/ui_extras"}
 # [dependencies.bevy]
 # version = "0.11"
 # # Disable the default features if there are any that you do not want

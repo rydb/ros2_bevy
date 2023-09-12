@@ -1,10 +1,11 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, pbr::wireframe::{Wireframe, WireframePlugin}};
 
 
 use mesh_extras::ramp::*;
 use camera_extras::plugins::DefaultCameraPlugin;
 use component_extras::components::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use editor_extras::plugins::{EditorPlugin, SelecterPlugin};
 //use editor_extras::plugins::EditorPlugin;
 use mesh_extras::systems::*;
 fn main() {
@@ -14,10 +15,12 @@ fn main() {
                 DefaultPlugins,
                 DefaultCameraPlugin,
                 WorldInspectorPlugin::new(),
+                SelecterPlugin,
+                //WireframePlugin,
                 //EditorPlugin, 
             )
         )
-        .add_systems(Startup, spawn_world)
+        .add_systems(Startup, spawn_world/*, second_window_test*/)
         .add_systems(Update, (visualize_verticies, visualize_verticies_ui))
         .run();
 }
@@ -38,6 +41,7 @@ pub fn spawn_world (
             },
             //Followed,
             Watched,
+            Wireframe,
             
         ),
     );
