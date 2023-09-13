@@ -6,6 +6,7 @@ use camera_extras::plugins::DefaultCameraPlugin;
 use component_extras::components::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use editor_extras::plugins::{EditorPlugin, SelecterPlugin};
+use ui_extras::systems::*;
 //use editor_extras::plugins::EditorPlugin;
 use mesh_extras::systems::*;
 fn main() {
@@ -22,6 +23,7 @@ fn main() {
         )
         .add_systems(Startup, spawn_world/*, second_window_test*/)
         .add_systems(Update, (visualize_verticies, visualize_verticies_ui))
+        .add_systems(Update,  visualize_window_for::<Selected>)
         .run();
 }
 
