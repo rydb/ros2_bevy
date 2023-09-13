@@ -16,20 +16,24 @@ pub fn follow_flagged (
 ) {
     let mut cord_total = Vec3::new(0.0,0.0,0.0);
 
-    for e in to_watch_querry.iter() {
-        if let Ok(trans) = transform_querry.get(e) {
-            cord_total += trans.translation;
+    if to_watch_querry.iter().len() > 0 {
+        for e in to_watch_querry.iter() {
+            if let Ok(trans) = transform_querry.get(e) {
+                cord_total += trans.translation;
+            }
+        }
+        for (e, viewer) in viewer_querry.iter() {
+            if let Ok(mut trans) = transform_querry.get_mut(e) {
+                //println!("following {:#?}", e);
+                //println!("new trans for FOLLOW is {:#}", new_trans.translation);
+                trans.translation = cord_total + viewer.offset;
+                //println!("following all followed entities at: {:#?}", new_trans.translation);
+                //commands.entity(e).insert(new_trans);
+            }
+    
         }
     }
-    for (e, viewer) in viewer_querry.iter() {
-        if let Ok(mut trans) = transform_querry.get_mut(e) {
-            //println!("new trans for FOLLOW is {:#}", new_trans.translation);
-            trans.translation = cord_total + viewer.offset;
-            //println!("following all followed entities at: {:#?}", new_trans.translation);
-            //commands.entity(e).insert(new_trans);
-        }
 
-    }
 }
 
 /// rotates camera to watch entities marked for watching
