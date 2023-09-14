@@ -12,6 +12,7 @@ bevy-inspector-egui = "0.19.0"
 egui = "0.22.0"
 bevy_egui = "*"
 bevy_window = "*"
+
 editor_extras = {path = "../editor_extras"}
 ui_extras = {path = "../ui_extras"}
 [lib]

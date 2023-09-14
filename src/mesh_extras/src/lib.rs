@@ -1,6 +1,6 @@
 pub mod ramp;
-mod components;
-mod quad;
+pub mod components;
+pub mod quad;
 pub mod systems;
 
 pub mod prelude {

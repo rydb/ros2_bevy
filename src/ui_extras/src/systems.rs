@@ -18,7 +18,7 @@ pub fn visualize_sidepanel_for<T: Component>(
     let menu_name = std::any::type_name::<T>();
     
     // // ui
-    egui::SidePanel::new(egui::panel::Side::Right,menu_name)
+    egui::SidePanel::new(egui::panel::Side::Left,menu_name)
     .show(egui_context.get_mut(), |ui| {
         egui::ScrollArea::vertical().show(ui, |ui| {
             ui.heading(menu_name);
