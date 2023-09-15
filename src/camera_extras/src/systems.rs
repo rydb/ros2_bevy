@@ -71,7 +71,7 @@ pub fn spawn_debug_cam(mut commands:Commands) {
     commands.spawn(
         (
 Camera3dBundle {
-            transform: Transform::from_xyz(20.0, 4.0, 20.0).with_rotation(Quat::from_rotation_y(PI / 2.5)),
+            transform: Transform::from_xyz(5.0, 4.0, 5.0).with_rotation(Quat::from_rotation_y(PI / 2.5)),
             ..default()
         },
         FlyCam,

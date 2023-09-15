@@ -45,20 +45,22 @@ pub fn quads_to_uvs(quads: &Vec<Quad>) -> Vec<[f32; 2]> {
 }
 
 
-pub fn quads_to_normals(quads: &Vec<Quad>) -> Vec<[f32; 3]> {
+// pub fn quads_to_normals(quads: &Vec<Quad>) -> Vec<[f32; 3]> {
 
-    let mut normals_list = Vec::new();
+//     let mut normals_list = Vec::new();
 
-    for quad in quads.iter() {
-        normals_list.push(Vec3::normalize(Vec3::from(quad.a)).into());
-        normals_list.push(Vec3::normalize(Vec3::from(quad.b)).into());
-        normals_list.push(Vec3::normalize(Vec3::from(quad.c)).into());
-        normals_list.push(Vec3::normalize(Vec3::from(quad.d)).into());
+//     for quad in quads.iter() {
+//         normals_list.push(Vec3::normalize(Vec3::from(quad.a)).into());
+//         normals_list.push(Vec3::normalize(Vec3::from(quad.b)).into());
+//         normals_list.push(Vec3::normalize(Vec3::from(quad.c)).into());
+//         normals_list.push(Vec3::normalize(Vec3::from(quad.d)).into());
 
-    }     
-    println!("normal count is {:#?}", normals_list.len());
-    return normals_list
-} 
+//     }     
+//     println!("normal count is {:#?}", normals_list.len());
+//     return normals_list
+// } 
+
+
 
 /// take a quad, and get indicies so bevy can turn it into triangles
 pub fn quads_to_indices(quads: &Vec<Quad>) -> Indices {
@@ -189,15 +191,17 @@ impl From<Box> for Mesh {
         ];
 
         let positions: Vec<_> = quads_to_vertexes(&faces);//vertices.iter().map(|(p, _, _)| *p).collect();
-        let normals: Vec<_> = quads_to_normals(&faces);
+        //let normals: Vec<_> = quads_to_normals(&faces);
         let uvs: Vec<_> = quads_to_uvs(&faces);
         let indices = quads_to_indices(&faces);
 
         let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
         mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, positions);
-        mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
+        
+        //mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
         mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
         mesh.set_indices(Some(indices));
+        //compute_normals_for_mesh(&mut mesh);
         mesh
     }
 }

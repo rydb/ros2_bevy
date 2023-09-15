@@ -33,6 +33,7 @@ fn main() {
 pub fn spawn_world (
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     commands.spawn(
         (
@@ -42,6 +43,7 @@ pub fn spawn_world (
                     height: 1.0,
                     width: 1.0
                 }.into()),
+                material: materials.add(Color::GREEN.into()),
                 ..default()
             },
             //Followed,

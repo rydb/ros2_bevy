@@ -47,6 +47,60 @@ pub fn select_specific_face (
     }
 }
 
+/// get the normals of all non-tugs, and display their directions
+pub fn display_normal_directions(
+    commands: Commands,
+    meshes: Res<Assets<Mesh>>,
+    meshes_to_visualize: Query<(Entity, &Handle<Mesh>), Without<MeshPull>>,
+    mut gizmos: Gizmos
+) {
+    for (e, mesh_handle) in meshes_to_visualize.iter() {
+        if let Some(mesh) = meshes.get(mesh_handle) {
+            if let Some(mesh_attr_type) = mesh.attribute(Mesh::ATTRIBUTE_POSITION) {
+                match mesh_attr_type {
+                    Float32x3(vertex_list) => {
+
+                        //let mut triangle = [Vec3::ZERO, Vec3::ZERO, Vec3::ZERO];
+                        //let triangle = default_triangle.iter().cycle();
+        
+                        //let mut i = [0, 1, 2].into_iter().cycle();
+                        for (u, vertex) in vertex_list.iter().enumerate() {
+
+                            if let Some(mesh_normals_attr_type) = mesh.attribute(Mesh::ATTRIBUTE_NORMAL) {
+                                match mesh_normals_attr_type {
+                                    Float32x3(normal_list) => {
+                                        let norm_x = normal_list[u][0];
+                                        let norm_y = normal_list[u][1];
+                                        let norm_z = normal_list[u][2];
+
+                                        let norm_project_distance = Vec3::new(norm_x, norm_y, norm_z) * 10.0;
+                                        gizmos.ray((*vertex).into(), norm_project_distance, Color::GREEN)
+                                    }
+                                    _ => panic!("{:#?}, is not a supported mesh attr type.", mesh_attr_type)
+                                }
+
+                            }
+
+
+                            // let vertex_i = i.next().unwrap();
+                            // triangle[vertex_i] = (*vertex).into();
+                            
+                            // if vertex_i == 0 {
+                            //     // get middle of triangle, and shoot gizmo 
+                            //     let middle = triangle.iter().sum() / 3.0;
+
+
+                            // }
+                        }
+                    }
+                    _ => panic!("{:#?}, is not a supported mesh attr type.", mesh_attr_type)
+                    
+                }
+            }
+        }
+    }
+}
+
 
 /// ui for displaying vertex stuff in ui
 pub fn visualize_verticies (
@@ -67,6 +121,7 @@ pub fn visualize_verticies (
                         for (i, vertex) in vertex_list.iter().enumerate() {
                             //println!("vertex color is {:#?}", vertex_colors.next().unwrap());
                             //if spawned_vertexes.contains(vertex) != true  {
+                                println!("spawned vertex is at {:#?}", vertex);
                                 spawned_vertexes.push(*vertex);
                                 commands.spawn(PbrBundle {
                                     mesh: tug_cube_mesh.clone(),
@@ -82,7 +137,7 @@ pub fn visualize_verticies (
                             //}
                             println!("current index of vertex pos iterator is {:#?}", i);
                         }
-                        //println!("vertex count is {:#?}", vertex_list.len())
+                        println!("vertex count is {:#?}", vertex_list.len())
 
                     }
                     _ => panic!("{:#?}, is not a support mesh attr type for spawning visualizaton tugs.", mesh_attr_type)
